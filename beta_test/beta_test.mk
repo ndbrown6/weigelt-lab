@@ -15,7 +15,7 @@ $(foreach sample,$(SAMPLES),\
 		$(eval $(call beta-test,$(sample))))
 
 ..DUMMY := $(shell mkdir -p version; \
-	     ~/share/env/weigelt-lab/bin/R --version >> version/beta_test.txt;)
+	     ~/share/env/weigelt-lab-0.0.1/bin/R --version >> version/beta_test.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: beta_test
