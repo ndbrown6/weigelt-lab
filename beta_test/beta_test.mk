@@ -12,7 +12,7 @@ beta_test/$1.txt :
 
 endef
 $(foreach sample,$(SAMPLES),\
-		$(eval $(call bam-to-fastq,$(sample))))
+		$(eval $(call beta-test,$(sample))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	     ~/share/env/weigelt-lab/bin/R --version >> version/beta_test.txt;)
