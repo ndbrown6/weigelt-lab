@@ -5,8 +5,8 @@ LOGDIR ?= log/align_impact_fastq.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam)
-#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz)
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
@@ -15,7 +15,7 @@ bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
-#	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+#	 $(foreach sample,$(SAMPLES),bam/$(sample).bam)
 #	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
 #	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
 #	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
@@ -46,117 +46,117 @@ BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-	$$(call RUN,-c -n 1 -s 0.5G -m 1G,"set -o pipefail && \
-					   zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -N $1_R1_fastq_gz,"set -o pipefail && \
+							     zcat $$(^) | gzip -c > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-	$$(call RUN,-c -n 1 -s 0.5G -m 1G,"set -o pipefail && \
-					   zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -N $1_R2_fastq_gz,"set -o pipefail && \
+							     zcat $$(^) | gzip -c > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
 		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
 		
 define fastq-2-bam
 bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
-	$$(call RUN,-c -n 1 -s 4G -m 8G,"set -o pipefail && \
-					 $$(FASTQ_TO_SAM) \
-					 FASTQ=bwamem/$1/$1_R1.fastq.gz \
-					 FASTQ2=bwamem/$1/$1_R2.fastq.gz \
-					 OUTPUT=$$(@) \
-					 SM=$1 \
-					 LB=$1 \
-					 PU=NA \
-					 PL=illumina")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -N $1_aln_bam,"set -o pipefail && \
+						       $$(FASTQ_TO_SAM) \
+						       FASTQ=bwamem/$1/$1_R1.fastq.gz \
+						       FASTQ2=bwamem/$1/$1_R2.fastq.gz \
+						       OUTPUT=$$(@) \
+						       SM=$1 \
+						       LB=$1 \
+						       PU=NA \
+						       PL=illumina")
 									       
 bwamem/$1/$1_cl.fastq.gz : bwamem/$1/$1_aln.bam
-	$$(call RUN,-c -n 1 -s 4G -m 8G,"set -o pipefail && \
-					 $$(MARK_ADAPTERS) \
-					 INPUT=$$(<) \
-					 OUTPUT=/dev/stdout \
-					 METRICS=bwamem/$1/$1_adapter-metrics.txt | \
-					 $$(SAM_TO_FASTQ) \
-					 INPUT=/dev/stdin \
-					 FASTQ=$$(@) \
-					 INTERLEAVE=true \
-					 CLIPPING_ATTRIBUTE=XT \
-					 CLIPPING_ACTION=X \
-					 CLIPPING_MIN_LENGTH=25")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -N $1_cl_fastq_gz,"set -o pipefail && \
+							   $$(MARK_ADAPTERS) \
+							   INPUT=$$(<) \
+							   OUTPUT=/dev/stdout \
+							   METRICS=bwamem/$1/$1_adapter-metrics.txt | \
+							   $$(SAM_TO_FASTQ) \
+							   INPUT=/dev/stdin \
+							   FASTQ=$$(@) \
+							   INTERLEAVE=true \
+							   CLIPPING_ATTRIBUTE=XT \
+							   CLIPPING_ACTION=X \
+							   CLIPPING_MIN_LENGTH=25")
 									       
 bwamem/$1/$1_cl_aln.bam : bwamem/$1/$1_cl.fastq.gz
-	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 1G -m $(BWAMEM_MEM_PER_THREAD),"set -o pipefail && \
-									       $$(BWA) mem -p -M \
-									       -R \"@RG\tID:$1\tLB:$1\tPL:illumina\tSM:$1\" \
-									       -t $$(BWAMEM_THREADS) $$(REF_FASTA) $$(<) | \
-									       $$(SAMTOOLS) view -bhS - > $$(@)")
+	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 1G -m $(BWAMEM_MEM_PER_THREAD) -N $1_cl_aln_bam,"set -o pipefail && \
+												$$(BWA) mem -p -M \
+												-R \"@RG\tID:$1\tLB:$1\tPL:illumina\tSM:$1\" \
+												-t $$(BWAMEM_THREADS) $$(REF_FASTA) $$(<) | \
+												$$(SAMTOOLS) view -bhS - > $$(@)")
 
 bwamem/$1/$1_cl_aln_srt.bam : bwamem/$1/$1_cl_aln.bam
-	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD),"set -o pipefail && \
-									       $$(SAMTOOLS) sort $$(<) -o $$(@) && \
-									       $$(SAMTOOLS) index $$(@) && \
-									       cp bwamem/$1/$1_cl_aln_srt.bam.bai bwamem/$1/$1_cl_aln_srt.bai")
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -N $1_cl_aln_srt_bam,"set -o pipefail && \
+												    $$(SAMTOOLS) sort $$(<) -o $$(@) && \
+												    $$(SAMTOOLS) index $$(@) && \
+												    cp bwamem/$1/$1_cl_aln_srt.bam.bai bwamem/$1/$1_cl_aln_srt.bai")
 
 bwamem/$1/$1_cl_aln_srt.intervals : bwamem/$1/$1_cl_aln_srt.bam
-	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV),"set -o pipefail && \
-										      $$(call GATK_CMD,8G) \
-										      -T RealignerTargetCreator \
-										      -I $$(^) \
-										      -nt $$(GATK_THREADS) \
-										      -R $$(REF_FASTA) \
-										      -o $$(@) \
-										      -known $$(KNOWN_INDELS)")
+	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -N $1_cl_aln_srt_intervals,"set -o pipefail && \
+														 $$(call GATK_CMD,8G) \
+														 -T RealignerTargetCreator \
+														 -I $$(^) \
+														 -nt $$(GATK_THREADS) \
+														 -R $$(REF_FASTA) \
+														 -o $$(@) \
+														 -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR.bam : bwamem/$1/$1_cl_aln_srt.bam bwamem/$1/$1_cl_aln_srt.intervals
-	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV),"set -o pipefail && \
-										      $$(call GATK_CMD,8G) \
-										      -T IndelRealigner \
-										      -I $$(<) \
-										      -R $$(REF_FASTA) \
-										      -targetIntervals $$(<<) \
-										      -o $$(@) \
-										      -known $$(KNOWN_INDELS)")
+	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -N $1_cl_aln_srt_IR_bam,"set -o pipefail && \
+													      $$(call GATK_CMD,8G) \
+													      -T IndelRealigner \
+													      -I $$(<) \
+													      -R $$(REF_FASTA) \
+													      -targetIntervals $$(<<) \
+													      -o $$(@) \
+													      -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
-	$$(call RUN,-c -n 1 -s 8G -m 16G,"set -o pipefail && \
-					  $$(FIX_MATE) \
-					  INPUT=$$(<) \
-					  OUTPUT=$$(@) \
-					  SORT_ORDER=coordinate \
-					  COMPRESSION_LEVEL=0 \
-					  CREATE_INDEX=true")
+	$$(call RUN,-c -n 1 -s 8G -m 16G -N $1_cl_aln_srt_IR_FX_bam,"set -o pipefail && \
+								     $$(FIX_MATE) \
+								     INPUT=$$(<) \
+								     OUTPUT=$$(@) \
+								     SORT_ORDER=coordinate \
+								     COMPRESSION_LEVEL=0 \
+								     CREATE_INDEX=true")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
-	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV),"set -o pipefail && \
-										      $$(call GATK_CMD,8G) \
-										      -T BaseRecalibrator \
-										      -R $$(REF_FASTA) \
-										      -knownSites $$(DBSNP) \
-										      -I $$(<) \
-										      -o $$(@)")
+	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -N $1_cl_aln_srt_IR_FX_grp,"set -o pipefail && \
+														 $$(call GATK_CMD,8G) \
+														 -T BaseRecalibrator \
+														 -R $$(REF_FASTA) \
+														 -knownSites $$(DBSNP) \
+														 -I $$(<) \
+														 -o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam : bwamem/$1/$1_cl_aln_srt_IR_FX.bam bwamem/$1/$1_cl_aln_srt_IR_FX.grp
-	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV),"set -o pipefail && \
-										      $$(call GATK_CMD,8G) \
-										      -T PrintReads \
-										      -R $$(REF_FASTA) \
-										      -I $$(<) \
-										      -BQSR $$(<<) \
-										      -o $$(@)")
+	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -N $1_cl_aln_srt_IR_FX_BR_bam,"set -o pipefail && \
+														    $$(call GATK_CMD,8G) \
+														    -T PrintReads \
+														    -R $$(REF_FASTA) \
+														    -I $$(<) \
+														    -BQSR $$(<<) \
+														    -o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR_MD.bam : bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam
-	$$(call RUN, -c -n 12 -s 4G -m 6G -v $(SAMBAMBA_ENV) -w 72:00:00,"set -o pipefail && \
-									  $$(SAMBAMBA) \
-									  markdup \
-									  -t 12 \
-									  -l 9 \
-									  --tmpdir $$(TMPDIR) \
-									  $$(<) \
-									  $$(@)")
+	$$(call RUN, -c -n 12 -s 4G -m 6G -v $(SAMBAMBA_ENV) -N $1_cl_aln_srt_IR_FX_BR_MD_bam,"set -o pipefail && \
+											       $$(SAMBAMBA) \
+											       markdup \
+											       -t 12 \
+											       -l 9 \
+											       --tmpdir $$(TMPDIR) \
+											       $$(<) \
+											       $$(@)")
 
 bam/$1.bam : bwamem/$1/$1_cl_aln_srt_IR_FX_BR_MD.bam
-	$$(call RUN, -c -n 1 -s 1G -m 2G,"set -o pipefail && \
-					  cp $$(<) $$(@) && \
-					  cp $$(<).bai $$(@).bai && \
-					  cp $$(<).bai bam/$1.bai")
+	$$(call RUN, -c -n 1 -s 1G -m 2G -N $1_bam,"set -o pipefail && \
+						    cp $$(<) $$(@) && \
+						    cp $$(<).bai $$(@).bai && \
+						    cp $$(<).bai bam/$1.bai")
 
 endef
 $(foreach sample,$(SAMPLES),\
