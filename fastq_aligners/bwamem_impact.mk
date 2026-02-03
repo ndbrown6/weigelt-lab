@@ -22,15 +22,17 @@ bwa_mem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	  $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
 	  $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
 	  $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
+	  $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
 	  $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
 	  summary/idx_metrics.txt \
 	  summary/aln_metrics.txt \
 	  summary/insert_metrics.txt \
 	  summary/oxog_metrics.txt \
 	  summary/gc_metrics.txt \
+	  summary/hs_metrics.txt \
 	  summary/duplicate_metrics.txt
+	  
 	    
-
 BWAMEM_THREADS = 4
 BWAMEM_MEM_PER_THREAD = 1G
 
@@ -43,11 +45,11 @@ GATK_MEM_THREAD = 2G
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
 	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-								       $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
 	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-								       $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
 		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
@@ -159,8 +161,6 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call fastq-2-bam,$(sample))))
 		
 
-						
-
 define picard-metrics
 metrics/$1.idx_stats.txt : bam/$1.bam
 	$$(call RUN, -c -n 1 -s 12G -m 24G -w 24:00:00,"set -o pipefail && \
@@ -198,13 +198,21 @@ metrics/$1.gc_metrics_summary.txt : bam/$1.bam
 							CHART_OUTPUT=metrics/$1.gc_metrics.pdf \
 							REFERENCE_SEQUENCE=$$(REF_FASTA) \
 							SUMMARY_OUTPUT=$$(@)")
-					   
+metrics/$1.hs_metrics.txt : bam/$1.bam
+	$$(call RUN, -c -n 1 -s 12G -m 24G -w 24:00:00,"set -o pipefail && \
+							$$(COLLECT_HS_METRICS) \
+							REFERENCE_SEQUENCE=$$(REF_FASTA) \
+							INPUT=$$(<) \
+							OUTPUT=$$(@) \
+							BAIT_INTERVALS=$$(BAITS_LIST) \
+							TARGET_INTERVALS=$$(TARGETS_LIST)")
+							
 metrics/$1.duplicate_metrics.txt : bam/$1.bam
 	$$(call RUN, -c -n 1 -s 12G -m 24G -w 24:00:00,"set -o pipefail && \
 							$$(COLLECT_DUP_METRICS) \
 							INPUT=$$(<) \
 							METRICS_FILE=$$(@)")
-
+							
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call picard-metrics,$(sample))))
@@ -228,6 +236,10 @@ summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_me
 summary/gc_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt)
 	$(call RUN, -c -n 1 -s 8G -m 12G,"set -o pipefail && \
 					  $(RSCRIPT) $(SCRIPTS_DIR)/summary/bwa_parallel.R --option 5 --sample_names '$(SAMPLES)'")
+					  
+summary/hs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt)
+	$(call RUN, -c -n 1 -s 8G -m 12G,"set -o pipefail && \
+					  $(RSCRIPT) $(SCRIPTS_DIR)/summary/bwa_parallel.R --option 6 --sample_names '$(SAMPLES)'")
 					  
 summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt)
 	$(call RUN, -c -n 1 -s 8G -m 12G,"set -o pipefail && \
