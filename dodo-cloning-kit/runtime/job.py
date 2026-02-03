@@ -252,7 +252,7 @@ class SlurmJob(ClusterJob):
         self.retval = None
 
     def run_job(self):
-        """ sbatch job and spawn srun --wait to monitor it
+        """ sbatch job and spawn scontrol to monitor it
         """
         self.job_script_file = tempfile.NamedTemporaryFile(mode='w',
                                                            suffix='.sh',
@@ -261,34 +261,65 @@ class SlurmJob(ClusterJob):
         self.job_script_file.close()
         os.chmod(self.job_script_file.name, 0o555)
 
-        # Submit the job with sbatch
-        cmd = "sbatch {args} {script}".format(args=self.sbatch_args, script=self.job_script_file.name)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = proc.communicate()
+        # Submit the job with sbatch and use --wait to block until completion
+        cmd = "sbatch --wait {args} {script}".format(args=self.sbatch_args, script=self.job_script_file.name)
+        self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         
-        if proc.returncode != 0:
-            raise Exception('unable to sbatch job: {}. Error: {}'.format(cmd, stderr))
-        
-        # Parse job ID from sbatch output (format: "Submitted batch job 12345")
-        match = re.search(r'Submitted batch job (\d+)', stdout.decode())
-        if not match:
-            raise Exception('unable to parse job ID from sbatch output: {}'.format(stdout))
-        
-        self.job_id = match.group(1)
-        
-        # Use srun --wait to monitor the job (blocks until job completes)
-        wait_cmd = "srun --jobid={} --wait=0 true".format(self.job_id)
-        self.process = subprocess.Popen(wait_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        # Read the job ID from stdout immediately (sbatch prints it before blocking)
+        stdout_line = self.process.stdout.readline().decode()
+        match = re.search(r'Submitted batch job (\d+)', stdout_line)
+        if match:
+            self.job_id = match.group(1)
+        else:
+            # If we can't get the job ID, still continue
+            self.job_id = None
 
     def wait(self):
-        """Wait for job to complete using srun --wait"""
+        """Wait for job to complete. sbatch --wait will block until job finishes."""
         if self._kill_now:
             sys.stderr.write("registering job for deletion\n")
-            subprocess.Popen("scancel {}".format(self.job_id), shell=True)
+            if self.job_id:
+                subprocess.Popen("scancel {}".format(self.job_id), shell=True)
             self.retval = 1
             return self.retval
+        
+        # Wait for sbatch --wait to complete
+        sbatch_retcode = self.process.wait()
+        
+        # Get the actual job exit status using sacct if we have a job ID
+        if self.job_id:
+            try:
+                # Wait a moment for job accounting to be updated
+                time.sleep(2)
+                # sacct format: JobID|State|ExitCode
+                sacct_cmd = "sacct -j {} -n -P -o JobID,State,ExitCode".format(self.job_id)
+                sacct_output = subprocess.check_output(sacct_cmd, shell=True, stderr=DEVNULL).decode()
+                
+                # Parse sacct output - look for the main job (not .batch or .extern)
+                for line in sacct_output.strip().split('\n'):
+                    fields = line.split('|')
+                    if len(fields) >= 3:
+                        job_id_field = fields[0]
+                        # Skip .batch and .extern job steps, look for the main job ID
+                        if job_id_field == self.job_id:
+                            state = fields[1]
+                            exit_code = fields[2]
+                            # ExitCode format is typically "0:0" where first number is exit code
+                            if ':' in exit_code:
+                                self.retval = int(exit_code.split(':')[0])
+                            else:
+                                self.retval = int(exit_code) if exit_code.isdigit() else sbatch_retcode
+                            break
+                else:
+                    # If we couldn't parse sacct output, fall back to sbatch return code
+                    self.retval = sbatch_retcode
+            except:
+                # If sacct fails, use sbatch return code
+                self.retval = sbatch_retcode
+        else:
+            # No job ID, use sbatch return code
+            self.retval = sbatch_retcode
             
-        self.retval = self.process.wait()
         return self.retval
 
     def is_finished(self):
