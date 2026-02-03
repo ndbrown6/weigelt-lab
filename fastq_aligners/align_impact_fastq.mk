@@ -47,11 +47,11 @@ BAITS_LIST := $(BAITS_FILE:.bed=.list)
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
 	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 6:00:00,"set -o pipefail && \
-						      $$(ZCAT) $$(^) | $$(GZIP) -c > $$(@)")
+						      zcat $$(^) | gzip -c > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
 	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 6:00:00,"set -o pipefail && \
-						      $$(ZCAT) $$(^) | $$(GZIP) -c > $$(@)")
+						      zcat $$(^) | gzip -c > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
 		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
