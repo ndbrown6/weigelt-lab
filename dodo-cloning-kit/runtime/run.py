@@ -78,12 +78,17 @@ if __name__ == '__main__':
         job_script = "#!{shell}\n{script}".format(shell=args.shell, script=job_script)
 
     job_name = None
+    max_job_name_len = 64  # Safe limit for most Slurm installations
     if args.job_name is not None and args.project_name is not None:
         job_name = "{}_{}".format(args.project_name, args.job_name)
     elif args.job_name is not None:
         job_name = args.job_name
     elif args.project_name is not None and args.out_file is not None:
         job_name = "{}_{}".format(args.project_name, os.path.basename(args.out_file))
+
+    # Truncate job name if it exceeds the maximum length
+    if job_name is not None and len(job_name) > max_job_name_len:
+        job_name = job_name[:max_job_name_len]
 
     if args.local or (args.internet and args.cluster_engine != 'lsf'):
         my_job = job.LocalJob(job_script=job_script, out_file=args.out_file, log_file=args.log_file, shell=args.shell)
