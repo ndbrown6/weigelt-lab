@@ -46,11 +46,11 @@ BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
 								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
 								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
