@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--check', default=False, action='store_true', help='check for non-zero file size')
     parser.add_argument('-d', '--docker', default=False, action='store_true', help='request docker support')
     parser.add_argument('-I', '--internet', default=False, action='store_true', help='request internet access')
-    parser.add_argument('-g', '--cluster_engine', default='slurm', help='cluster engine (sge, lsf, pbs, or slurm supported)')
+    parser.add_argument('-g', '--cluster_engine', default='sge', help='cluster engine (sge, lsf, pbs, or slurm supported)')
     parser.add_argument('-l', '--local', default=False, action='store_true', help='run job locally')
     parser.add_argument('-o', '--out_file', default=None, help='output file to check')
     parser.add_argument('-p', '--project_name', default=None, help='project name')
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     elif cluster_engine == 'slurm':
         sbatch_args = "-D {pwd}".format(pwd=os.getcwd())
         if job_name is not None:
-            sbatch_args += " --job-name={}".format(job_name)
+            sbatch_args += ' --job-name="{}"'.format(job_name)
         if args.log_file is not None:
             sbatch_args += " --output={}".format(args.log_file)
         if args.num_cores > 1:
@@ -161,4 +161,11 @@ if __name__ == '__main__':
             exit_status += 66
     else:
         exit_status = 1
+        # Clean up failed output file so make doesn't think target is done
+        if args.out_file is not None and os.path.exists(args.out_file):
+            try:
+                os.remove(args.out_file)
+                sys.stderr.write("Removed failed output file: {}\n".format(args.out_file))
+            except:
+                pass
     sys.exit(exit_status)
