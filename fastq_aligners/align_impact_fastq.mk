@@ -1,6 +1,5 @@
 include weigelt-lab/Makefile.inc
 include weigelt-lab/config/gatk.inc
-include weigelt-lab/config/align.inc
 
 LOGDIR ?= log/align_impact_fastq.$(NOW)
 
@@ -42,8 +41,8 @@ SAMTOOLS_MEM_THREAD = 1G
 GATK_THREADS = 4
 GATK_MEM_THREAD = 2G
 
-#TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
-#BAITS_LIST := $(BAITS_FILE:.bed=.list)
+TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
+BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
