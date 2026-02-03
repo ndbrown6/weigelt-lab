@@ -2,13 +2,12 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/beta_test.$(NOW)
 
-beta_test : $(foreach sample,$(SAMPLES),beta_test/$(sample).txt)
+beta_test : $(foreach sample,$(SAMPLES),txt/$(sample).txt)
 
 define beta-test
-beta_test/$1.txt :
+txt/$1.txt : bam/$1.txt
 	$$(call RUN,-n 4 -s 4G -m 9G,"set -o pipefail && \
-				      mkdir -p beta_test/ && \
-				      echo $1 > $$(@)")
+				      cp $$(<) $$(@)")
 
 endef
 $(foreach sample,$(SAMPLES),\
