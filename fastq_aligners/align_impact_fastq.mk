@@ -4,8 +4,8 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/align_impact_fastq.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz)
-#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam)
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
 #	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
