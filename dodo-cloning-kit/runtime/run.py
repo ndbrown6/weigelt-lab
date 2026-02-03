@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--check', default=False, action='store_true', help='check for non-zero file size')
     parser.add_argument('-d', '--docker', default=False, action='store_true', help='request docker support')
     parser.add_argument('-I', '--internet', default=False, action='store_true', help='request internet access')
-    parser.add_argument('-g', '--cluster_engine', default='sge', help='cluster engine (sge, lsf, pbs, or slurm supported)')
+    parser.add_argument('-g', '--cluster_engine', default='slurm', help='cluster engine (sge, lsf, pbs, or slurm supported)')
     parser.add_argument('-l', '--local', default=False, action='store_true', help='run job locally')
     parser.add_argument('-o', '--out_file', default=None, help='output file to check')
     parser.add_argument('-p', '--project_name', default=None, help='project name')

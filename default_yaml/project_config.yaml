@@ -1,26 +1,11 @@
 ---
 # job submission
-cluster_engine: SLURM
+cluster_engine: slurm
 use_cluster: true
 
 # reference genome
 ref: b37
 
-# bwa mem options
-aligner: bwamem
-bam_chr1_base_recal: true
-bam_dup_type: markdup
-bam_no_filter: false
-bam_no_recal: false
-bam_no_realn: false
-bam_no_sort: false
-bam_fix_rg: false
-bam_phred64: false
-bam_reprocess: false
-
-# splitting options
-bwa_splits: 250
-
 # target bed file
-targets_file: ~/share/lib/bed_files/MSK-IMPACT-v3.bed
+targets_file: ~/share/lib/bed_files/targets/IMPACT505/b37/IMPACT505_b37_targets.bed
 ...
