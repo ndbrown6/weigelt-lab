@@ -23,6 +23,7 @@ BGZIP ?= bgzip
 UNZIP ?= unzip
 PIGZ ?= pigz
 ZCAT ?= zcat
+GZIP ?= gzip
 TABIX ?= tabix
 PICARD ?= picard
 GATK ?= gatk
