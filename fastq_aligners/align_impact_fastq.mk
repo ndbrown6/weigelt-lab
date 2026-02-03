@@ -4,33 +4,33 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/align_impact_fastq.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
-	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
-	 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
-	 summary/idx_metrics.txt \
-	 summary/aln_metrics.txt \
-	 summary/insert_metrics.txt \
-	 summary/oxog_metrics.txt \
-	 summary/gc_metrics.txt \
-	 summary/hs_metrics.txt \
-	 summary/duplicate_metrics.txt \
-	 clean
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz)
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
+#	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
+#	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
+#	 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
+#	 summary/idx_metrics.txt \
+#	 summary/aln_metrics.txt \
+#	 summary/insert_metrics.txt \
+#	 summary/oxog_metrics.txt \
+#	 summary/gc_metrics.txt \
+#	 summary/hs_metrics.txt \
+#	 summary/duplicate_metrics.txt \
+#	 clean
 	 
 BWAMEM_THREADS = 4
 BWAMEM_MEM_PER_THREAD = 1G
@@ -44,30 +44,17 @@ GATK_MEM_THREAD = 2G
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
-#define merge-fastq
-#bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-#	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-#								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
-#	
-#bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-#	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-#								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
-#endef
-#$(foreach sample,$(SAMPLES),\
-#		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
-		
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-	$$(call RUN,-c -n 1 -s 6G -m 12G -w 6:00:00,"set -o pipefail && \
-						     zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 12 -s 1G -m 2G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+								    $$(ZCAT) $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-	$$(call RUN,-c -n 1 -s 6G -m 12G -w 6:00:00,"set -o pipefail && \
-						     zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 12 -s 1G -m 2G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+								    $$(ZCAT) $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
-		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))		
-
+		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
 		
 define fastq-2-bam
 bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz

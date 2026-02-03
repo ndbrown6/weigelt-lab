@@ -22,6 +22,7 @@ BEDTOOLS ?= bedtools
 BGZIP ?= bgzip
 UNZIP ?= unzip
 PIGZ ?= pigz
+ZCAT ?= zcat
 TABIX ?= tabix
 PICARD ?= picard
 GATK ?= gatk
