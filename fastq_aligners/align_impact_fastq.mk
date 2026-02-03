@@ -44,17 +44,30 @@ GATK_MEM_THREAD = 2G
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
+#define merge-fastq
+#bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
+#	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+#								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+#	
+#bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
+#	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
+#								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+#endef
+#$(foreach sample,$(SAMPLES),\
+#		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
+		
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+	$$(call RUN,-c -n 1 -s 6G -m 12G -w 6:00:00,"set -o pipefail && \
+						     zcat $$(^) | gzip -c > $$(@)")
 	
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-	$$(call RUN,-c -n 12 -s 6G -m 12G -w 6:00:00 -v $(PIGZ_ENV),"set -o pipefail && \
-								      $$(PIGZ) -cd -p 12 $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+	$$(call RUN,-c -n 1 -s 6G -m 12G -w 6:00:00,"set -o pipefail && \
+						     zcat $$(^) | gzip -c > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
-		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
+		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))		
+
 		
 define fastq-2-bam
 bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
