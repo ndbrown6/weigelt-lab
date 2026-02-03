@@ -19,10 +19,6 @@ BWA ?= bwa
 SAMTOOLS ?= samtools
 SAMBAMBA ?= sambamba
 BEDTOOLS ?= bedtools
-BGZIP ?= bgzip
-UNZIP ?= unzip
-PIGZ ?= pigz
-TABIX ?= tabix
 PICARD ?= picard
 GATK ?= gatk
 
