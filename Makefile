@@ -25,11 +25,11 @@ endef
 RUN_MAKE = $(if $(findstring false,$(USE_CLUSTER))$(findstring n,$(MAKEFLAGS)),+$(MAKE) -f $1,$(call RUN_QMAKE,$1,$(NUM_JOBS)))
 
 #==================================================
-# Beta testing
+# FASTQ aligners
 #==================================================
 
-TARGETS += beta_test
-beta_test :
-	$(call RUN_MAKE,weigelt-lab/beta_test/beta_test.mk)
+TARGETS += align_impact_fastq
+align_impact_fastq :
+	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_impact_fastq.mk)
 	
 .PHONY : $(TARGETS)

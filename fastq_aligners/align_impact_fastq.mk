@@ -2,35 +2,35 @@ include weigelt-lab/Makefile.inc
 include weigelt-lab/config/gatk.inc
 include weigelt-lab/config/align.inc
 
-LOGDIR ?= log/bwamem_impact.$(NOW)
+LOGDIR ?= log/align_impact_fastq.$(NOW)
 
-bwa_mem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
-	  $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
-	  $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
-	  $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
-	  summary/idx_metrics.txt \
-	  summary/aln_metrics.txt \
-	  summary/insert_metrics.txt \
-	  summary/oxog_metrics.txt \
-	  summary/gc_metrics.txt \
-	  summary/hs_metrics.txt \
-	  summary/duplicate_metrics.txt
+bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
+	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
+	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
+	 summary/idx_metrics.txt \
+	 summary/aln_metrics.txt \
+	 summary/insert_metrics.txt \
+	 summary/oxog_metrics.txt \
+	 summary/gc_metrics.txt \
+	 summary/hs_metrics.txt \
+	 summary/duplicate_metrics.txt
 	  
 	    
 BWAMEM_THREADS = 4
@@ -256,4 +256,4 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 	     $(PICARD) MarkIlluminaAdapters --version &>> version/bwamem_impact.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: bwa_mem
+.PHONY: bwamem
