@@ -288,33 +288,69 @@ class SlurmJob(ClusterJob):
         
         # Get the actual job exit status using sacct if we have a job ID
         if self.job_id:
-            try:
-                # Wait a moment for job accounting to be updated
-                time.sleep(2)
-                # sacct format: JobID|State|ExitCode
-                sacct_cmd = "sacct -j {} -n -P -o JobID,State,ExitCode".format(self.job_id)
-                sacct_output = subprocess.check_output(sacct_cmd, shell=True, stderr=DEVNULL).decode()
-                
-                # Parse sacct output - look for the main job (not .batch or .extern)
-                for line in sacct_output.strip().split('\n'):
-                    fields = line.split('|')
-                    if len(fields) >= 3:
-                        job_id_field = fields[0]
-                        # Skip .batch and .extern job steps, look for the main job ID
-                        if job_id_field == self.job_id:
-                            state = fields[1]
-                            exit_code = fields[2]
-                            # ExitCode format is typically "0:0" where first number is exit code
-                            if ':' in exit_code:
-                                self.retval = int(exit_code.split(':')[0])
-                            else:
-                                self.retval = int(exit_code) if exit_code.isdigit() else sbatch_retcode
-                            break
-                else:
-                    # If we couldn't parse sacct output, fall back to sbatch return code
-                    self.retval = sbatch_retcode
-            except:
-                # If sacct fails, use sbatch return code
+            # Try multiple times with increasing wait time for accounting data
+            max_attempts = 5
+            for attempt in range(max_attempts):
+                try:
+                    time.sleep(2 * (attempt + 1))  # Increasing wait time
+                    # sacct format: JobID|State|ExitCode
+                    sacct_cmd = "sacct -j {} -n -P -o JobID,State,ExitCode".format(self.job_id)
+                    sacct_output = subprocess.check_output(sacct_cmd, shell=True, stderr=DEVNULL).decode()
+                    
+                    # Parse sacct output - look for the main job (not .batch or .extern)
+                    job_found = False
+                    for line in sacct_output.strip().split('\n'):
+                        if not line:
+                            continue
+                        fields = line.split('|')
+                        if len(fields) >= 3:
+                            job_id_field = fields[0]
+                            # Skip .batch and .extern job steps, look for the main job ID
+                            if job_id_field == self.job_id:
+                                job_found = True
+                                state = fields[1]
+                                exit_code = fields[2]
+                                
+                                # Check state - if FAILED, CANCELLED, TIMEOUT, NODE_FAIL, etc., return non-zero
+                                if state in ['FAILED', 'CANCELLED', 'TIMEOUT', 'NODE_FAIL', 'PREEMPTED', 'OUT_OF_MEMORY']:
+                                    sys.stderr.write("Job {} state: {}\n".format(self.job_id, state))
+                                    self.retval = 1
+                                    return self.retval
+                                
+                                # ExitCode format is typically "0:0" where first number is exit code
+                                if ':' in exit_code:
+                                    exit_val = int(exit_code.split(':')[0])
+                                elif exit_code.isdigit():
+                                    exit_val = int(exit_code)
+                                else:
+                                    # Can't parse exit code
+                                    continue
+                                
+                                # Successfully parsed
+                                self.retval = exit_val
+                                if self.retval != 0:
+                                    sys.stderr.write("Job {} exit code: {}\n".format(self.job_id, self.retval))
+                                return self.retval
+                    
+                    # If we found the job and got here, it means we parsed it successfully
+                    if job_found:
+                        break
+                        
+                except subprocess.CalledProcessError:
+                    # sacct command failed, retry
+                    if attempt == max_attempts - 1:
+                        sys.stderr.write("Failed to get sacct info after {} attempts\n".format(max_attempts))
+                        self.retval = sbatch_retcode
+                        return self.retval
+                except Exception as e:
+                    # Other error
+                    if attempt == max_attempts - 1:
+                        sys.stderr.write("Error parsing sacct: {}\n".format(str(e)))
+                        self.retval = sbatch_retcode
+                        return self.retval
+            
+            # If we still don't have a return value, use sbatch return code
+            if self.retval is None:
                 self.retval = sbatch_retcode
         else:
             # No job ID, use sbatch return code
