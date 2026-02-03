@@ -30,9 +30,9 @@ bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 summary/oxog_metrics.txt \
 	 summary/gc_metrics.txt \
 	 summary/hs_metrics.txt \
-	 summary/duplicate_metrics.txt
-	  
-	    
+	 summary/duplicate_metrics.txt \
+	 clean
+	 
 BWAMEM_THREADS = 4
 BWAMEM_MEM_PER_THREAD = 1G
 
@@ -256,4 +256,18 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 	     $(PICARD) MarkIlluminaAdapters --version &>> version/bwamem_impact.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: bwamem
+.PHONY: clean
+
+clean : $(foreach sample,$(SAMPLES),bam/$(sample).bam) summary/duplicate_metrics.txt
+	$(call RUN, -c -n 1 -s 1G -m 2G,"set -o pipefail && \
+					 rm -f bwamem/*/*_R1.fastq.gz && \
+					 rm -f bwamem/*/*_R2.fastq.gz && \
+					 rm -f bwamem/*/*_aln.bam && \
+					 rm -f bwamem/*/*_cl.fastq.gz && \
+					 rm -f bwamem/*/*_cl_aln.bam && \
+					 rm -f bwamem/*/*_cl_aln_srt.bam* && \
+					 rm -f bwamem/*/*_cl_aln_srt.intervals && \
+					 rm -f bwamem/*/*_cl_aln_srt_IR.bam* && \
+					 rm -f bwamem/*/*_cl_aln_srt_IR_FX.bam* && \
+					 rm -f bwamem/*/*_cl_aln_srt_IR_FX.grp && \
+					 rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR.bam*")
