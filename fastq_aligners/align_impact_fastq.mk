@@ -99,7 +99,7 @@ bwamem/$1/$1_cl_aln_srt.bam : bwamem/$1/$1_cl_aln.bam
 
 bwamem/$1/$1_cl_aln_srt.intervals : bwamem/$1/$1_cl_aln_srt.bam
 	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/realign_targets,"set -o pipefail && \
-																     $$(call GATK_CMD,12G) \
+																     $$(call GATK_CMD,16G) \
 																     -T RealignerTargetCreator \
 																     -I $$(^) \
 																     -nt $$(GATK_THREADS) \
@@ -108,14 +108,14 @@ bwamem/$1/$1_cl_aln_srt.intervals : bwamem/$1/$1_cl_aln_srt.bam
 																     -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR.bam : bwamem/$1/$1_cl_aln_srt.bam bwamem/$1/$1_cl_aln_srt.intervals
-	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/indel_realign,"set -o pipefail && \
-												     $$(call GATK_CMD,8G) \
-												     -T IndelRealigner \
-												     -I $$(<) \
-												     -R $$(REF_FASTA) \
-												     -targetIntervals $$(<<) \
-												     -o $$(@) \
-												     -known $$(KNOWN_INDELS)")
+	$$(call RUN,-c -n 1 -s 8G -m 16G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/indel_realign,"set -o pipefail && \
+												      $$(call GATK_CMD,16G) \
+												      -T IndelRealigner \
+												      -I $$(<) \
+												      -R $$(REF_FASTA) \
+												      -targetIntervals $$(<<) \
+												      -o $$(@) \
+												      -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
 	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
@@ -128,7 +128,7 @@ bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
 	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/base_recal,"set -o pipefail && \
-																$$(call GATK_CMD,12G) \
+																$$(call GATK_CMD,16G) \
 																-T BaseRecalibrator \
 																-R $$(REF_FASTA) \
 																-knownSites $$(DBSNP) \
@@ -136,8 +136,8 @@ bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
 																-o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam : bwamem/$1/$1_cl_aln_srt_IR_FX.bam bwamem/$1/$1_cl_aln_srt_IR_FX.grp
-	$$(call RUN,-c -n 1 -s 6G -m 12G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/apply_bqsr,"set -o pipefail && \
-												   $$(call GATK_CMD,8G) \
+	$$(call RUN,-c -n 1 -s 8G -m 16G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/apply_bqsr,"set -o pipefail && \
+												   $$(call GATK_CMD,16G) \
 												   -T PrintReads \
 												   -R $$(REF_FASTA) \
 												   -I $$(<) \
@@ -167,56 +167,56 @@ $(foreach sample,$(SAMPLES),\
 
 define picard-metrics
 metrics/$1.idx_stats.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 2G -m 4G -w 12:00:00 -p $(PROJECT_DIR)/metrics -N $1/idx_stats,"set -o pipefail && \
-											        $$(BAM_INDEX) \
-												INPUT=$$(<) \
-												> $$(@)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/idx_stats,"set -o pipefail && \
+										    $$(BAM_INDEX) \
+										    INPUT=$$(<) \
+										    > $$(@)")
 									   
 metrics/$1.aln_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/aln_metrics,"set -o pipefail && \
-												  $$(COLLECT_ALIGNMENT_METRICS) \
-												  REFERENCE_SEQUENCE=$$(REF_FASTA) \
-												  INPUT=$$(<) \
-												  OUTPUT=$$(@)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/aln_metrics,"set -o pipefail && \
+										      $$(COLLECT_ALIGNMENT_METRICS) \
+										      REFERENCE_SEQUENCE=$$(REF_FASTA) \
+										      INPUT=$$(<) \
+										      OUTPUT=$$(@)")
 									   
 metrics/$1.insert_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/insert_metrics,"set -o pipefail && \
-												     $$(COLLECT_INSERT_METRICS) \
-												     INPUT=$$(<) \
-												     OUTPUT=$$(@) \
-												     HISTOGRAM_FILE=metrics/$1.insert_metrics.pdf \
-												     MINIMUM_PCT=0.05")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/insert_metrics,"set -o pipefail && \
+											 $$(COLLECT_INSERT_METRICS) \
+											 INPUT=$$(<) \
+											 OUTPUT=$$(@) \
+											 HISTOGRAM_FILE=metrics/$1.insert_metrics.pdf \
+											 MINIMUM_PCT=0.05")
 									   
 metrics/$1.oxog_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/oxog_metrics,"set -o pipefail && \
-												   $$(COLLECT_OXOG_METRICS) \
-												   REFERENCE_SEQUENCE=$$(REF_FASTA) \
-												   INPUT=$$(<) \
-												   OUTPUT=$$(@)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/oxog_metrics,"set -o pipefail && \
+										       $$(COLLECT_OXOG_METRICS) \
+										       REFERENCE_SEQUENCE=$$(REF_FASTA) \
+										       INPUT=$$(<) \
+										       OUTPUT=$$(@)")
 					    
 metrics/$1.gc_metrics_summary.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/gc_metrics,"set -o pipefail && \
-												 $$(COLLECT_GC_BIAS) \
-												 INPUT=$$(<) \
-												 OUTPUT=metrics/$1.gc_metrics.txt \
-												 CHART_OUTPUT=metrics/$1.gc_metrics.pdf \
-												 REFERENCE_SEQUENCE=$$(REF_FASTA) \
-												 SUMMARY_OUTPUT=$$(@)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/gc_metrics,"set -o pipefail && \
+										     $$(COLLECT_GC_BIAS) \
+										     INPUT=$$(<) \
+										     OUTPUT=metrics/$1.gc_metrics.txt \
+										     CHART_OUTPUT=metrics/$1.gc_metrics.pdf \
+										     REFERENCE_SEQUENCE=$$(REF_FASTA) \
+										     SUMMARY_OUTPUT=$$(@)")
 
 metrics/$1.hs_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/hs_metrics,"set -o pipefail && \
-												 $$(COLLECT_HS_METRICS) \
-												 REFERENCE_SEQUENCE=$$(REF_FASTA) \
-												 INPUT=$$(<) \
-												 OUTPUT=$$(@) \
-												 BAIT_INTERVALS=$$(BAITS_LIST) \
-												 TARGET_INTERVALS=$$(TARGETS_LIST)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/hs_metrics,"set -o pipefail && \
+										     $$(COLLECT_HS_METRICS) \
+										     REFERENCE_SEQUENCE=$$(REF_FASTA) \
+										     INPUT=$$(<) \
+										     OUTPUT=$$(@) \
+										     BAIT_INTERVALS=$$(BAITS_LIST) \
+										     TARGET_INTERVALS=$$(TARGETS_LIST)")
 							
 metrics/$1.duplicate_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 2G -m 4G -w 24:00:00 -p $(PROJECT_DIR)/metrics -N $1/dup_metrics,"set -o pipefail && \
-												  $$(COLLECT_DUP_METRICS) \
-												  INPUT=$$(<) \
-												  METRICS_FILE=$$(@)")
+	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/dup_metrics,"set -o pipefail && \
+										      $$(COLLECT_DUP_METRICS) \
+										      INPUT=$$(<) \
+										      METRICS_FILE=$$(@)")
 							
 endef
 $(foreach sample,$(SAMPLES),\
