@@ -30,7 +30,8 @@ RUN_MAKE = $(if $(findstring false,$(USE_CLUSTER))$(findstring n,$(MAKEFLAGS)),+
 
 TARGETS += align_impact_fastq
 align_impact_fastq :
-	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_impact_fastq.mk)
+	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_impact_fastq.mk) && \
+	$(MAKE) -f weigelt-lab/fastq_aligners/align_impact_fastq.mk clean
 	
 TARGETS += align_exome_fastq
 align_exome_fastq :

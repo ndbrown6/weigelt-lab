@@ -17,8 +17,7 @@ bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 	 summary/oxog_metrics.txt \
 	 summary/gc_metrics.txt \
 	 summary/hs_metrics.txt \
-	 summary/duplicate_metrics.txt \
-	 clean
+	 summary/duplicate_metrics.txt
 	 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -270,4 +269,5 @@ clean : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 									 rm -f bwamem/*/*_cl_aln_srt_IR.bam* && \
 									 rm -f bwamem/*/*_cl_aln_srt_IR_FX.bam* && \
 									 rm -f bwamem/*/*_cl_aln_srt_IR_FX.grp && \
-									 rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR.bam*")
+									 rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR.bam* && \
+									 rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR_MD.bam*")
