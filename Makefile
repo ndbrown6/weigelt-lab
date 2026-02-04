@@ -97,7 +97,7 @@ gridss_tumor_only :
 	$(call RUN_MAKE,weigelt-lab/sv_callers/gridss_tumor_only.mk)
 	
 #==================================================
-# RNA structural variant/fusion callers
+# RNA fusion callers
 #==================================================
 
 TARGETS += star_fusion
@@ -108,9 +108,9 @@ TARGETS += fusion_catcher
 fusion_catcher :
 	$(call RUN_MAKE,modules/sv_callers/fusion_catcher.mk)
 	
-TARGETS += arriba
-arriba :
-	$(call RUN_MAKE,modules/sv_callers/arriba.mk)
+TARGETS += arriba_fusion
+arriba_fusion :
+	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk)
 	
 
 .PHONY : $(TARGETS)
