@@ -118,7 +118,7 @@ bwamem/$1/$1_cl_aln_srt_IR.bam : bwamem/$1/$1_cl_aln_srt.bam bwamem/$1/$1_cl_aln
 												     -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
-	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
 										  $$(FIX_MATE) \
 										  INPUT=$$(<) \
 										  OUTPUT=$$(@) \

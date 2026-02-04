@@ -39,8 +39,8 @@ SAM_TO_FASTQ = $(PICARD) -Xmx$(PICARD_MEM) SamToFastq $(PICARD_OPTS)
 
 
 # paths
-SCRIPTS_DIR ?= weigelt-lab/dodo-cloning-kit
-TMPDIR ?= $(HOME)/share/usr/$(USER)/tmp
+SCRIPTS_DIR = weigelt-lab/dodo-cloning-kit
+TMPDIR = $(HOME)/share/usr/$(USER)/tmp
 
 endif
 CONFIG_INC = true
