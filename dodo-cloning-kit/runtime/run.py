@@ -80,11 +80,11 @@ if __name__ == '__main__':
     job_name = None
     max_job_name_len = 64  # Safe limit for most Slurm installations
     if args.job_name is not None and args.project_name is not None:
-        job_name = "{}_{}".format(args.project_name, args.job_name)
+        job_name = "{}|{}".format(args.project_name, args.job_name)
     elif args.job_name is not None:
         job_name = args.job_name
     elif args.project_name is not None and args.out_file is not None:
-        job_name = "{}_{}".format(args.project_name, os.path.basename(args.out_file))
+        job_name = "{}|{}".format(args.project_name, os.path.basename(args.out_file))
 
     # Replace forward slashes with pipes (or another character)
     if job_name is not None:
