@@ -60,7 +60,7 @@ $(foreach sample,$(SAMPLES),\
 		
 define fastq-2-bam
 bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
-	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/bwamem -N $1/fastq2sam,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/fastq2sam,"set -o pipefail && \
 										  $$(FASTQ_TO_SAM) \
 										  FASTQ=bwamem/$1/$1_R1.fastq.gz \
 										  FASTQ2=bwamem/$1/$1_R2.fastq.gz \
@@ -71,7 +71,7 @@ bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
 										  PL=illumina")
 									       
 bwamem/$1/$1_cl.fastq.gz : bwamem/$1/$1_aln.bam
-	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/bwamem -N $1/clip_adapters,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/clip_adapters,"set -o pipefail && \
 										      $$(MARK_ADAPTERS) \
 										      INPUT=$$(<) \
 										      OUTPUT=/dev/stdout \
@@ -118,13 +118,13 @@ bwamem/$1/$1_cl_aln_srt_IR.bam : bwamem/$1/$1_cl_aln_srt.bam bwamem/$1/$1_cl_aln
 												     -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
-										 $$(FIX_MATE) \
-										 INPUT=$$(<) \
-										 OUTPUT=$$(@) \
-										 SORT_ORDER=coordinate \
-										 COMPRESSION_LEVEL=0 \
-										 CREATE_INDEX=true")
+	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
+										  $$(FIX_MATE) \
+										  INPUT=$$(<) \
+										  OUTPUT=$$(@) \
+										  SORT_ORDER=coordinate \
+										  COMPRESSION_LEVEL=0 \
+										  CREATE_INDEX=true")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
 	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/base_recal,"set -o pipefail && \
