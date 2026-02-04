@@ -250,14 +250,7 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 .DELETE_ON_ERROR:
 .PHONY: clean
 
-clean : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-	summary/idx_metrics.txt \
-	summary/aln_metrics.txt \
-	summary/insert_metrics.txt \
-	summary/oxog_metrics.txt \
-	summary/gc_metrics.txt \
-	summary/hs_metrics.txt \
-	summary/duplicate_metrics.txt
+clean : 
 	$(call RUN, -c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR) -N clean_up,"set -o pipefail && \
 									 rm -f bwamem/*/*_R1.fastq.gz && \
 									 rm -f bwamem/*/*_R2.fastq.gz && \
