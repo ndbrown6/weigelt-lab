@@ -1,7 +1,7 @@
 include weigelt-lab/Makefile.inc
 include weigelt-lab/config/gatk.inc
 
-LOGDIR ?= log/align_impact_fastq.$(NOW)
+LOGDIR ?= log/align_exome_fastq.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
@@ -32,13 +32,13 @@ bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 summary/duplicate_metrics.txt \
 	 clean
 	 
-BWAMEM_THREADS = 8
+BWAMEM_THREADS = 16
 BWAMEM_MEM_PER_THREAD = 2G
 
-SAMTOOLS_THREADS = 4
+SAMTOOLS_THREADS = 8
 SAMTOOLS_MEM_THREAD = 2G
 
-GATK_THREADS = 4
+GATK_THREADS = 8
 GATK_MEM_THREAD = 4G
 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
@@ -85,11 +85,11 @@ bwamem/$1/$1_cl.fastq.gz : bwamem/$1/$1_aln.bam
 										      CLIPPING_MIN_LENGTH=25")
 									       
 bwamem/$1/$1_cl_aln.bam : bwamem/$1/$1_cl.fastq.gz
-	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 2G -m $(BWAMEM_MEM_PER_THREAD) -p $(PROJECT_DIR)/bwamem -N $1/bwa_align,"set -o pipefail && \
-														        $$(BWA) mem -p -M \
-															-R \"@RG\tID:$1\tLB:$1\tPL:illumina\tSM:$1\" \
-															-t $$(BWAMEM_THREADS) $$(REF_FASTA) $$(<) | \
-															$$(SAMTOOLS) view -bhS - > $$(@)")
+	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 2G -m $(BWAMEM_MEM_PER_THREAD) -p $(PROJECT_DIR)/bwamem -N $1/bwa_align -w 12:00:00,"set -o pipefail && \
+																    $$(BWA) mem -p -M \
+																    -R \"@RG\tID:$1\tLB:$1\tPL:illumina\tSM:$1\" \
+																    -t $$(BWAMEM_THREADS) $$(REF_FASTA) $$(<) | \
+																    $$(SAMTOOLS) view -bhS - > $$(@)")
 
 bwamem/$1/$1_cl_aln_srt.bam : bwamem/$1/$1_cl_aln.bam
 	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 2G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/bwamem -N $1/sort_index,"set -o pipefail && \
@@ -108,14 +108,14 @@ bwamem/$1/$1_cl_aln_srt.intervals : bwamem/$1/$1_cl_aln_srt.bam
 																     -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR.bam : bwamem/$1/$1_cl_aln_srt.bam bwamem/$1/$1_cl_aln_srt.intervals
-	$$(call RUN,-c -n 1 -s 8G -m 16G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/indel_realign,"set -o pipefail && \
-												      $$(call GATK_CMD,16G) \
-												      -T IndelRealigner \
-												      -I $$(<) \
-												      -R $$(REF_FASTA) \
-												      -targetIntervals $$(<<) \
-												      -o $$(@) \
-												      -known $$(KNOWN_INDELS)")
+	$$(call RUN,-c -n 1 -s 8G -m 16G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/indel_realign -w 10:00:00,"set -o pipefail && \
+														  $$(call GATK_CMD,16G) \
+														  -T IndelRealigner \
+														  -I $$(<) \
+														  -R $$(REF_FASTA) \
+														  -targetIntervals $$(<<) \
+														  -o $$(@) \
+														  -known $$(KNOWN_INDELS)")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
 	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
@@ -127,13 +127,13 @@ bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
 										  CREATE_INDEX=true")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
-	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/base_recal,"set -o pipefail && \
-																$$(call GATK_CMD,16G) \
-																-T BaseRecalibrator \
-																-R $$(REF_FASTA) \
-																-knownSites $$(DBSNP) \
-																-I $$(<) \
-																-o $$(@)")
+	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/base_recal -w 10:00:00,"set -o pipefail && \
+																	    $$(call GATK_CMD,16G) \
+																	    -T BaseRecalibrator \
+																	    -R $$(REF_FASTA) \
+																	    -knownSites $$(DBSNP) \
+																	    -I $$(<) \
+																	    -o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam : bwamem/$1/$1_cl_aln_srt_IR_FX.bam bwamem/$1/$1_cl_aln_srt_IR_FX.grp
 	$$(call RUN,-c -n 1 -s 8G -m 16G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/apply_bqsr,"set -o pipefail && \
@@ -252,13 +252,13 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
-	     head -3 version/tmp.txt | tail -2 > version/align_impact_fastq.txt; \
+	     head -3 version/tmp.txt | tail -2 > version/align_exome_fastq.txt; \
 	     rm version/tmp.txt; \
-	     $(SAMTOOLS) --version >> version/align_impact_fastq.txt; \
-	     echo "gatk3" >> version/align_impact_fastq.txt; \
-	     $(GATK) --version >> version/align_impact_fastq.txt; \
-	     echo "picard" >> version/align_impact_fastq.txt; \
-	     $(PICARD) MarkIlluminaAdapters --version &>> version/align_impact_fastq.txt)
+	     $(SAMTOOLS) --version >> version/align_exome_fastq.txt; \
+	     echo "gatk3" >> version/align_exome_fastq.txt; \
+	     $(GATK) --version >> version/align_exome_fastq.txt; \
+	     echo "picard" >> version/align_exome_fastq.txt; \
+	     $(PICARD) MarkIlluminaAdapters --version &>> version/align_exome_fastq.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

@@ -5,9 +5,11 @@ SEQ_PLATFORM ?= illumina
 
 # conda
 WEIGELT_LAB_ENV ?= $(HOME)/share/env/weigelt-lab-0.0.1
-PIGZ_ENV ?= $(HOME)/share/env/pigz-2.6
+PIGZ_ENV ?= $(HOME)/share/env/pigz-2.8
 GATK_ENV ?= $(HOME)/share/env/gatk-3.8-10
 SAMBAMBA_ENV ?= $(HOME)/share/env/sambamba-0.8.2
+FASTQ_SPLITTER_ENV ?= $(HOME)/share/env/fastqsplitter-1.2.0
+STAR_ENV ?= 
 
 
 # aliases
@@ -21,6 +23,7 @@ SAMBAMBA ?= sambamba
 BEDTOOLS ?= bedtools
 PICARD ?= picard
 GATK ?= gatk
+PIGZ ?= pigz
 
 # picard command lines
 PICARD_MEM = 8G
