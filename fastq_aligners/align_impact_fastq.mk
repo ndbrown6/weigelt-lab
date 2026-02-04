@@ -252,13 +252,13 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
-	     head -3 version/tmp.txt | tail -2 > version/bwamem_impact.txt; \
+	     head -3 version/tmp.txt | tail -2 > version/align_impact_fastq.txt; \
 	     rm version/tmp.txt; \
-	     $(SAMTOOLS) --version >> version/bwamem_impact.txt; \
-	     echo "gatk3" >> version/bwamem_impact.txt; \
-	     $(GATK) --version >> version/bwamem_impact.txt; \
-	     echo "picard" >> version/bwamem_impact.txt; \
-	     $(PICARD) MarkIlluminaAdapters --version &>> version/bwamem_impact.txt)
+	     $(SAMTOOLS) --version >> version/align_impact_fastq.txt; \
+	     echo "gatk3" >> version/align_impact_fastq.txt; \
+	     $(GATK) --version >> version/align_impact_fastq.txt; \
+	     echo "picard" >> version/align_impact_fastq.txt; \
+	     $(PICARD) MarkIlluminaAdapters --version &>> version/align_impact_fastq.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
