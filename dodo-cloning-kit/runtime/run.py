@@ -86,9 +86,12 @@ if __name__ == '__main__':
     elif args.project_name is not None and args.out_file is not None:
         job_name = "{}_{}".format(args.project_name, os.path.basename(args.out_file))
 
-    # Truncate job name if it exceeds the maximum length
-    if job_name is not None and len(job_name) > max_job_name_len:
-        job_name = job_name[:max_job_name_len]
+    # Replace forward slashes with pipes (or another character)
+    if job_name is not None:
+        job_name = job_name.replace('/', '|')
+        # Truncate job name if it exceeds the maximum length
+        if len(job_name) > max_job_name_len:
+            job_name = job_name[:max_job_name_len]
 
     if args.local or (args.internet and args.cluster_engine != 'lsf'):
         my_job = job.LocalJob(job_script=job_script, out_file=args.out_file, log_file=args.log_file, shell=args.shell)
