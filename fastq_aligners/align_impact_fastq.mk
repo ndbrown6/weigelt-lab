@@ -254,12 +254,17 @@ clean :
 	rm -f bwamem/*/*_R1.fastq.gz && \
 	rm -f bwamem/*/*_R2.fastq.gz && \
 	rm -f bwamem/*/*_aln.bam && \
+	rm -f bwamem/*/*_adapter-metrics.txt && \
 	rm -f bwamem/*/*_cl.fastq.gz && \
 	rm -f bwamem/*/*_cl_aln.bam && \
 	rm -f bwamem/*/*_cl_aln_srt.bam* && \
+	rm -f bwamem/*/*_cl_aln_srt.bai* && \
 	rm -f bwamem/*/*_cl_aln_srt.intervals && \
 	rm -f bwamem/*/*_cl_aln_srt_IR.bam* && \
+	rm -f bwamem/*/*_cl_aln_srt_IR.bai* && \
 	rm -f bwamem/*/*_cl_aln_srt_IR_FX.bam* && \
+	rm -f bwamem/*/*_cl_aln_srt_IR_FX.bai && \
 	rm -f bwamem/*/*_cl_aln_srt_IR_FX.grp && \
 	rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR.bam* && \
+	rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR.bai* && \
 	rm -f bwamem/*/*_cl_aln_srt_IR_FX_BR_MD.bam*
