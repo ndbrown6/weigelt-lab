@@ -39,7 +39,7 @@ SAMTOOLS_THREADS = 4
 SAMTOOLS_MEM_THREAD = 2G
 
 GATK_THREADS = 4
-GATK_MEM_THREAD = 3G
+GATK_MEM_THREAD = 4G
 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)
@@ -136,13 +136,13 @@ bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam
 																-o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam : bwamem/$1/$1_cl_aln_srt_IR_FX.bam bwamem/$1/$1_cl_aln_srt_IR_FX.grp
-	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/apply_bqsr,"set -o pipefail && \
-												  $$(call GATK_CMD,8G) \
-												  -T PrintReads \
-												  -R $$(REF_FASTA) \
-												  -I $$(<) \
-												  -BQSR $$(<<) \
-												  -o $$(@)")
+	$$(call RUN,-c -n 1 -s 6G -m 12G -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1/apply_bqsr,"set -o pipefail && \
+												   $$(call GATK_CMD,8G) \
+												   -T PrintReads \
+												   -R $$(REF_FASTA) \
+												   -I $$(<) \
+												   -BQSR $$(<<) \
+												   -o $$(@)")
 
 bwamem/$1/$1_cl_aln_srt_IR_FX_BR_MD.bam : bwamem/$1/$1_cl_aln_srt_IR_FX_BR.bam
 	$$(call RUN, -c -n 8 -s 2G -m 4G -v $(SAMBAMBA_ENV) -w 72:00:00 -p $(PROJECT_DIR)/bwamem -N $1/mark_dup,"set -o pipefail && \
