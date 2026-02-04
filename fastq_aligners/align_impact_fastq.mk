@@ -110,7 +110,7 @@ bwamem/$1/$1_cl_aln_srt_IR_FX.bam : bwamem/$1/$1_cl_aln_srt_IR.bam
 										  INPUT=$$(<) \
 										  OUTPUT=$$(@) \
 										  SORT_ORDER=coordinate \
-										  COMPRESSION_LEVEL=6 \
+										  COMPRESSION_LEVEL=9 \
 										  CREATE_INDEX=true")
 										      
 bwamem/$1/$1_cl_aln_srt_IR_FX.grp : bwamem/$1/$1_cl_aln_srt_IR_FX.bam

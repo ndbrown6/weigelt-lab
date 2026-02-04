@@ -35,7 +35,8 @@ align_impact_fastq :
 	
 TARGETS += align_exome_fastq
 align_exome_fastq :
-	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_exome_fastq.mk)
+	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_exome_fastq.mk) && \
+	$(MAKE) -f weigelt-lab/fastq_aligners/align_exome_fastq.mk clean
 	
 TARGETS += align_genome_fastq
 align_genome_fastq :
