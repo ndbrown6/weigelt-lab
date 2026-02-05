@@ -9,7 +9,6 @@ PIGZ_ENV ?= $(HOME)/share/env/pigz-2.8
 GATK_ENV ?= $(HOME)/share/env/gatk-3.8-10
 SAMBAMBA_ENV ?= $(HOME)/share/env/sambamba-0.8.2
 FASTQ_SPLITTER_ENV ?= $(HOME)/share/env/fastqsplitter-1.2.0
-STAR_ENV ?= 
 
 
 # aliases
@@ -35,11 +34,11 @@ COLLECT_GC_BIAS = $(PICARD) -Xmx$(PICARD_MEM) CollectGcBiasMetrics $(PICARD_OPTS
 COLLECT_HS_METRICS = $(PICARD) -Xmx$(PICARD_MEM) CollectHsMetrics $(PICARD_OPTS)
 COLLECT_INSERT_METRICS = $(PICARD) -Xmx$(PICARD_MEM) CollectInsertSizeMetrics $(PICARD_OPTS)
 COLLECT_OXOG_METRICS = $(PICARD) -Xmx$(PICARD_MEM) CollectOxoGMetrics $(PICAD_OPTS)
+COLLECT_RNASEQ_METRICS = $(PICARD) -Xmx$(PICARD_MEM) CollectRnaSeqMetrics $(PICARD_OPTS)
 FASTQ_TO_SAM = $(PICARD) -Xmx$(PICARD_MEM) FastqToSam $(PICARD_OPTS)
 FIX_MATE = $(PICARD) -Xmx$(PICARD_MEM) FixMateInformation $(PICARD_OPTS)
 MARK_ADAPTERS = $(PICARD) -Xmx$(PICARD_MEM) MarkIlluminaAdapters $(PICARD_OPTS)
 SAM_TO_FASTQ = $(PICARD) -Xmx$(PICARD_MEM) SamToFastq $(PICARD_OPTS)
-
 
 # paths
 SCRIPTS_DIR = weigelt-lab/dodo-cloning-kit
