@@ -61,8 +61,8 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 		
 
 facets_suite/summary.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
-	$(call RUN, -c -n 1 -s 24G -m 48G -v $(INNOVATION_ENV),"set -o pipefail && \
-								$(RSCRIPT) $(SCRIPTS_DIR)/facets_suite.R --option 1 --sample_pairs '$(SAMPLE_PAIRS)'")
+	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV),"set -o pipefail && \
+								 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R --option 1 --sample_pairs '$(SAMPLE_PAIRS)'")
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(FACETS_SUITE_ENV)/bin/R --version > version/facets_suite.txt)
