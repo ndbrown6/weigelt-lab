@@ -40,8 +40,8 @@ align_exome_fastq :
 	
 TARGETS += align_genome_fastq
 align_genome_fastq :
-	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_genome_fastq.mk) && \
-	$(MAKE) -f weigelt-lab/fastq_aligners/align_genome_fastq.mk clean
+	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_genome_fastq.mk)
+#	$(MAKE) -f weigelt-lab/fastq_aligners/align_genome_fastq.mk clean
 	
 TARGETS += align_rnaseq_fastq
 align_rnaseq_fastq :
