@@ -40,12 +40,12 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define merge-fastq
 star/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-    $$(call RUN,-c -n 12 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R1,"set -o pipefail && \
-    											 zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R1,"set -o pipefail && \
+											     zcat $$(^) | gzip -c > $$(@)")
     
 star/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-    $$(call RUN,-c -n 12 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R2,"set -o pipefail && \
-    											 zcat $$(^) | gzip -c > $$(@)")
+	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R2,"set -o pipefail && \
+											     zcat $$(^) | gzip -c > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
         $(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
@@ -53,28 +53,28 @@ $(foreach sample,$(SAMPLES),\
 
 define align-fastq
 star/$1/$1.Aligned.sortedByCoord.out.bam : star/$1/$1_R1.fastq.gz star/$1/$1_R2.fastq.gz
-    $$(call RUN,-c -n $(STAR_THREADS) -s 2G -m $(STAR_MEM_THREAD) -w 8:00:00 -p $(PROJECT_DIR)/star -N $1/star_align,"set -o pipefail && \
-    														      STAR $$(STAR_OPTS) \
-														      --outFileNamePrefix star/$1/$1. \
-														      --runThreadN $$(STAR_THREADS) \
-														      --outSAMattrRGline \"ID:$1\" \"LB:$1\" \"SM:$1\" \"PL:illumina\" \
-														      --readFilesIn $$(^) \
-														      --readFilesCommand zcat")
+	$$(call RUN,-c -n $(STAR_THREADS) -s 2G -m $(STAR_MEM_THREAD) -w 8:00:00 -p $(PROJECT_DIR)/star -N $1/star_align,"set -o pipefail && \
+															  STAR $$(STAR_OPTS) \
+															  --outFileNamePrefix star/$1/$1. \
+															  --runThreadN $$(STAR_THREADS) \
+															  --outSAMattrRGline \"ID:$1\" \"LB:$1\" \"SM:$1\" \"PL:illumina\" \
+															  --readFilesIn $$(^) \
+															  --readFilesCommand zcat")
                                    
 star/$1/$1.Aligned.sortedByCoord.out.bam.bai : star/$1/$1.Aligned.sortedByCoord.out.bam
-    $$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -w 1:00:00 -p $(PROJECT_DIR)/star -N $1/index_bam,"set -o pipefail && \
-    															     $$(SAMTOOLS) index -@ $$(SAMTOOLS_THREADS) $$(<)")
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -w 1:00:00 -p $(PROJECT_DIR)/star -N $1/index_bam,"set -o pipefail && \
+																 $$(SAMTOOLS) index -@ $$(SAMTOOLS_THREADS) $$(<)")
 
 bam/$1.bam : star/$1/$1.Aligned.sortedByCoord.out.bam
-    $$(call RUN,-c -n 1 -s 0.5G -m 1G -w 1:00:00 -p $(PROJECT_DIR)/bam -N $1/copy_bam,"set -o pipefail && \
-    										       cp $$(<) $$(@)")
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 1:00:00 -p $(PROJECT_DIR)/bam -N $1/copy_bam,"set -o pipefail && \
+											   cp $$(<) $$(@)")
                                    
 bam/$1.bam.bai : star/$1/$1.Aligned.sortedByCoord.out.bam.bai
-    $$(call RUN,-c -n 1 -s 0.5G -m 1G -w 1:00:00 -p $(PROJECT_DIR)/bam -N $1/copy_bai,"set -o pipefail && \
-    										       cp $$(<) $$(@)")
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 1:00:00 -p $(PROJECT_DIR)/bam -N $1/copy_bai,"set -o pipefail && \
+											   cp $$(<) $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
-    $(eval $(call align-fastq,$(sample))))
+	$(eval $(call align-fastq,$(sample))))
     
 define picard-metrics
 metrics/$1_rnaseq_metrics.txt : bam/$1.bam
