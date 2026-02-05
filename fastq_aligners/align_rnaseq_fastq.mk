@@ -27,7 +27,7 @@ STAR_OPTS = --genomeDir $(STAR_REF) \
 	    --alignSJDBoverhangMin 10 \
 	    --alignMatesGapMax 200000 \
 	    --alignIntronMax 200000 \
-	    --chimSegmentReadGapMax parameter 3 \
+	    --chimSegmentReadGapMax 3 \
 	    --alignSJstitchMismatchNmax 5 -1 5 5 \
 	    --chimOutType WithinBAM \
 	    --quantMode GeneCounts
