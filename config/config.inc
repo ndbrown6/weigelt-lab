@@ -9,7 +9,7 @@ PIGZ_ENV ?= $(HOME)/share/env/pigz-2.8
 GATK_ENV ?= $(HOME)/share/env/gatk-3.8-10
 SAMBAMBA_ENV ?= $(HOME)/share/env/sambamba-0.8.2
 FASTQ_SPLITTER_ENV ?= $(HOME)/share/env/fastqsplitter-1.2.0
-
+FACETS_SUITE_ENV ?= $(HOME)/share/env/facets-suite-2.0.10
 
 # aliases
 PYTHON ?= python
