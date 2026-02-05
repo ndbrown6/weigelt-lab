@@ -73,6 +73,6 @@ facets_suite/summary.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/t
 .PHONY: clean
 
 clean :
-    rm -f facets_suite/targets_dbsnp.vcf && \
-    rm -f facets_suite/*/*snp_pileup.gz && \
-    rm -f facets_suite/*/*taskcomplete
+	rm -f facets_suite/targets_dbsnp.vcf && \
+	rm -f facets_suite/*/*snp_pileup.gz && \
+	rm -f facets_suite/*/*taskcomplete
