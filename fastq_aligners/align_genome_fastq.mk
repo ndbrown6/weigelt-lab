@@ -54,11 +54,11 @@ PROJECT_DIR := $(notdir $(CURDIR))
 define merge-fastq
 bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
 	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 24:00:00 -v $(PIGZ_ENV) -p $(PROJECT_DIR)/bwamem -N $1/merge_R1,"set -o pipefail && \
-													       $$(PIGZ) -cd $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+													       pigz -cd $$(^) | pigz -c -p 12 > $$(@)")
     
 bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
 	$$(call RUN,-c -n 12 -s 0.5G -m 1G -w 24:00:00 -v $(PIGZ_ENV) -p $(PROJECT_DIR)/bwamem -N $1/merge_R2,"set -o pipefail && \
-													       $$(PIGZ) -cd $$(^) | $$(PIGZ) -c -p 12 > $$(@)")
+													       pigz -cd $$(^) | pigz -c -p 12 > $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))

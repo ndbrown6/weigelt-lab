@@ -22,7 +22,6 @@ SAMBAMBA ?= sambamba
 BEDTOOLS ?= bedtools
 PICARD ?= picard
 GATK ?= gatk
-PIGZ ?= pigz
 
 # picard command lines
 PICARD_MEM = 8G
