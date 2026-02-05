@@ -78,6 +78,34 @@ platypus_tumor_normal :
 	$(MAKE) -f weigelt-lab/variant_callers/platypus_tumor_normal.mk clean
 	
 #==================================================
+# Copy number aberrations
+#==================================================
+
+TARGETS += facets_suite
+facets_suite :
+	$(call RUN_MAKE,weigelt-lab/copy_number/facets_suite.mk) && \
+	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
+	
+TARGETS += cnv_kit
+cnv_kit :
+	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_kit.mk) && \
+	$(MAKE) -f weigelt-lab/copy_number/cnv_kit.mk clean
+	
+#==================================================
+# RNA expression
+#==================================================
+
+TARGETS += kallisto_quant
+kallisto_quant :
+	$(call RUN_MAKE,weigelt-lab/rna_seq/kallisto_quant.mk) && \
+	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
+	
+TARGETS += salmon_quant
+salmon_quant :
+	$(call RUN_MAKE,weigelt-lab/rna_seq/salmon_quant.mk) && \
+	$(MAKE) -f weigelt-lab/rna_seq/salmon_quant.mk clean
+	
+#==================================================
 # DNA structural variant callers
 #==================================================	
 
@@ -130,5 +158,20 @@ arriba_fusion :
 	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
 	
+#==================================================
+# Annotation
+#==================================================
 
+TARGETS += mutation_summary
+mutation_summary :
+	$(call RUN_MAKE,modules/summary/mutation_summary.mk)
+	
+TARGETS += sv_summary
+sv_summary :
+	$(call RUN_MAKE,modules/summary/sv_summary.mk)
+	
+TARGETS += fusion_summary
+fusion_summary :
+	$(call RUN_MAKE,modules/summary/fusion_summary.mk)
+	
 .PHONY : $(TARGETS)

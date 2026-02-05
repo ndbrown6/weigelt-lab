@@ -3,19 +3,7 @@ include weigelt-lab/config/gatk.inc
 
 LOGDIR ?= log/align_exome_fastq.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R2.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_aln.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl.fastq.gz) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt.intervals) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX.grp) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
-	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
-	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
 	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
 	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
