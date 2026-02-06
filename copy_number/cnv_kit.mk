@@ -108,7 +108,7 @@ endef
 #endef
 #$(foreach pair,$(SAMPLE_PAIRS),\
 #		$(eval $(call cnvkit-total-copy,$(tumor.$(pair)),$(normal.$(pair)))))
-#		
+		
 #cnvkit/summary/total_copy.txt : $(foreach sample,$(TUMOR_SAMPLES),cnvkit/totalcopy/$(sample).txt)
 #	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
 #							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
