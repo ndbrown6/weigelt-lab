@@ -18,8 +18,8 @@ NORMAL_DEPTH ?= 25
 PROJECT_DIR := $(notdir $(CURDIR))
 
 facets_suite/targets_dbsnp.vcf : $(TARGETS_FILE)
-	$(call RUN,-c -n 1 -s 6G -m 8G -p $(PROJECT_DIR) -N on_target_dbsnp,"set -o pipefail && \
-									     $(BEDTOOLS) intersect -header -u -a $(DBSNP) -b $(<) > $(@)")
+	$(call RUN,-c -n 1 -s 6G -m 8G -p $(PROJECT_DIR) -N target_dbsnp,"set -o pipefail && \
+									  $(BEDTOOLS) intersect -header -u -a $(DBSNP) -b $(<) > $(@)")
     
 define snp-pileup
 facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf bam/$1.bam bam/$2.bam
