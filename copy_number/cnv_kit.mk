@@ -3,8 +3,8 @@ include modules/genome_inc/b37.inc
 
 LOGDIR ?= log/cnv_kit.$(NOW)
 
-cnv_kit : cnv_kit/bed/ontarget.bed \
-	  cnv_kit/bed/offtarget.bed \
+cnv_kit : cnv_kit/target_bed/on_target.bed \
+	  cnv_kit/target_bed/off_target.bed \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).targetcoverage.cnn) \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).antitargetcoverage.cnn) \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).targetcoverage.cnn) \
@@ -19,6 +19,13 @@ cnv_kit : cnv_kit/bed/ontarget.bed \
 	  cnv_kit/summary/total_copy.txt \
 	  cnv_kit/summary/log2_ratio.txt
 	  
+
+PROJECT_DIR := $(notdir $(CURDIR))
+
+
+cnvkit.py target my_baits.bed --annotate refFlat.txt --split -o my_targets.bed
+cnvkit.py access hg19.fa -x excludes.bed -o access-excludes.hg19.bed
+cnvkit.py antitarget my_targets.bed -g data/access-5kb-mappable.hg19.bed -o my_antitargets.bed
 
 define cnvkit-tumor-cnn
 cnvkit/cnn/tumor/$1.targetcoverage.cnn : bam/$1.bam
@@ -76,15 +83,6 @@ endef
  $(foreach sample,$(TUMOR_SAMPLES),\
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 		
-define cnvkit-normal-cnr
-cnvkit/cnr/$1.cnr : cnvkit/cnn/normal/$1.targetcoverage.cnn cnvkit/cnn/normal/$1.antitargetcoverage.cnn cnvkit/reference/combined_reference.cnr
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						     cnvkit.py fix $$(<) $$(<<) $$(<<<) -o cnvkit/cnr/$1.cnr")
-
-endef
- $(foreach sample,$(NORMAL_SAMPLES),\
-		$(eval $(call cnvkit-normal-cnr,$(sample))))
-
 
 define cnvkit-total-copy
 cnvkit/totalcopy/$1.txt : cnvkit/segmented/$1.txt facets/cncf/$1_$2.out
