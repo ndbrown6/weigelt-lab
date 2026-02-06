@@ -123,6 +123,13 @@ endef
 
 ..DUMMY := $(shell mkdir -p version; \
 	     python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnvkit.txt)
-.DELETE_ON_ERROR:
 .SECONDARY:
-.PHONY: cnv_kit
+.DELETE_ON_ERROR:
+.PHONY: clean
+
+clean :
+	rm -f cnv_kit/on_target.bed && \
+	rm -f cnv_kit/off_target.bed && \
+	rm -f cnv_kit/cnn/*/*.targetcoverage.cnn && \
+	rm -f cnv_kit/cnn/*/*.antitargetcoverage.cnn && \
+	rm -f cnv_kit/reference.cnr
