@@ -75,54 +75,52 @@ endef
  $(foreach sample,$(TUMOR_SAMPLES),\
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 		
-define cnvkit-total-copy
-cnvkit/plots/log2/$1.pdf : cnvkit/cnr/$1.cnr
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-						     --option 1 \
-						     --sample_name $1")
-
-cnvkit/segmented/$1.txt : cnvkit/cnr/$1.cnr
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-						     --option 2 \
-						     --sample_name $1")
-						     
-cnvkit/plots/segmented/$1.pdf : cnvkit/cnr/$1.cnr
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-						     --option 3 \
-						     --sample_name $1")
-						     
-cnvkit/totalcopy/$1.txt : cnvkit/segmented/$1.txt facets/cncf/$1_$2.out
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-						    --option 4 \
-						    --sample_name $1_$2")
-						    
-cnvkit/plots/totalcopy/$1.pdf : cnvkit/cnr/$1.cnr cnvkit/totalcopy/$1.txt facets/cncf/$1_$2.out
-	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-						    --option 5 \
-						    --sample_name $1_$2")
-	
-endef
-$(foreach pair,$(SAMPLE_PAIRS),\
-		$(eval $(call cnvkit-total-copy,$(tumor.$(pair)),$(normal.$(pair)))))
-		
-cnvkit/summary/total_copy.txt : $(foreach sample,$(TUMOR_SAMPLES),cnvkit/totalcopy/$(sample).txt)
-	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
-							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-							--option 6 \
-							--sample_name '$(TUMOR_SAMPLES)'")
-							
-cnvkit/summary/log2_ratio.txt : $(foreach sample,$(SAMPLES),cnvkit/cnr/$(sample).cnr)
-	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
-							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-							--option 7 \
-							--sample_name '$(SAMPLES)'")
-
-
+#define cnvkit-total-copy
+#cnvkit/plots/log2/$1.pdf : cnvkit/cnr/$1.cnr
+#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
+#						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#						     --option 1 \
+#						     --sample_name $1")
+#
+#cnvkit/segmented/$1.txt : cnvkit/cnr/$1.cnr
+#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
+#						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#						     --option 2 \
+#						     --sample_name $1")
+#						     
+#cnvkit/plots/segmented/$1.pdf : cnvkit/cnr/$1.cnr
+#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
+#						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#						     --option 3 \
+#						     --sample_name $1")
+#						     
+#cnvkit/totalcopy/$1.txt : cnvkit/segmented/$1.txt facets/cncf/$1_$2.out
+#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
+#						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#						    --option 4 \
+#						    --sample_name $1_$2")
+#						    
+#cnvkit/plots/totalcopy/$1.pdf : cnvkit/cnr/$1.cnr cnvkit/totalcopy/$1.txt facets/cncf/$1_$2.out
+#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
+#						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#						    --option 5 \
+#						    --sample_name $1_$2")
+#	
+#endef
+#$(foreach pair,$(SAMPLE_PAIRS),\
+#		$(eval $(call cnvkit-total-copy,$(tumor.$(pair)),$(normal.$(pair)))))
+#		
+#cnvkit/summary/total_copy.txt : $(foreach sample,$(TUMOR_SAMPLES),cnvkit/totalcopy/$(sample).txt)
+#	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
+#							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#							--option 6 \
+#							--sample_name '$(TUMOR_SAMPLES)'")
+#							
+#cnvkit/summary/log2_ratio.txt : $(foreach sample,$(SAMPLES),cnvkit/cnr/$(sample).cnr)
+#	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
+#							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+#							--option 7 \
+#							--sample_name '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
 	     python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnvkit.txt)
