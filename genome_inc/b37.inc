@@ -5,6 +5,7 @@ REF_DIR = $(HOME)/share/lib/ref_files
 REF_FASTA ?= $(REF_DIR)/b37/human_g1k_v37.fasta
 DECOY_FASTA ?= $(REF_DIR)/b37/human_g1k_v37_decoy.fasta
 DBSNP ?= $(REF_DIR)/b37/dbsnp_138.b37.vcf
+DBSNP_GMAF ?= $(REF_DIR)/b37/dbsnp_138.b37.gmaf.vcf.gz
 KNOWN_INDELS ?= $(REF_DIR)/b37/Mills_and_1000G_gold_standard.indels.b37.vcf
 OMNI ?= $(REF_DIR)/b37/1000G_omni2.5.b37.vcf
 HAPMAP ?= $(REF_DIR)/b37/hapmap_3.3.b37.vcf
