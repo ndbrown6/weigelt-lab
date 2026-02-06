@@ -8,7 +8,7 @@ cnv_kit : cnv_kit/on_target.bed \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).antitargetcoverage.cnn) \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).targetcoverage.cnn) \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).antitargetcoverage.cnn) \
-	  cnv_kit/reference/reference.cnr \
+	  cnv_kit/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnr/$(sample).cnr)
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/segments/$(sample).txt) \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
