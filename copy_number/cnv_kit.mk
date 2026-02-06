@@ -71,6 +71,11 @@ cnv_kit/cnr/$1.cnr : cnv_kit/cnn/tumor/$1.targetcoverage.cnn cnv_kit/cnn/tumor/$
 	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/cnr -N $1/fix,"set -o pipefail && \
 										     cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
 
+endef
+ $(foreach sample,$(TUMOR_SAMPLES),\
+		$(eval $(call cnvkit-tumor-cnr,$(sample))))
+		
+define cnvkit-total-copy
 cnvkit/plots/log2/$1.pdf : cnvkit/cnr/$1.cnr
 	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
 						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
@@ -88,13 +93,7 @@ cnvkit/plots/segmented/$1.pdf : cnvkit/cnr/$1.cnr
 						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
 						     --option 3 \
 						     --sample_name $1")
-	
-endef
- $(foreach sample,$(TUMOR_SAMPLES),\
-		$(eval $(call cnvkit-tumor-cnr,$(sample))))
-		
-
-define cnvkit-total-copy
+						     
 cnvkit/totalcopy/$1.txt : cnvkit/segmented/$1.txt facets/cncf/$1_$2.out
 	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
 						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
