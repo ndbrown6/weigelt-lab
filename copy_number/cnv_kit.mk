@@ -3,23 +3,22 @@ include modules/genome_inc/b37.inc
 
 LOGDIR ?= log/cnv_kit.$(NOW)
 
-cnv_kit : $(foreach sample,$(TUMOR_SAMPLES),cnvkit/cnn/tumor/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/cnn/tumor/$(sample).antitargetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnvkit/cnn/normal/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnvkit/cnn/normal/$(sample).antitargetcoverage.cnn) \
-	  cnvkit/reference/combined_reference.cnr \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/cnr/$(sample).cnr) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnvkit/cnr/$(sample).cnr) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/segmented/$(sample).txt) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/plots/log2/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/plots/segmented/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/totalcopy/$(sample).txt) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnvkit/plots/totalcopy/$(sample).pdf) \
-	  cnvkit/summary/total_copy.txt \
-	  cnvkit/summary/log2_ratio.txt
+cnv_kit : cnv_kit/bed/ontarget.bed \
+	  cnv_kit/bed/offtarget.bed \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).targetcoverage.cnn) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).antitargetcoverage.cnn) \
+	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).targetcoverage.cnn) \
+	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).antitargetcoverage.cnn) \
+	  cnv_kit/reference/reference.cnr \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnr/$(sample).cnr) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/segments/$(sample).txt) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/segmented/$(sample).pdf) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/totalcopy/$(sample).txt) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/totalcopy/$(sample).pdf) \
+	  cnv_kit/summary/total_copy.txt \
+	  cnv_kit/summary/log2_ratio.txt
 	  
-ONTARGET_FILE = $(HOME)/share/lib/bed_files/MSK-IMPACT-v3_cnvkit_ontarget.bed
-OFFTARGET_FILE = $(HOME)/share/lib/bed_files/MSK-IMPACT-v4_cnvkit_offtarget.bed
 
 define cnvkit-tumor-cnn
 cnvkit/cnn/tumor/$1.targetcoverage.cnn : bam/$1.bam
