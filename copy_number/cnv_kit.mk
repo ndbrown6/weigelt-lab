@@ -10,14 +10,14 @@ cnv_kit : cnv_kit/target_bed/on_target.bed \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).targetcoverage.cnn) \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).antitargetcoverage.cnn) \
 	  cnv_kit/reference/reference.cnr \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnr/$(sample).cnr) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/segments/$(sample).txt) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/segmented/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/totalcopy/$(sample).txt) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/totalcopy/$(sample).pdf) \
-	  cnv_kit/summary/total_copy.txt \
-	  cnv_kit/summary/log2_ratio.txt
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnr/$(sample).cnr)
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/segments/$(sample).txt) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/segmented/$(sample).pdf) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/totalcopy/$(sample).txt) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/totalcopy/$(sample).pdf) \
+#	  cnv_kit/summary/total_copy.txt \
+#	  cnv_kit/summary/log2_ratio.txt
 	  
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
