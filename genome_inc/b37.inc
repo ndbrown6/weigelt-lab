@@ -10,7 +10,6 @@ OMNI ?= $(REF_DIR)/b37/1000G_omni2.5.b37.vcf
 HAPMAP ?= $(REF_DIR)/b37/hapmap_3.3.b37.vcf
 HAPMAP_POP_FILE ?= $(REF_DIR)/b37/hapmap_3.3_b37_pop_stratified_af.vcf.gz
 CHROMOSOMES := $(shell grep -v '@' $(TARGETS_FILE) | cut -f1 | sort | uniq)
-REF_MSI = $(REF_DIR)/b37/human_g1k_v37_msi.list
 ENSEMBL = $(HOME)/share/lib/resource_files/Ensemble_b37.RData
 STAR_REF = $(REF_DIR)/STAR_b37
 KALLISTO_INDEX = $(REF_DIR)/b37/ensembl_v75-0.43.0_kallisto_index
