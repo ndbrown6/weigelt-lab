@@ -21,21 +21,21 @@ bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 $(foreach sample,$(SAMPLES),$(foreach n,$(FASTQ_SEQ),bwamem/$(sample)/$(sample)--$(n)_cl_aln_srt_IR_FX_BR.bam)) \
 	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR.bam) \
 	 $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_cl_aln_srt_IR_FX_BR_MD.bam) \
-	 $(foreach sample,$(SAMPLES),bam/$(sample).bam)
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt) \
-#	 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
-#	 summary/idx_metrics.txt \
-#	 summary/aln_metrics.txt \
-#	 summary/insert_metrics.txt \
-#	 summary/oxog_metrics.txt \
-#	 summary/gc_metrics.txt \
-#	 summary/wgs_metrics.txt \
-#	 summary/duplicate_metrics.txt
+	 $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt) \
+	 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
+	 summary/idx_metrics.txt \
+	 summary/aln_metrics.txt \
+	 summary/insert_metrics.txt \
+	 summary/oxog_metrics.txt \
+	 summary/gc_metrics.txt \
+	 summary/wgs_metrics.txt \
+	 summary/duplicate_metrics.txt
 
 SPLIT_THREADS = 8
 SPLIT_MEM_THREAD = 1G
