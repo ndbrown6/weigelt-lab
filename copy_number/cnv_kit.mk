@@ -92,7 +92,7 @@ endef
 $(foreach set,$(SAMPLE_SETS),\
 		$(eval $(call aggregate-copy-number,$(set))))
 
-cnv_kit/summary/log2_smry.txt : $(foreach sample,$(SAMPLES),cnv_kit/log2/$(sample).txt)
+cnv_kit/summary/log2_smry.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt)
 	$(call RUN,-n 1 -s 24G -m 36G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
 											    $$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
 											    --option 3 \
