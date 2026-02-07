@@ -12,12 +12,11 @@ cnv_kit : cnv_kit/on_target.bed \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/segmented/$(set).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
+	  cnv_kit/summary/copy_smry.txt \
+	  cnv_kit/summary/log2_smry.txt \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/log2/$(sample).pdf) \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/segmented/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/totalcopy/$(sample).pdf) \
-	  cnv_kit/summary/total_copy.txt \
-	  cnv_kit/summary/log2_ratio.txt
-	  
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/totalcopy/$(sample).pdf)
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
@@ -76,19 +75,16 @@ endef
 		
 define aggregate-copy-number
 cnv_kit/segmented/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt)
-	$$(call RUN,-c -n 1 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
-											      $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
+											      $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 											      --option 1 \
-											      --tumor_sample_name '$(tumors.$1)' \
-											      --normal_sample_name '$(normal.$1)' \
+											      --file_in $$(^) \
 											      --file_out $$(@)")
 
 cnv_kit/totalcopy/$1.txt : cnv_kit/segmented/$1.txt
-	$$(call RUN,-c -n 1 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/segments,"set -o pipefail && \
-												  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/segments,"set -o pipefail && \
+												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												  --option 2 \
-												  --tumor_sample_name '$(tumors.$1)' \
-												  --normal_sample_name '$(normal.$1)' \
 												  --file_in $$(<) \
 												  --file_out $$(@)")
 
@@ -96,47 +92,52 @@ endef
 $(foreach set,$(SAMPLE_SETS),\
 		$(eval $(call aggregate-copy-number,$(set))))
 
-cnvkit/summary/total_copy.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
-	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N ,"set -o pipefail && \
-							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-							--option 6 \
-							--sample_name '$(TUMOR_SAMPLES)'")
-							
-#cnvkit/summary/log2_ratio.txt : $(foreach sample,$(SAMPLES),cnvkit/cnr/$(sample).cnr)
-#	$(call RUN,-n 1 -s 24G -m 32G -v $(CNVKIT_ENV),"set -o pipefail && \
-#							$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-#							--option 7 \
-#							--sample_name '$(SAMPLES)'")
+cnv_kit/summary/log2_smry.txt : $(foreach sample,$(SAMPLES),cnv_kit/log2/$(sample).txt)
+	$(call RUN,-n 1 -s 24G -m 36G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
+											    $$(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+											    --option 3 \
+											    --file_in $(^) \
+											    --file_out $(@)")
 
-#cnv_kit/plot/log2/$1.pdf :
-#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/plot -N $1/log2,"set -o pipefail && \
-#										       $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
-#										       --option 3 \
-#										       --tumor_sample_name '$(tumors.$1)' \
-#										       --normal_sample_name '$(normal.$1)' \
-#										       --file_out $$(@)")
-#
-#cnvkit/plots/segmented/$1.pdf : cnvkit/cnr/$1.cnr
-#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-#						     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-#						     --option 3 \
-#						     --sample_name $1")
-#						     
-#cnvkit/totalcopy/$1.txt : cnvkit/segmented/$1.txt facets/cncf/$1_$2.out
-#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-#						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-#						    --option 4 \
-#						    --sample_name $1_$2")
-#						    
-#cnvkit/plots/totalcopy/$1.pdf : cnvkit/cnr/$1.cnr cnvkit/totalcopy/$1.txt facets/cncf/$1_$2.out
-#	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV),"set -o pipefail && \
-#						    $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
-#						    --option 5 \
-#						    --sample_name $1_$2")
+cnv_kit/summary/copy_smry.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
+	$(call RUN,-n 1 -s 12G -m 24G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/sets,"set -o pipefail && \
+											    $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+											    --option 4 \
+											    --file_in $(^) \
+											    --file_out $(@)")
+
+define plot-tumor
+cnv_kit/plot/log2/$1.pdf : cnv_kit/summary/log2_smry.txt
+	$$(call RUN,-c -s 12G -m 24G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/plot -N $1/log2,"set -o pipefail && \
+										         $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+											 --option 5 \
+											 --sample_name $1 \
+											 --file_in $$(<) \
+											 --file_out $$(@)")
+
+cnv_kit/plots/segmented/$1.pdf : cnv_kit/summary/log2_smry.txt cnv_kit/summary/copy_smry.txt
+	$$(call RUN,-c -s 24G -m 36G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/plot -N $1/segmented,"set -o pipefail && \
+											      $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+											      --option 6 \
+											      --sample_name $1 \
+											      --file_in $$(^) \
+											      --file_out $$(@)")
+						     
+cnv_kit/plots/totalcopy/$1.pdf : cnv_kit/summary/log2_smry.txt cnv_kit/summary/copy_smry.txt
+	$$(call RUN,-c -s 24G -m 36G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/plot -N $1/totalcopy,"set -o pipefail && \
+											      $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+											      --option 7 \
+											      --sample_name $1 \
+											      --file_in $$(^) \
+											      --file_out $$(@)")
+
+endef
+ $(foreach sample,$(TUMOR_SAMPLES),\
+		$(eval $(call plot-tumor,$(sample))))
 
 
 ..DUMMY := $(shell mkdir -p version; \
-	     python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnvkit.txt)
+         python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnv_kit.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
