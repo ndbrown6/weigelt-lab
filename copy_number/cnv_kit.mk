@@ -14,9 +14,9 @@ cnv_kit : cnv_kit/on_target.bed \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
 	  cnv_kit/summary/copy_smry.txt \
 	  cnv_kit/summary/log2_smry.txt \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/log2/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/segmented/$(sample).pdf) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plot/totalcopy/$(sample).pdf)
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/segmented/$(sample).pdf) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/totalcopy/$(sample).pdf)
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
@@ -107,7 +107,7 @@ cnv_kit/summary/copy_smry.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$
 											    --file_out $(@)")
 
 define plot-tumor
-cnv_kit/plot/log2/$1.pdf : cnv_kit/summary/log2_smry.txt
+cnv_kit/plots/log2/$1.pdf : cnv_kit/summary/log2_smry.txt
 	$$(call RUN,-c -s 12G -m 24G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/plot -N $1/log2,"set -o pipefail && \
 										         $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 											 --option 5 \
