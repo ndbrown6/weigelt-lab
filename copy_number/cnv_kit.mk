@@ -99,7 +99,7 @@ cnv_kit/summary/log2_smry.txt : $(foreach sample,$(SAMPLES),cnv_kit/log2/$(sampl
 											    --file_in $(^) \
 											    --file_out $(@)")
 
-cnv_kit/summary/copy_smry.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
+cnv_kit/summary/copy_smry.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt)
 	$(call RUN,-n 1 -s 12G -m 24G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/sets,"set -o pipefail && \
 											    $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 											    --option 4 \
