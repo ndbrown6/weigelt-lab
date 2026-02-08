@@ -10,6 +10,7 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
 	  cnv_kit/normal_reference/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
+	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
 #	  cnv_kit/summary/copy_smry.txt \
@@ -72,6 +73,15 @@ cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/tumor/$1.targetcoverage.cnn
 endef
  $(foreach sample,$(TUMOR_SAMPLES),\
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
+		
+define cnvkit-normal-cnr
+cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/normal/$1.targetcoverage.cnn cnv_kit/read_counts/normal/$1.antitargetcoverage.cnn cnv_kit/normal_reference/reference.cnr
+	$$(call RUN,-c -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalized_log2 -N $1/fix,"set -o pipefail && \
+												 cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
+
+endef
+ $(foreach sample,$(NORMAL_SAMPLES),\
+		$(eval $(call cnvkit-normal-cnr,$(sample))))
 		
 define aggregate-copy-number
 cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt)
