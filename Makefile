@@ -88,8 +88,8 @@ facets_suite :
 	
 TARGETS += cnv_kit
 cnv_kit :
-	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_kit.mk) && \
-	$(MAKE) -f weigelt-lab/copy_number/cnv_kit.mk clean
+	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_kit.mk)
+#	$(MAKE) -f weigelt-lab/copy_number/cnv_kit.mk clean
 	
 #==================================================
 # RNA expression
