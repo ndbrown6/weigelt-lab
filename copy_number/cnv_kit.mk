@@ -74,7 +74,7 @@ endef
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 		
 define aggregate-copy-number
-cnv_kit/segmented/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt)
+cnv_kit/segmented/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt)
 	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
 												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												  --option 1 \
