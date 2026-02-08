@@ -21,10 +21,10 @@ arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
 
 if (as.numeric(opt$option) == 1) {
-	file_names = unlist(strsplit(x = as.character(opt$file_in), split = " ", fixed = TRUE, perl = FALSE))
+	sample_names = unlist(strsplit(x = as.character(opt$tumor_sample), split = " ", fixed = TRUE))
 	data = list()
-	for (i in 1:length(file_names)) {
-		data[[i]] = readr::read_tsv(file = file_names[i], col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	for (i in 1:length(sample_names)) {
+		data[[i]] = readr::read_tsv(file = paste0("cnv_kit/normalized_log2/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			    readr::type_convert() %>%
 			    dplyr::select(Chromosome = chromosome,
 					  Start_Position = start,
@@ -32,7 +32,7 @@ if (as.numeric(opt$option) == 1) {
 					  Hugo_GeneSymbol = gene,
 					  Log2_Ratio = log2) %>%
 			    dplyr::filter(Chromosome %in% c(1:22, "X")) %>%
-			    dplyr::mutate(Sample_Name = gsub(pattern = ".txt", replacement = "", x = gsub(pattern = "cnv_kit/log2/", replacement = "", x = file_names[i], fixed = TRUE), fixed = TRUE))
+			    dplyr::mutate(Sample_Name = sample_names[i])
 	}
 	data = do.call(rbind, data) %>%
 	       reshape2::dcast(Chromosome + Start_Position + End_Position + Hugo_GeneSymbol ~ Sample_Name, value.var = "Log2_Ratio")
