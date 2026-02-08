@@ -32,7 +32,7 @@ if (as.numeric(opt$option) == 1) {
 					  Hugo_GeneSymbol = gene,
 					  Log2_Ratio = log2) %>%
 			    dplyr::filter(Chromosome %in% c(1:22, "X")) %>%
-			    dplyr::mutate(Sample_Name = sample_names[i]) %>%
+			    dplyr::mutate(Sample_Name = sample_names[i])
 	}
 	data = do.call(rbind, data) %>%
 	       reshape2::dcast(Chromosome + Position + Hugo_GeneSymbol ~ Sample_Name, value.var = "Log2_Ratio")
