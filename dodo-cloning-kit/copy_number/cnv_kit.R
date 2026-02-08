@@ -42,7 +42,8 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(x = as.character(opt$tumor_sample), split = " ", fixed = TRUE))
 	data = readr::read_tsv(file = as.character(opt$file_in), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       dplyr::mutate(Chromosome = ifelse(Chromosome == "X", "23", Chromosome)) %>%
-	       readr::type_convert()
+	       readr::type_convert() %>%
+	       dplyr::select(-Hugo_GeneSymbol)
 	if (length(sample_names) == 1) {
 		smoothed_log2 = data %>%
 				copynumber::winsorize(method = "mad", , tau = 2.5, k = 25, verbose = FALSE) %>%
