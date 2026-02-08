@@ -46,6 +46,7 @@ if (as.numeric(opt$option) == 1) {
 	       dplyr::select(-Hugo_GeneSymbol)
 	if (length(sample_names) == 1) {
 		smoothed_log2 = data %>%
+				as.data.frame() %>%
 				copynumber::winsorize(method = "mad", , tau = 2.5, k = 25, verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)
 		segmented_log2 = smoothed_log2 %>%
@@ -53,10 +54,11 @@ if (as.numeric(opt$option) == 1) {
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
-				 dplyr::rename(sample_name = sampleID, Log2_Ratio = mean)
+				 dplyr::rename(Sample_Name = sampleID, Log2_Ratio = mean)
 		readr::write_tsv(x = segmented_log2, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	} else {
 		smoothed_log2 = data %>%
+				as.data.frame() %>%
 				copynumber::winsorize(method = "mad", , tau = 2.5, k = 25, verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)	
 		segmented_log2 = smoothed_log2 %>%
@@ -64,7 +66,7 @@ if (as.numeric(opt$option) == 1) {
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
-				 reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"), variable.name = "sample_name", value.name = "Log2_Ratio")
+				 reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"), variable.name = "Sample_Name", value.name = "Log2_Ratio")
 		readr::write_tsv(x = segmented_log2, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	}
 	
