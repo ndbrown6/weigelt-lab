@@ -26,7 +26,7 @@ if (as.numeric(opt$option) == 1) {
 	for (i in 1:length(sample_names)) {
 		data[[i]] = readr::read_tsv(file = paste0("cnv_kit/normalized_log2/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			    readr::type_convert() %>%
-			    dplyr::mutate(Position = round(.5*(Start_Position + End_Position))) %>%
+			    dplyr::mutate(Position = round(.5*(start + end))) %>%
 			    dplyr::select(Chromosome = chromosome,
 					  Position,
 					  Hugo_GeneSymbol = gene,
