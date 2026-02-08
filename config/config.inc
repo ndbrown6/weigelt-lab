@@ -11,6 +11,7 @@ SAMBAMBA_ENV ?= $(HOME)/share/env/sambamba-0.8.2
 FASTQ_SPLITTER_ENV ?= $(HOME)/share/env/fastqsplitter-1.2.0
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 CNVKIT_ENV ?= $(HOME)/share/env/cnvkit-0.9.9
+COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 
 # aliases
 PYTHON ?= python
