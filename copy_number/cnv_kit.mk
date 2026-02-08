@@ -78,7 +78,8 @@ cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/norma
 	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
 												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												  --option 1 \
-												  --sample_set $1 \
+												  --tumor_sample '$(tumors.$1)' \
+												  --normal_sample '$(normal.$1)' \
 												  --file_out $$(@)")
 
 cnv_kit/totalcopy/$1.txt : cnv_kit/segmented/$1.txt
