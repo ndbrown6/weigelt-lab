@@ -89,6 +89,7 @@ cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/norma
 												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												  --option 1 \
 												  --tumor_sample '$(tumors.$1)' \
+												  --normal_sample '$(NORMAL_SAMPLES)' \
 												  --file_out $$(@)")
 
 cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
