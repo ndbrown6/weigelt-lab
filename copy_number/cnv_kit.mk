@@ -3,11 +3,11 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/cnv_kit.$(NOW)
 
 cnv_kit : cnv_kit/bed_files/on_target.bed \
-	  cnv_kit/bed_files/off_target.bed
-#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
-#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
-#	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
-#	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn)
+	  cnv_kit/bed_files/off_target.bed \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
+	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
+	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
+	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn)
 #	  cnv_kit/reference.cnr \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt) \
 #	  $(foreach set,$(SAMPLE_SETS),cnv_kit/segmented/$(set).txt)
@@ -36,11 +36,11 @@ cnv_kit/bed_files/off_target.bed : cnv_kit/bed_files/on_target.bed
 											 -o $(@)")
 
 define cnvkit-tumor-cnn
-cnv_kit/cnn/tumor/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/on_target.bed
+cnv_kit/read_counts/tumor/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
 	$$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/cnn -N $1/on_target,"set -o pipefail && \
 												cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 
-cnv_kit/cnn/tumor/$1.antitargetcoverage.cnn : bam/$1.bam cnv_kit/off_target.bed
+cnv_kit/read_counts/tumor/$1.antitargetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/off_target.bed
 	$$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/cnn -N $1/off_target,"set -o pipefail && \
 												 cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 endef
@@ -48,11 +48,11 @@ endef
 		$(eval $(call cnvkit-tumor-cnn,$(sample))))
 		
 define cnvkit-normal-cnn
-cnv_kit/cnn/normal/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/on_target.bed
+cnv_kit/read_counts/normal/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
 	$$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/cnn -N $1/on_target,"set -o pipefail && \
 												cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 
-cnv_kit/cnn/normal/$1.antitargetcoverage.cnn : bam/$1.bam bam/$1.bam cnv_kit/off_target.bed
+cnv_kit/read_counts/normal/$1.antitargetcoverage.cnn : bam/$1.bam bam/$1.bam cnv_kit/bed_files/off_target.bed
 	$$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/cnn -N $1/off_target,"set -o pipefail && \
 												 cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 endef
