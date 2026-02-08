@@ -4,6 +4,7 @@ suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("magrittr"))
+suppressPackageStartupMessages(library("reshape2"))
 suppressPackageStartupMessages(library("copynumber"))
 
 if (!interactive()) {

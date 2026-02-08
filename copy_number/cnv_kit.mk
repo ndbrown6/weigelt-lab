@@ -2,15 +2,15 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/cnv_kit.$(NOW)
 
-cnv_kit : cnv_kit/on_target.bed \
-	  cnv_kit/off_target.bed \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/cnn/tumor/$(sample).antitargetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/cnn/normal/$(sample).antitargetcoverage.cnn) \
-	  cnv_kit/reference.cnr \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/segmented/$(set).txt)
+cnv_kit : cnv_kit/bed_files/on_target.bed \
+	  cnv_kit/bed_files/off_target.bed
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
+#	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
+#	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn)
+#	  cnv_kit/reference.cnr \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/log2/$(sample).txt) \
+#	  $(foreach set,$(SAMPLE_SETS),cnv_kit/segmented/$(set).txt)
 #	  $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
 #	  cnv_kit/summary/copy_smry.txt \
 #	  cnv_kit/summary/log2_smry.txt \
@@ -23,13 +23,13 @@ EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-cnv_kit/on_target.bed : $(TARGETS_FILE)
+cnv_kit/bed_files/on_target.bed : $(TARGETS_FILE)
 	$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N on_target,"set -o pipefail && \
 											cnvkit.py target $(<) \
 											--annotate $(REF_FLAT) \
 											--split -o $(@)")
 
-cnv_kit/off_target.bed : cnv_kit/on_target.bed
+cnv_kit/bed_files/off_target.bed : cnv_kit/bed_files/on_target.bed
 	$(call RUN,-c -n 4 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N off_target,"set -o pipefail && \
 											 cnvkit.py antitarget $(<) \
 											 -g $(EXCLUDE_BED) \
