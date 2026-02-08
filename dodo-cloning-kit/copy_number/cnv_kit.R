@@ -37,4 +37,7 @@ if (as.numeric(opt$option) == 1) {
 	data = do.call(rbind, data) %>%
 	       reshape2::dcast(Chromosome + Start_Position + End_Position + Hugo_GeneSymbol ~ Sample_Name, value.var = "Log2_Ratio")
 	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
+	
+} else if (as.numeric(opt$option) == 2) {
+	
 }

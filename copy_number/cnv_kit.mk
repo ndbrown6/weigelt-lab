@@ -11,7 +11,7 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  cnv_kit/normal_reference/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
-#	  $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
+#	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
 #	  cnv_kit/summary/copy_smry.txt \
 #	  cnv_kit/summary/log2_smry.txt \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
@@ -81,12 +81,12 @@ cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/norma
 												  --tumor_sample '$(tumors.$1)' \
 												  --file_out $$(@)")
 
-cnv_kit/totalcopy/$1.txt : cnv_kit/segmented/$1.txt
-	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N aggregate/segments,"set -o pipefail && \
-												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
-												  --option 2 \
-												  --file_in $$(<) \
-												  --file_out $$(@)")
+cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
+	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segments,"set -o pipefail && \
+												      $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+												      --option 2 \
+												      --file_in $$(<) \
+												      --file_out $$(@)")
 
 endef
 $(foreach set,$(SAMPLE_SETS),\
