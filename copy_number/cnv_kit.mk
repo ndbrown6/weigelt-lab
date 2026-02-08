@@ -10,8 +10,8 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
 	  cnv_kit/normal_reference/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
-#	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
+	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
+	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
 #	  cnv_kit/summary/copy_smry.txt \
 #	  cnv_kit/summary/log2_smry.txt \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
@@ -86,7 +86,8 @@ cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
 												      $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												      --option 2 \
 												      --file_in $$(<) \
-												      --file_out $$(@)")
+												      --file_out $$(@) \
+												      --tumor_sample '$(tumors.$1)'")
 
 endef
 $(foreach set,$(SAMPLE_SETS),\
