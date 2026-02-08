@@ -39,7 +39,7 @@ if (as.numeric(opt$option) == 1) {
 		     dplyr::as_tibble() %>%
 		     readr::type_convert() %>%
 		     dplyr::group_by(Chromosome, Position, Hugo_Symbol) %>%
-		     dplyr::summarize(Sigma2 = std(Log2_Ratio)) %>%
+		     dplyr::summarize(Sigma2 = var(Log2_Ratio)) %>%
 		     dplyr::ungroup()
 
 	data_tumor = list()
