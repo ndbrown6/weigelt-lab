@@ -10,7 +10,7 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
 	  cnv_kit/normal_reference/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/segmented_log2/$(set).txt)
+	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
 #	  $(foreach set,$(SAMPLE_SETS),cnv_kit/totalcopy/$(set).txt) \
 #	  cnv_kit/summary/copy_smry.txt \
 #	  cnv_kit/summary/log2_smry.txt \
@@ -74,11 +74,11 @@ endef
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 		
 define aggregate-copy-number
-cnv_kit/segmented_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt)
+cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt)
 	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2,"set -o pipefail && \
 												  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												  --option 1 \
-												  --file_in $$(^) \
+												  --sample_set $1 \
 												  --file_out $$(@)")
 
 cnv_kit/totalcopy/$1.txt : cnv_kit/segmented/$1.txt
