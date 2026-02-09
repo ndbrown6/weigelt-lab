@@ -103,7 +103,7 @@ $(foreach set,$(SAMPLE_SETS),\
 
 cnv_kit/summary/log2_ratio.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
 	$(call RUN,-n 1 -s 24G -m 36G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2/sets,"set -o pipefail && \
-												     $(RSCRIPT) $(SCRIPTS_DIR)/cnvkit.R \
+												     $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												     --option 3 \
 												     --file_in $(^) \
 												     --file_out $(@)")
