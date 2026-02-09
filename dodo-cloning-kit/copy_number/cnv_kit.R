@@ -15,7 +15,11 @@ args_list <- list(make_option("--option", default = NA, type = 'character', help
 		  make_option("--file_in", default = NA, type = 'character', help = "file name input"),
 		  make_option("--file_out", default = NA, type = 'character', help = "file name output"),
 		  make_option("--tumor_sample", default = NA, type = 'character', help = "tumor sample name"),
-		  make_option("--normal_sample", default = NA, type = 'character', help = "normal sample name"))
+		  make_option("--normal_sample", default = NA, type = 'character', help = "normal sample name"),
+		  make_option("--sigma", default = NA, type = 'character', help = "variance filter"),
+		  make_option("--tau", default = NA, type = 'character', help = "tau smoothing in copynumber"),
+		  make_option("--k", default = NA, type = 'character', help = "window size k in copynumber"),
+		  make_option("--gamma", default = NA, type = 'character', help = "penalty gamma in copynumber"))
 parser <- OptionParser(usage = "%prog", option_list = args_list)
 arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
@@ -43,7 +47,7 @@ if (as.numeric(opt$option) == 1) {
 			     dplyr::summarize(sigma = var(Log2_Ratio)) %>%
 			     dplyr::ungroup() %>%
 			     dplyr::mutate(keep = case_when(
-				     Hugo_Symbol == "Antitarget" & sigma > as.numeric(Sys.getenv("MAX_SIGMA")) ~ "no",
+				     Hugo_Symbol == "Antitarget" & sigma > as.numeric(opt$sigma) ~ "no",
 				     TRUE ~ "yes"
 			     )) %>%
 			     dplyr::select(Chromosome, Position, Hugo_Symbol, keep)
@@ -86,10 +90,10 @@ if (as.numeric(opt$option) == 1) {
 	if (length(sample_names) == 1) {
 		smoothed_log2 = data %>%
 				as.data.frame() %>%
-				copynumber::winsorize(method = "mad", , tau = as.numeric(Sys.getenv("WINSORIZE_TAU")), k = as.numeric(Sys.getenv("WINSORIZE_K")), verbose = FALSE) %>%
+				copynumber::winsorize(method = "mad", , tau = as.numeric(opt$tau), k = as.numeric(opt$k), verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)
 		segmented_log2 = smoothed_log2 %>%
-				 copynumber::pcf(gamma = as.numeric(Sys.getenv("PCF_GAMMA")), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
+				 copynumber::pcf(gamma = as.numeric(opt$gamma), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
@@ -99,10 +103,10 @@ if (as.numeric(opt$option) == 1) {
 	} else {
 		smoothed_log2 = data %>%
 				as.data.frame() %>%
-				copynumber::winsorize(method = "mad", , tau = as.numeric(Sys.getenv("WINSORIZE_TAU")), k = as.numeric(Sys.getenv("WINSORIZE_K")), verbose = FALSE) %>%
+				copynumber::winsorize(method = "mad", , tau = as.numeric(opt$tau), k = as.numeric(opt$k), verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)	
 		segmented_log2 = smoothed_log2 %>%
-				 copynumber::multipcf(gamma = as.numeric(Sys.getenv("PCF_GAMMA")), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
+				 copynumber::multipcf(gamma = as.numeric(opt$gamma), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%

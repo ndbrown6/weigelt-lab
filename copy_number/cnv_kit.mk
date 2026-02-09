@@ -92,7 +92,8 @@ cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/norma
 												     --option 1 \
 												     --tumor_sample '$(tumors.$1)' \
 												     --normal_sample '$(NORMAL_SAMPLES)' \
-												     --file_out $$(@)")
+												     --file_out $$(@) \
+												     --sigma $(MAX_SIGMA)")
 
 cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
 	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segmented/$1,"set -o pipefail && \
@@ -100,7 +101,10 @@ cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
 													  --option 2 \
 													  --file_in $$(<) \
 													  --file_out $$(@) \
-													  --tumor_sample '$(tumors.$1)'")
+													  --tumor_sample '$(tumors.$1)' \
+													  --tau $(WINSORIZE_TAU) \
+													  --k $(WINSORIZE_K)\
+													  --gamma $(PCF_GAMMA)")
 
 endef
 $(foreach set,$(SAMPLE_SETS),\
