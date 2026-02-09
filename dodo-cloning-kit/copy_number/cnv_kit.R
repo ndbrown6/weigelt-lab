@@ -43,7 +43,7 @@ if (as.numeric(opt$option) == 1) {
 		     dplyr::ungroup()
 
 	data_tumor = list()
-	for (i in 1:length(sample_names)) {
+	for (i in 1:length(tumor_names)) {
 		data_tumor[[i]] = readr::read_tsv(file = paste0("cnv_kit/normalized_log2/", tumor_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				  readr::type_convert() %>%
 				  dplyr::mutate(Position = round(.5*(start + end))) %>%
@@ -52,7 +52,7 @@ if (as.numeric(opt$option) == 1) {
 						Hugo_Symbol = gene,
 						Log2_Ratio = log2) %>%
 				  dplyr::filter(Chromosome %in% c(1:22, "X")) %>%
-				  dplyr::mutate(Sample_Name = sample_names[i])
+				  dplyr::mutate(Sample_Name = tumor_names[i])
 	}
 	data_tumor = do.call(rbind, data_tumor) %>%
 		     reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
