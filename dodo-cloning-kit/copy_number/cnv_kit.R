@@ -104,7 +104,7 @@ if (as.numeric(opt$option) == 1) {
 			    readr::type_convert() %>%
 			    reshape2::melt(id.vars = c("Chromosome", "Position", "Hugo_Symbol"), variable.name = "Sample_Name", value.name = "Log2_Ratio")
 	}
-	data = do.call(rbind, data_tumor) %>%
+	data = do.call(rbind, data) %>%
 	       reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
 	       readr::type_convert()
 	
@@ -117,7 +117,7 @@ if (as.numeric(opt$option) == 1) {
 		data[[i]] = readr::read_tsv(file = file_names[i], col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			    readr::type_convert()
 	}
-	data = do.call(rbind, data_tumor) %>%
+	data = do.call(rbind, data) %>%
 	       readr::type_convert()
 	
 	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
