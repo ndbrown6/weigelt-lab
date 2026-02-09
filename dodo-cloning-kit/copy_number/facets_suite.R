@@ -39,7 +39,7 @@ if (as.numeric(opt$option) == 1) {
 			    dplyr::as_tibble() %>%
 			    dplyr::select(Chromosome = chrom,
 					  Position = maploc,
-					  Log2_Ratio) %>%
+					  Log2_Ratio = cnlr) %>%
 			    dplyr::mutate(Sample_Name = sample_names[i]) %>%
 			    readr::type_convert()
 	}
