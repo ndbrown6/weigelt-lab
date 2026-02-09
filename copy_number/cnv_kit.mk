@@ -122,8 +122,7 @@ cnv_kit/summary/segmented_log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normal
 .PHONY: clean
 
 clean :
-	rm -f cnv_kit/on_target.bed && \
-	rm -f cnv_kit/off_target.bed && \
-	rm -f cnv_kit/cnn/*/*.targetcoverage.cnn && \
-	rm -f cnv_kit/cnn/*/*.antitargetcoverage.cnn && \
-	rm -f cnv_kit/reference.cnr
+	rm -f cnv_kit/bed_files/*.bed && \
+	rm -f cnv_kit/read_counts/*/*.targetcoverage.cnn && \
+	rm -f cnv_kit/read_counts/*/*.antitargetcoverage.cnn && \
+	rm -f cnv_kit/normal_reference/reference.cnr
