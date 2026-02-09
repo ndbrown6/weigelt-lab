@@ -44,7 +44,7 @@ if (as.numeric(opt$option) == 1) {
 			    readr::type_convert()
 	}
 	data = do.call(rbind, data) %>%
-	       reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
+	       reshape2::dcast(Chromosome + Position ~ Sample_Name, value.var = "Log2_Ratio") %>%
 	       readr::type_convert()
 	
 	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
