@@ -57,7 +57,7 @@ if (as.numeric(opt$option) == 1) {
 	data_tumor = do.call(rbind, data_tumor) %>%
 		     reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
 		     dplyr::left_join(var_filter, by = c("Chromosome", "Position", "Hugo_Symbol")) %>%
-		     dplyr::filter(Sigma2 < 1.5) %>%
+		     dplyr::filter(Sigma2 <= 1) %>%
 		     dplyr::select(-Sigma2)
 	
 	readr::write_tsv(x = data_tumor, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
