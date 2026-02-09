@@ -21,8 +21,8 @@ arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
 
 if (as.numeric(opt$option) == 1) {
-	tumor_names = unlist(strsplit(x = as.character(opt$tumor_sample), split = " ", fixed = TRUE))
 	normal_names = unlist(strsplit(x = as.character(opt$normal_sample), split = " ", fixed = TRUE))
+	tumor_names = unlist(strsplit(x = as.character(opt$tumor_sample), split = " ", fixed = TRUE))
 	
 	data_normal = list()
 	for (i in 1:length(normal_names)) {
@@ -35,12 +35,27 @@ if (as.numeric(opt$option) == 1) {
 						 Log2_Ratio = log2) %>%
 				   dplyr::filter(Chromosome %in% c(1:22, "X"))
 	}
-	var_filter = do.call(rbind, data_normal) %>%
-		     dplyr::as_tibble() %>%
-		     readr::type_convert() %>%
-		     dplyr::group_by(Chromosome, Position, Hugo_Symbol) %>%
-		     dplyr::summarize(Sigma2 = var(Log2_Ratio)) %>%
-		     dplyr::ungroup()
+	if (length(normal_names) > 3) {
+		var_filter = do.call(rbind, data_normal) %>%
+			     dplyr::as_tibble() %>%
+			     readr::type_convert() %>%
+			     dplyr::group_by(Chromosome, Position, Hugo_Symbol) %>%
+			     dplyr::summarize(sigma = var(Log2_Ratio)) %>%
+			     dplyr::ungroup() %>%
+			     dplyr::mutate(keep = case_when(
+				     Hugo_Symbol == "Antitarget" & sigma > .25 ~ "no",
+				     TRUE ~ "no"
+			     )) %>%
+			     dplyr::select(Chromosome, Position Hugo_Symbol, keep)
+	} else {
+		var_filter = do.call(rbind, data_normal) %>%
+			     dplyr::as_tibble() %>%
+			     readr::type_convert() %>%
+			     dplyr::group_by(Chromosome, Position, Hugo_Symbol) %>%
+			     dplyr::summarize(keep = "yes") %>%
+			     dplyr::ungroup() %>%
+			     dplyr::select(Chromosome, Position Hugo_Symbol, keep)
+	}
 
 	data_tumor = list()
 	for (i in 1:length(tumor_names)) {
@@ -57,8 +72,8 @@ if (as.numeric(opt$option) == 1) {
 	data_tumor = do.call(rbind, data_tumor) %>%
 		     reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
 		     dplyr::left_join(var_filter, by = c("Chromosome", "Position", "Hugo_Symbol")) %>%
-		     dplyr::filter(Sigma2 <= 0.25) %>%
-		     dplyr::select(-Sigma2)
+		     dplyr::filter(keep == "yes") %>%
+		     dplyr::select(-keep)
 	
 	readr::write_tsv(x = data_tumor, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	

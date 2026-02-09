@@ -13,8 +13,8 @@ cnvkit : cnv_kit/bed_files/on_target.bed \
 	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
 	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv) \
-	 cnv_kit/summary/log2_ratio.txt \
-	 cnv_kit/summary/segmented_log2.txt
+	 cnv_kit/summary/aggregated-log2.txt \
+	 cnv_kit/summary/aggregated-segmented.txt
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
@@ -101,14 +101,14 @@ endef
 $(foreach set,$(SAMPLE_SETS),\
 		$(eval $(call aggregate-copy-number,$(set))))
 
-cnv_kit/summary/log2_ratio.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
+cnv_kit/summary/aggregated-log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
 	$(call RUN,-n 1 -s 24G -m 36G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2/sets,"set -o pipefail && \
 												     $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 												     --option 3 \
 												     --file_in '$(^)' \
 												     --file_out $(@)")
 
-cnv_kit/summary/segmented_log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
+cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
 	$(call RUN,-n 1 -s 12G -m 24G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segmented/sets,"set -o pipefail && \
 													  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 													  --option 4 \
@@ -122,7 +122,7 @@ cnv_kit/summary/segmented_log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normal
 .PHONY: clean
 
 clean :
-	rm -f cnv_kit/bed_files/*.bed && \
-	rm -f cnv_kit/read_counts/*/*.targetcoverage.cnn && \
-	rm -f cnv_kit/read_counts/*/*.antitargetcoverage.cnn && \
-	rm -f cnv_kit/normal_reference/reference.cnr
+	rm -f cnv_kit/bed_files && \
+	rm -f cnv_kit/read_counts && \
+	rm -f cnv_kit/normal_reference && \
+	rm -f cnv_kit/normalized_log2
