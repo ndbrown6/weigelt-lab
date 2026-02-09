@@ -2,10 +2,10 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/facets_suite.$(NOW)
 
-facets_suite : facets_suite/targets_dbsnp.vcf \
-	       $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair).snp_pileup.gz) \
-	       $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete) \
-	       facets_suite/summary.txt
+facets : facets_suite/targets_dbsnp.vcf \
+	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair).snp_pileup.gz) \
+	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete) \
+	 facets_suite/summary.txt
     
 FACETS_MAX_DEPTH ?= 15000
 FACETS_CVAL ?= 50
