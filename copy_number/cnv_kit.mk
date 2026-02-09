@@ -2,19 +2,19 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/cnv_kit.$(NOW)
 
-cnv_kit : cnv_kit/bed_files/on_target.bed \
-	  cnv_kit/bed_files/off_target.bed \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
-	  cnv_kit/normal_reference/reference.cnr \
-	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
-	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv) \
-	  cnv_kit/summary/log2_ratio.txt \
-	  cnv_kit/summary/segmented_log2.txt
+cnvkit : cnv_kit/bed_files/on_target.bed \
+	 cnv_kit/bed_files/off_target.bed \
+	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
+	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
+	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
+	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
+	 cnv_kit/normal_reference/reference.cnr \
+	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
+	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
+	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
+	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv) \
+	 cnv_kit/summary/log2_ratio.txt \
+	 cnv_kit/summary/segmented_log2.txt
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
