@@ -11,8 +11,8 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  cnv_kit/normal_reference/reference.cnr \
 	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
-	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
-#	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
+	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
+	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
 #	  cnv_kit/summary/copy_smry.txt \
 #	  cnv_kit/summary/log2_smry.txt \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
