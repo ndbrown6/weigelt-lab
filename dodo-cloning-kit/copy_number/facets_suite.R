@@ -47,7 +47,7 @@ if (as.numeric(opt$option) == 1) {
 	       reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
 	       readr::type_convert()
 	
-	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
+	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	
 } else if (as.numeric(opt$option) == 3) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
@@ -68,7 +68,7 @@ if (as.numeric(opt$option) == 1) {
 	data = do.call(rbind, data) %>%
 	       readr::type_convert()
 	
-	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
+	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 
 } else if (as.numeric(opt$option) == 3) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
@@ -84,6 +84,6 @@ if (as.numeric(opt$option) == 1) {
 			     Ploidy = unlist(ploidy)) %>%
 	       readr::type_convert()
 	
-	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
+	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 
 }
