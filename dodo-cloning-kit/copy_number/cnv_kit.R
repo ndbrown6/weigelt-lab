@@ -97,7 +97,9 @@ if (as.numeric(opt$option) == 1) {
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
-				 dplyr::rename(Sample_Name = sampleID, Log2_Ratio = mean)
+				 dplyr::rename(Sample_Name = sampleID, Log2_Ratio = mean) %>%
+				 readr::type_convert() %>%
+				 dplyr::arrange(Chromosome, Start_Position, End_Position)
 		
 		readr::write_tsv(x = segmented_log2, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	} else {
@@ -110,7 +112,9 @@ if (as.numeric(opt$option) == 1) {
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
-				 reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"), variable.name = "Sample_Name", value.name = "Log2_Ratio")
+				 reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"), variable.name = "Sample_Name", value.name = "Log2_Ratio") %>%
+				 readr::type_convert() %>%
+				 dplyr::arrange(Chromosome, Start_Position, End_Position)
 		
 		readr::write_tsv(x = segmented_log2, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	}
