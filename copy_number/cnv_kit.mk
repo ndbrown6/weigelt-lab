@@ -127,7 +127,6 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 .PHONY: clean
 
 clean :
-	rm -f cnv_kit/bed_files && \
-	rm -f cnv_kit/read_counts && \
-	rm -f cnv_kit/normal_reference && \
-	rm -f cnv_kit/normalized_log2
+	rm -f cnv_kit/bed_files/* && \
+	rm -f cnv_kit/read_counts/* && \
+	rm -f cnv_kit/normal_reference/*
