@@ -44,7 +44,7 @@ if (as.numeric(opt$option) == 1) {
 			     dplyr::ungroup() %>%
 			     dplyr::mutate(keep = case_when(
 				     Hugo_Symbol == "Antitarget" & sigma > as.numeric(Sys.getenv("MAX_SIGMA")) ~ "no",
-				     TRUE ~ "no"
+				     TRUE ~ "yes"
 			     )) %>%
 			     dplyr::select(Chromosome, Position, Hugo_Symbol, keep)
 	} else {
