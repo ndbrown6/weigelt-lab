@@ -13,11 +13,11 @@ cnv_kit : cnv_kit/bed_files/on_target.bed \
 	  $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
 	  $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
-#	  cnv_kit/summary/copy_smry.txt \
-#	  cnv_kit/summary/log2_smry.txt \
-#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf) \
+#	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/log2/$(sample).pdf)
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/segmented/$(sample).pdf) \
 #	  $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/plots/totalcopy/$(sample).pdf)
+#	  cnv_kit/summary/copy_smry.txt \
+#	  cnv_kit/summary/log2_smry.txt \
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
