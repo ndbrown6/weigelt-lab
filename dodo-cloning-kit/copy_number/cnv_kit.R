@@ -46,7 +46,7 @@ if (as.numeric(opt$option) == 1) {
 				     Hugo_Symbol == "Antitarget" & sigma > as.numeric(Sys.getenv("MAX_SIGMA")) ~ "no",
 				     TRUE ~ "no"
 			     )) %>%
-			     dplyr::select(Chromosome, Position Hugo_Symbol, keep)
+			     dplyr::select(Chromosome, Position, Hugo_Symbol, keep)
 	} else {
 		var_filter = do.call(rbind, data_normal) %>%
 			     dplyr::as_tibble() %>%
@@ -54,7 +54,7 @@ if (as.numeric(opt$option) == 1) {
 			     dplyr::group_by(Chromosome, Position, Hugo_Symbol) %>%
 			     dplyr::summarize(keep = "yes") %>%
 			     dplyr::ungroup() %>%
-			     dplyr::select(Chromosome, Position Hugo_Symbol, keep)
+			     dplyr::select(Chromosome, Position, Hugo_Symbol, keep)
 	}
 
 	data_tumor = list()

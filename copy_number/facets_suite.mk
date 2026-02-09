@@ -5,9 +5,10 @@ LOGDIR ?= log/facets_suite.$(NOW)
 facets : facets_suite/targets_dbsnp.vcf \
 	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair).snp_pileup.gz) \
 	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete) \
-	 facets_suite/summary/smry_bygene.txt \
-	 facets_suite/summary/smry_bysegment.txt \
-	 facets_suite/summary/smry_bysample.txt
+	 facets_suite/summary/aggregated-gene.txt \
+	 facets_suite/summary/aggregated-log2.txt \
+	 facets_suite/summary/aggregated-segmented.txt \
+	 facets_suite/summary/aggregated-purity_ploidy.txt
     
 FACETS_MAX_DEPTH ?= 15000
 FACETS_CVAL ?= 50
@@ -63,23 +64,33 @@ endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call run-facets,$(tumor.$(pair)),$(normal.$(pair)))))
 
-facets_suite/summary/smry_bygene.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-gene.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
 	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N summary/facets,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 1 \
-														  --sample_pairs '$(SAMPLE_PAIRS)'")
+														  --sample_pairs '$(SAMPLE_PAIRS)' \
+														  --file_out $(@)")
 														  
-facets_suite/summary/smry_bysegment.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-log2.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
 	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N summary/facets,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 2 \
-														  --sample_pairs '$(SAMPLE_PAIRS)'")
+														  --sample_pairs '$(SAMPLE_PAIRS)' \
+														  --file_out $(@)")
 														  
-facets_suite/summary/smry_bysample.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-segmented.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
 	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N summary/facets,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 3 \
-														  --sample_pairs '$(SAMPLE_PAIRS)'")
+														  --sample_pairs '$(SAMPLE_PAIRS)' \
+														  --file_out $(@)")
+
+facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N summary/facets,"set -o pipefail && \
+														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
+														  --option 4 \
+														  --sample_pairs '$(SAMPLE_PAIRS)' \
+														  --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
          $(FACETS_SUITE_ENV)/bin/R --version > version/facets_suite.txt)
