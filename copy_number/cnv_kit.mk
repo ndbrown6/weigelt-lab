@@ -15,6 +15,12 @@ cnvkit : cnv_kit/bed_files/on_target.bed \
 	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv) \
 	 cnv_kit/summary/aggregated-log2.txt \
 	 cnv_kit/summary/aggregated-segmented.txt
+	 
+MAX_SIGMA ?= 0.25
+WINSORIZE_TAU ?= 2.5
+WINSORIZE_K ?= 25
+PCF_GAMMA ?= 150
+
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed

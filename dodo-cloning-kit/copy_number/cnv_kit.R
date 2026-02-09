@@ -43,7 +43,7 @@ if (as.numeric(opt$option) == 1) {
 			     dplyr::summarize(sigma = var(Log2_Ratio)) %>%
 			     dplyr::ungroup() %>%
 			     dplyr::mutate(keep = case_when(
-				     Hugo_Symbol == "Antitarget" & sigma > .25 ~ "no",
+				     Hugo_Symbol == "Antitarget" & sigma > as.numeric(Sys.getenv("MAX_SIGMA")) ~ "no",
 				     TRUE ~ "no"
 			     )) %>%
 			     dplyr::select(Chromosome, Position Hugo_Symbol, keep)
@@ -86,10 +86,10 @@ if (as.numeric(opt$option) == 1) {
 	if (length(sample_names) == 1) {
 		smoothed_log2 = data %>%
 				as.data.frame() %>%
-				copynumber::winsorize(method = "mad", , tau = 2.5, k = 25, verbose = FALSE) %>%
+				copynumber::winsorize(method = "mad", , tau = as.numeric(Sys.getenv("WINSORIZE_TAU")), k = as.numeric(Sys.getenv("WINSORIZE_K")), verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)
 		segmented_log2 = smoothed_log2 %>%
-				 copynumber::pcf(gamma = 150, normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
+				 copynumber::pcf(gamma = as.numeric(Sys.getenv("PCF_GAMMA")), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
@@ -99,10 +99,10 @@ if (as.numeric(opt$option) == 1) {
 	} else {
 		smoothed_log2 = data %>%
 				as.data.frame() %>%
-				copynumber::winsorize(method = "mad", , tau = 2.5, k = 25, verbose = FALSE) %>%
+				copynumber::winsorize(method = "mad", , tau = as.numeric(Sys.getenv("WINSORIZE_TAU")), k = as.numeric(Sys.getenv("WINSORIZE_K")), verbose = FALSE) %>%
 				dplyr::rename(Chromosome = chrom, Position = pos)	
 		segmented_log2 = smoothed_log2 %>%
-				 copynumber::multipcf(gamma = 150, normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
+				 copynumber::multipcf(gamma = as.numeric(Sys.getenv("PCF_GAMMA")), normalize = FALSE, fast = TRUE, verbose = FALSE) %>%
 				 dplyr::select(-arm, -n.probes) %>%
 				 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
 				 dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
