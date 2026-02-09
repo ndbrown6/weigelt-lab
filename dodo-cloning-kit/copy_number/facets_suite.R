@@ -70,7 +70,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 
-} else if (as.numeric(opt$option) == 3) {
+} else if (as.numeric(opt$option) == 4) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
 	purity = ploidy = list()
 	for (i in 1:length(sample_names)) {
