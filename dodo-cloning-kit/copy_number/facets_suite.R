@@ -26,4 +26,8 @@ if (as.numeric(opt$option) == 1) {
 	CN = do.call(rbind, CN)
 	readr::write_tsv(x = CN, path = "facets_suite/summary.txt", col_names = TRUE, append = FALSE)
 
+} else if (as.numeric(opt$option) == 2) {
+	
+} else if (as.numeric(opt$option) == 3) {
+	
 }
