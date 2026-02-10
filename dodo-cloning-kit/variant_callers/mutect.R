@@ -27,7 +27,7 @@ if (as.numeric(opt$option) == 1) {
 		dir.create(opt$output_dir, recursive = TRUE)
 	}
 
-	bed = readr::read_tsv(file = opt$input, col_names = FALSE, col_types = cols(), show_col_types = FALSE)
+	bed = readr::read_tsv(file = opt$input, col_names = FALSE, col_types = cols(.default = col_character()))
 	colnames(bed)[1:3] = c("chr", "start", "end")
 	chr_levels = c(as.character(1:22), "X", "Y")
 	if (any(grepl("^chr", bed$chr))) {
