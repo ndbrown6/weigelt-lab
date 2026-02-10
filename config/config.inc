@@ -25,7 +25,7 @@ SAMBAMBA ?= sambamba
 BEDTOOLS ?= bedtools
 PICARD ?= picard
 GATK ?= gatk
-MUTECT ? mutect
+MUTECT ?= mutect
 
 # picard command lines
 PICARD_MEM = 8G
