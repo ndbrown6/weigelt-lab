@@ -66,7 +66,7 @@ mutect/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHU
     
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
-	$(eval $(call snp-pileup,$(tumor.$(pair)),$(normal.$(pair)))))
+	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
