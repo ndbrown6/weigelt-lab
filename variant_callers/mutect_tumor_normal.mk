@@ -37,18 +37,18 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								      
 define mutect-tumor-normal-chunk
 mutect/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam mutect/chunk_bed/taskcomplete.txt
-	$$(call RUN,-c -n 1 -s 12G -m 15G -v $(MUTECT_ENV) -p $(PROJECT_DIR)/mutect -N $1/$3,"set -o pipefail && \
-											      $$(MUTECT) \
-											      --analysis_type MuTect \
-											      $(MUTECT_OPTS) \
-											      --tumor_sample_name $1 \
-											      --normal_sample_name $2 \
-											      --intervals mutect/chunk_bed/chunk$3.bed \
-											      -I:tumor $$(<) \
-											      -I:normal $$(<<) \
-											      -vcf $$(@) \
-											      --out mutect/$1_$2/$1_$2--$3.txt \
-											      --coverage_file mutect/$1_$2/$1_$2--$3.wig")
+	$$(call RUN,-c -n 1 -s 6G -m 8G -v $(MUTECT_ENV) -p $(PROJECT_DIR)/mutect -N $1/$3,"set -o pipefail && \
+											    $$(MUTECT) \
+											    --analysis_type MuTect \
+											    $(MUTECT_OPTS) \
+											    --tumor_sample_name $1 \
+											    --normal_sample_name $2 \
+											    --intervals mutect/chunk_bed/chunk$3.bed \
+											    -I:tumor $$(<) \
+											    -I:normal $$(<<) \
+											    -vcf $$(@) \
+											    --out mutect/$1_$2/$1_$2--$3.txt \
+											    --coverage_file mutect/$1_$2/$1_$2--$3.wig")
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
 	$(foreach n,$(MUTECT_CHUNKS), \
