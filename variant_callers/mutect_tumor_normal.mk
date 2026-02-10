@@ -24,7 +24,8 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								       --input $(<) \
 								       --out_prefix chunk \
 								       --num_chunks $(MUTECT_NUM_CHUNKS) \
-								       --output_dir mutect/chunk_bed/")
+								       --output_dir mutect/chunk_bed/ && \
+								       touch $(@)")
 
 else
 
@@ -37,4 +38,4 @@ endif
 .PHONY: clean
 
 clean :
-	rm -rf mutect/chunk_bed/	
+	rm -f mutect/chunk_bed/*
