@@ -32,7 +32,7 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								      
 define mutect-tumor-normal-chunk
 mutect/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam mutect/chunk_bed/taskcomplete.txt
-	$$(call RUN,-c -n 1 -s 12G -m 15G -v $(MUTECT_ENV) -p $(PROJECT_DIR)/mutect -N $1/$2/$3,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 12G -m 15G -v $(MUTECT_ENV) -p $(PROJECT_DIR)/mutect -N $1_$2/$3,"set -o pipefail && \
 												 $$(MUTECT) \
 												 --analysis_type MuTect \
 												 $(MUTECT_OPTS) \
