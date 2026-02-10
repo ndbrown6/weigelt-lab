@@ -3,6 +3,8 @@
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("readr"))
+suppressPackageStartupMessages(library("magrittr"))
+suppressPackageStartupMessages(library("reshape2"))
 
 if (!interactive()) {
 	options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))

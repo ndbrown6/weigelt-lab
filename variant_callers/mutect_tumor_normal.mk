@@ -6,7 +6,9 @@ MUTECT_NUM_CHUNKS = 100
 MUTECT_CHUNKS = $(shell seq -w 1 $(MUTECT_NUM_CHUNKS))
 
 vcf : mutect/chunk_bed/taskcomplete.txt \
-      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).vcf))
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).vcf)) \
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).txt)
 
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
 MUTECT_MAX_ALT_IN_NORMAL_FRACTION ?= 0.05
@@ -54,7 +56,17 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	$(foreach n,$(MUTECT_CHUNKS), \
 			$(eval $(call mutect-tumor-normal-chunk,$(tumor.$(pair)),$(normal.$(pair)),$(n)))))
 
-
+define aggregate-pair-vcf
+mutect/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).vcf))
+	$$(call RUN,-c -n 1 -s 12G -m 44G -p $(PROJECT_DIR)/mutect -N $1_$2/aggregate-vcf,"set -o pipefail && \
+											   $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
+											   --option 2 \
+											   --chunks '$(MUTECT_CHUNKS)' \
+											   --file_out $$(@)")
+    
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call snp-pileup,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
