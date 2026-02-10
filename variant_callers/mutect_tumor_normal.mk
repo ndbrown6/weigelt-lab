@@ -10,12 +10,17 @@ vcf : mutect/chunk_bed/taskcomplete.txt \
 
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
 MUTECT_MAX_ALT_IN_NORMAL_FRACTION ?= 0.05
-MUTECT_FILTERS = DuplicateRead FailsVendorQualityCheck NotPrimaryAlignment BadMate MappingQualityUnavailable UnmappedRead BadCigar
+MUTECT_FILTERS = DuplicateRead \
+		 FailsVendorQualityCheck \
+		 NotPrimaryAlignment \
+		 BadMate \
+		 MappingQualityUnavailable \
+		 UnmappedRead BadCigar
 MUTECT_OPTS ?= --enable_extended_output \
 	       --max_alt_alleles_in_normal_count $(MUTECT_MAX_ALT_IN_NORMAL) \
 	       --max_alt_allele_in_normal_fraction $(MUTECT_MAX_ALT_IN_NORMAL_FRACTION) \
 	       -R $(REF_FASTA) \
-	       --dbsnp $(DBSNP) \
+	       --dbsnp $(DBSNP_GMAF) \
 	       $(foreach ft,$(MUTECT_FILTERS),-rf $(ft))
 
 PROJECT_DIR := $(notdir $(CURDIR))

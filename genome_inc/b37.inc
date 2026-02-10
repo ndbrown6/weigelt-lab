@@ -6,6 +6,7 @@ REF_FASTA ?= $(REF_DIR)/b37/human_g1k_v37.fasta
 REF_DICT ?= $(REF_DIR)/b37/human_g1k_v37.dict
 DECOY_FASTA ?= $(REF_DIR)/b37/human_g1k_v37_decoy.fasta
 DBSNP ?= $(REF_DIR)/b37/dbsnp_138.b37.vcf
+DBSNP_GMAF ?= $(REF_DIR)/b37/dbsnp_138.b37.gmaf.vcf.gz
 DBSNP_137 ?= $(REF_DIR)/b37/dbsnp_137.b37__RmDupsClean__plusPseudo50__DROP_SORT.vcf
 KNOWN_INDELS ?= $(REF_DIR)/b37/Mills_and_1000G_gold_standard.indels.b37.vcf
 OMNI ?= $(REF_DIR)/b37/1000G_omni2.5.b37.vcf
