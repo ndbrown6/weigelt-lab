@@ -31,7 +31,7 @@ else
 endif
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(MUTECT_ENV)/bin/mutect --version &> version/mutect.txt)
+	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
