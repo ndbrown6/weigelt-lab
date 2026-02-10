@@ -11,9 +11,12 @@ vcf : mutect/chunk_bed/taskcomplete.txt \
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
 MUTECT_MAX_ALT_IN_NORMAL_FRACTION ?= 0.05
 MUTECT_FILTERS = DuplicateRead FailsVendorQualityCheck NotPrimaryAlignment BadMate MappingQualityUnavailable UnmappedRead BadCigar
-MUTECT_OPTS ?= --enable_extended_output --max_alt_alleles_in_normal_count $(MUTECT_MAX_ALT_IN_NORMAL) \
-	       --max_alt_allele_in_normal_fraction $(MUTECT_MAX_ALT_IN_NORMAL_FRACTION) -R $(REF_FASTA) \
-	       --dbsnp $(DBSNP) $(foreach ft,$(MUTECT_FILTERS),-rf $(ft))
+MUTECT_OPTS ?= --enable_extended_output \
+	       --max_alt_alleles_in_normal_count $(MUTECT_MAX_ALT_IN_NORMAL) \
+	       --max_alt_allele_in_normal_fraction $(MUTECT_MAX_ALT_IN_NORMAL_FRACTION) \
+	       -R $(REF_FASTA) \
+	       --dbsnp $(DBSNP) \
+	       $(foreach ft,$(MUTECT_FILTERS),-rf $(ft))
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -31,6 +34,8 @@ define mutect-tumor-normal-chunk
 mutect/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam mutect/chunk_bed/taskcomplete.txt
 	$$(call RUN,-c -n 1 -s 12G -m 15G -v $(MUTECT_ENV) -p $(PROJECT_DIR)/mutect -N $1/$2/$3,"set -o pipefail && \
 												 $$(MUTECT) \
+												 --analysis_type MuTect \
+												 $(MUTECT_OPTS) \
 												 --tumor_sample_name $1 \
 												 --normal_sample_name $2 \
 												 --intervals mutect/chunk_bed/chunk$3.bed \
