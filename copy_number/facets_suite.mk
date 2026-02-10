@@ -22,7 +22,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 facets_suite/targets_dbsnp.vcf : $(TARGETS_FILE)
 	$(call RUN,-c -n 1 -s 6G -m 8G -p $(PROJECT_DIR) -N dbsnp_intersect,"set -o pipefail && \
-									     $(BEDTOOLS) intersect -header -u -a $(DBSNP_GMAF) -b $(<) > $(@)")
+									     $(BEDTOOLS) intersect -header -u -a $(DBSNP_137) -b $(<) > $(@)")
     
 define snp-pileup
 facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf bam/$1.bam bam/$2.bam
