@@ -16,7 +16,6 @@ MUTECT_OPTS ?= --enable_extended_output --max_alt_alleles_in_normal_count $(MUTE
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-ifeq ($(TARGETS_FILE),)
 mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N bed_file,"set -o pipefail && \
 								      $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
@@ -26,21 +25,6 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								      --num_chunks $(MUTECT_NUM_CHUNKS) \
 								      --output_dir mutect/chunk_bed/ && \
 								      echo 'completed!' > $(@)")
-
-else
-mutect/chunk_bed/taskcomplete.txt : $(REF_DICT)
-	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N ref_dict,"set -o pipefail && \
-								      $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
-								      --option 2 \
-								      --ref_dict $(<) \
-								      --out_prefix chunk \
-								      --num_chunks $(MUTECT_NUM_CHUNKS) \
-								      --window_size 10000 \
-								      --step_size 9900 \
-								       --output_dir mutect/chunk_bed/ && \
-								       echo 'completed!' > $(@)")
-
-endif
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
