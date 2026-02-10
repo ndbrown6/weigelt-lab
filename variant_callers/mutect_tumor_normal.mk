@@ -25,7 +25,7 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								      --out_prefix chunk \
 								      --num_chunks $(MUTECT_NUM_CHUNKS) \
 								      --output_dir mutect/chunk_bed/ && \
-								      touch $(@)")
+								      echo 'completed!' > $(@)")
 
 else
 mutect/chunk_bed/taskcomplete.txt : $(REF_DICT)
@@ -38,7 +38,7 @@ mutect/chunk_bed/taskcomplete.txt : $(REF_DICT)
 								      --window_size 10000 \
 								      --step_size 9900 \
 								       --output_dir mutect/chunk_bed/ && \
-								       touch $(@)")
+								       echo 'completed!' > $(@)")
 
 endif
 
