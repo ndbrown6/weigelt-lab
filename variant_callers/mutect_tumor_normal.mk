@@ -22,9 +22,9 @@ mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								       $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
 								       --option 1 \
 								       --input $(<) \
-								       --out_prefix 'chunk' \
+								       --out_prefix chunk \
 								       --num_chunks $(MUTECT_NUM_CHUNKS) \
-								       --output_dir 'mutect/chunk_bed/'")
+								       --output_dir mutect/chunk_bed/")
 
 else
 
