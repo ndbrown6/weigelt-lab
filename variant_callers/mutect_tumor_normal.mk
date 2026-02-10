@@ -18,16 +18,27 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 ifdef TARGETS_FILE
 mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
-	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N bed_files,"set -o pipefail && \
-								       $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
-								       --option 1 \
-								       --input $(<) \
-								       --out_prefix chunk \
-								       --num_chunks $(MUTECT_NUM_CHUNKS) \
-								       --output_dir mutect/chunk_bed/ && \
-								       touch $(@)")
+	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N bed_file,"set -o pipefail && \
+								      $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
+								      --option 1 \
+								      --input $(<) \
+								      --out_prefix chunk \
+								      --num_chunks $(MUTECT_NUM_CHUNKS) \
+								      --output_dir mutect/chunk_bed/ && \
+								      touch $(@)")
 
 else
+mutect/chunk_bed/taskcomplete.txt : $(REF_DICT)
+	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N ref_dict,"set -o pipefail && \
+								      $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
+								      --option 2 \
+								      --ref_dict $(<) \
+								      --out_prefix chunk \
+								      --num_chunks $(MUTECT_NUM_CHUNKS) \
+								      --window_size 10000 \
+								      --step_size 9900 \
+								       --output_dir mutect/chunk_bed/ && \
+								       touch $(@)")
 
 endif
 
