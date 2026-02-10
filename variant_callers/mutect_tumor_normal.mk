@@ -16,7 +16,7 @@ MUTECT_OPTS ?= --enable_extended_output --max_alt_alleles_in_normal_count $(MUTE
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-ifdef TARGETS_FILE
+ifneq ($(TARGETS_FILE),)
 mutect/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N bed_file,"set -o pipefail && \
 								      $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
