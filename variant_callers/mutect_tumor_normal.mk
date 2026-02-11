@@ -7,11 +7,12 @@ MUTECT_CHUNKS = $(shell seq -w 1 $(MUTECT_NUM_CHUNKS))
 
 vcf : mutect/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).vcf)) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.maf) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).maf))
+#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).vcf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).txt) \
+#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.vcf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.maf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
       
 
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
@@ -55,6 +56,23 @@ mutect/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam mutect/chunk_bed/taskcomplete
 											    -vcf $$(@) \
 											    --out mutect/$1_$2/$1_$2--$3.txt \
 											    --coverage_file mutect/$1_$2/$1_$2--$3.wig")
+											    
+mutect/$1_$2/$1_$2--$3.maf : mutect/$1_$2/$1_$2--$3.vcf
+	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/vcf2maf -N $1/$3,"set -o pipefail && \
+											       $$(VCF2MAF) \
+											       --input-vcf $$(<) \
+											       --output-maf $$(@) \
+											       --tmp-dir $$(TMPDIR) \
+											       --tumor-id $1 \
+											       --normal-id $2 \
+											       --vep-path $$(VCF2MAF_ENV)/bin \
+											       --vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
+											       --vep-forks 12 \
+											       --ref-fasta $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.gz \
+											       --filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
+											       --species homo_sapiens \
+											       --ncbi-build GRCh37 \
+											       --maf-center MSKCC")
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
 	$(foreach n,$(MUTECT_CHUNKS), \
