@@ -64,7 +64,7 @@ if (as.numeric(opt$option) == 1) {
 	}
 
 } else if (as.numeric(opt$option) == 2) {
-	chunks = strsplit(as.character(opt$chunks), split = " ", fixed = TRUE)
+	chunks = unlist(strsplit(as.character(opt$chunks), split = " ", fixed = TRUE))
 	vcf = list()
 	for (i in 1:length(chunks)) {
 		vcf[[i]] = readr::read_tsv(file = paste0("mutect/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".vcf"),
