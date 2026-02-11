@@ -128,4 +128,3 @@ if (as.numeric(opt$option) == 1) {
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
 	
 }
-

@@ -9,9 +9,9 @@ vcf : mutect/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHUNKS),mutect/$(pair)/$(pair)--$(n).vcf)) \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.vcf)
-#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.maf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
       
 
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
