@@ -86,4 +86,36 @@ if (as.numeric(opt$option) == 1) {
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
+}  else if (as.numeric(opt$option) == 3) {
+	chunks = unlist(strsplit(as.character(opt$chunks), split = " ", fixed = TRUE))
+	tab = list()
+	for (i in 1:length(chunks)) {
+		tab[[i]] = readr::read_tsv(file = paste0("mutect/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".txt"),
+					   comment = "##", col_types = cols(.default = col_character()))
+	}
+	tab = do.call(rbind, tab)
+	
+	chr_levels = c(as.character(1:22), "X", "Y")
+	if (any(grepl("^chr", tab$contig))) {
+		chr_levels = paste0("chr", chr_levels)
+	}
+	other_chrs = setdiff(unique(tab$contig), chr_levels)
+	chr_levels = c(chr_levels, sort(other_chrs))
+	
+	tab = tab %>%
+	      dplyr::mutate(contig = factor(contig, levels = chr_levels)) %>%
+	      dplyr::arrange(contig, position)
+	
+	cat("##MuTect:1.1.6-0-g6fe4f4c Gatk:2.7-1-g42d771f\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = tab, path = opt$file_out, col_names = TRUE, append = TRUE)
+	
+else if (as.numeric(opt$option) == 4) {
+	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	      readr::type_convert() %>%
+	      dplyr::filter(FILTER=="PASS")
+	
+	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
+
 }
+
