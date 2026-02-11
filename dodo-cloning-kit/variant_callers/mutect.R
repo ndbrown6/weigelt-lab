@@ -83,6 +83,7 @@ if (as.numeric(opt$option) == 1) {
 	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels)) %>%
 	      dplyr::arrange(`#CHROM`, POS)
 	
-	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = FALSE)
+	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
 }
