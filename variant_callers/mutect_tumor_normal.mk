@@ -61,6 +61,7 @@ mutect/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(MUTECT_CHU
 	$$(call RUN,-c -n 1 -s 12G -m 44G -p $(PROJECT_DIR)/mutect -N $1_$2/aggregate-vcf,"set -o pipefail && \
 											   $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
 											   --option 2 \
+											   --sample_name $1_$2 \
 											   --chunks '$(MUTECT_CHUNKS)' \
 											   --file_out $$(@)")
     
