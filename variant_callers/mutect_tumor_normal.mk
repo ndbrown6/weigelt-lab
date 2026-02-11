@@ -112,8 +112,8 @@ mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/mutect -N $1_$2/ann-maf,"set -o pipefail && \
 										     $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
 										     --option 5 \
-										     -file_in $$(<) \
-										     -file_out $$(@)")
+										     --file_in $$(<) \
+										     --file_out $$(@)")
 
 
 endef
