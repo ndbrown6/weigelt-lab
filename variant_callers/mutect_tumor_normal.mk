@@ -91,21 +91,29 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	
 define annotate-pair-vcf
 mutect/$1_$2/$1_$2_ft.maf : mutect/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -w 24:00:00 -p $(PROJECT_DIR)/mutect -N $1_$2/vcf2maf ,"set -o pipefail && \
-														   $$(VCF2MAF) \
-														   --input-vcf $$(<) \
-														   --output-maf $$(@) \
-														   --tmp-dir $$(TMPDIR) \
-														   --tumor-id $1 \
-														   --normal-id $2 \
-														   --vep-path $$(VCF2MAF_ENV)/bin \
-														   --vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
-														   --vep-forks 12 \
-														   --ref-fasta $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.gz \
-														   --filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
-														   --species homo_sapiens \
-														   --ncbi-build GRCh37 \
-														   --maf-center MSKCC")
+	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/mutect -N $1_$2/vcf2maf ,"set -o pipefail && \
+												       $$(VCF2MAF) \
+												       --input-vcf $$(<) \
+												       --output-maf $$(@) \
+												       --tmp-dir $$(TMPDIR) \
+												       --tumor-id $1 \
+												       --normal-id $2 \
+												       --vep-path $$(VCF2MAF_ENV)/bin \
+												       --vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
+												       --vep-forks 12 \
+												       --ref-fasta $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.gz \
+												       --filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
+												       --species homo_sapiens \
+												       --ncbi-build GRCh37 \
+												       --maf-center MSKCC")
+														   
+mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/mutect -N $1_$2/ann-maf,"set -o pipefail && \
+										     $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
+										     --option 5 \
+										     -file_in $$(<) \
+										     -file_out $$(@)")
+
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\

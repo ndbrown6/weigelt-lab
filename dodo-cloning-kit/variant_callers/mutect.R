@@ -117,5 +117,15 @@ if (as.numeric(opt$option) == 1) {
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
+} else if (as.numeric(opt$option) == 5) {
+	maf = readr::read_tsv(file = opt$file_in, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	      readr::type_convert() %>%
+	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
+			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
+			    Variant_Caller = "MuTect")
+	
+	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
+	
 }
 
