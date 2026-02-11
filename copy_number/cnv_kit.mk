@@ -132,5 +132,5 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 
 clean :
 	rm -f cnv_kit/bed_files/* && \
-	rm -f cnv_kit/read_counts/*/*/*.cnn && \
+	rm -f cnv_kit/read_counts/*/*.cnn && \
 	rm -f cnv_kit/normal_reference/*.cnr
