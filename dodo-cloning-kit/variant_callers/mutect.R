@@ -109,7 +109,7 @@ if (as.numeric(opt$option) == 1) {
 	cat("##MuTect:1.1.6-0-g6fe4f4c Gatk:2.7-1-g42d771f\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = tab, path = opt$file_out, col_names = TRUE, append = TRUE)
 	
-else if (as.numeric(opt$option) == 4) {
+} else if (as.numeric(opt$option) == 4) {
 	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	      readr::type_convert() %>%
 	      dplyr::filter(FILTER=="PASS")
