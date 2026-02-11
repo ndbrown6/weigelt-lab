@@ -122,7 +122,7 @@ if (as.numeric(opt$option) == 1) {
 	      readr::type_convert() %>%
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
 			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
-			    Variant_Caller = "MuTect")
+			    is_mutect = "TRUE")
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
