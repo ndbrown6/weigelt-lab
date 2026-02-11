@@ -109,7 +109,7 @@ mutect/$1_$2/$1_$2_ft.maf : mutect/$1_$2/$1_$2_ft.vcf
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
-	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
