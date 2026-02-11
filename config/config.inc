@@ -11,6 +11,7 @@ SAMBAMBA_ENV ?= $(HOME)/share/env/sambamba-0.8.2
 FASTQ_SPLITTER_ENV ?= $(HOME)/share/env/fastqsplitter-1.2.0
 CNVKIT_ENV ?= $(HOME)/share/env/cnvkit-0.9.9
 MUTECT_ENV ?= $(HOME)/share/env/mutect-1.1.6
+VCF2MAF_ENV ?= $(HOME)/share/env/vcf2maf-1.6.17
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 
@@ -26,6 +27,9 @@ BEDTOOLS ?= bedtools
 PICARD ?= picard
 GATK ?= gatk
 MUTECT ?= mutect
+VCF2MAF ?= vcf2maf.pl
+MAF2VCF ?= maf2vcf.pl
+MAF2MAF ?= maf2maf.pl
 
 # picard command lines
 PICARD_MEM = 8G
