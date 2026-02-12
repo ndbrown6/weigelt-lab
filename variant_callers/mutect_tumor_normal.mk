@@ -11,7 +11,8 @@ vcf : mutect/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair).txt) \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft.maf) \
-      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf) \
+      mutect/mutation_summary.maf
       
 
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
@@ -121,6 +122,13 @@ mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+	
+mutect/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf)
+	$(call RUN, -c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/mutect -N summary,"set -o pipefail && \
+									       $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/mutect.R \
+									       --option 6 \
+									       --sample_name '$(SAMPLE_PAIRS)' \
+									       --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
