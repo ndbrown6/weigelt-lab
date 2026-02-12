@@ -54,8 +54,8 @@ align_rnaseq_fastq :
 
 TARGETS += mutect_tumor_normal
 mutect_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/variant_callers/mutect_tumor_normal.mk)
-#	$(MAKE) -f weigelt-lab/variant_callers/mutect_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/variant_callers/mutect_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/variant_callers/mutect_tumor_normal.mk clean
 	
 TARGETS += varscan_tumor_normal
 varscan_tumor_normal :
