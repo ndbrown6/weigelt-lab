@@ -4,11 +4,11 @@ LOGDIR ?= log/cnv_kit.$(NOW)
 
 cnvkit : cnv_kit/bed_files/on_target.bed \
 	 cnv_kit/bed_files/off_target.bed \
-	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).targetcoverage.cnn) \
-	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/tumor/$(sample).antitargetcoverage.cnn) \
-	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) \
-	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn) \
-	 cnv_kit/normal_reference/reference.cnr \
+	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/T/$(sample).targetcoverage.cnn) \
+	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/read_counts/T/$(sample).antitargetcoverage.cnn) \
+	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/N/$(sample).targetcoverage.cnn) \
+	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/N/$(sample).antitargetcoverage.cnn) \
+	 cnv_kit/read_counts/reference.cnr \
 	 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/normalized_log2/$(sample).txt) \
 	 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
@@ -39,11 +39,11 @@ cnv_kit/bed_files/off_target.bed : cnv_kit/bed_files/on_target.bed
 											 -o $(@)")
 
 define cnvkit-tumor-cnn
-cnv_kit/read_counts/tumor/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
+cnv_kit/read_counts/T/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
 	$$(call RUN,-c -n 4 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/read_counts -N $1/on_target,"set -o pipefail && \
 													cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 
-cnv_kit/read_counts/tumor/$1.antitargetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/off_target.bed
+cnv_kit/read_counts/T/$1.antitargetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/off_target.bed
 	$$(call RUN,-c -n 4 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/read_counts -N $1/off_target,"set -o pipefail && \
 													 cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 endef
@@ -51,24 +51,24 @@ endef
 		$(eval $(call cnvkit-tumor-cnn,$(sample))))
 		
 define cnvkit-normal-cnn
-cnv_kit/read_counts/normal/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
+cnv_kit/read_counts/N/$1.targetcoverage.cnn : bam/$1.bam cnv_kit/bed_files/on_target.bed
 	$$(call RUN,-c -n 4 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/read_counts -N $1/on_target,"set -o pipefail && \
 													cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 
-cnv_kit/read_counts/normal/$1.antitargetcoverage.cnn : bam/$1.bam bam/$1.bam cnv_kit/bed_files/off_target.bed
+cnv_kit/read_counts/N/$1.antitargetcoverage.cnn : bam/$1.bam bam/$1.bam cnv_kit/bed_files/off_target.bed
 	$$(call RUN,-c -n 4 -s 2G -m 4G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/read_counts -N $1/off_target,"set -o pipefail && \
 													 cnvkit.py coverage -p 4 -q 0 $$(<) $$(<<) -o $$(@)")
 endef
  $(foreach sample,$(NORMAL_SAMPLES),\
 		$(eval $(call cnvkit-normal-cnn,$(sample))))
 
-cnv_kit/normal_reference/reference.cnr : $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).targetcoverage.cnn) $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/normal/$(sample).antitargetcoverage.cnn)
+cnv_kit/read_counts/reference.cnr : $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/N/$(sample).targetcoverage.cnn) $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/read_counts/N/$(sample).antitargetcoverage.cnn)
 	$(call RUN,-c -n 1 -s 12G -m 24G -v $(CNVKIT_ENV) -p $(PROJECT_DIR) -N reference,"set -o pipefail && \
 											  sleep 30 && \
-											  cnvkit.py reference cnv_kit/read_counts/normal/*.cnn -f $(REF_FASTA) --no-edge -o $(@)")
+											  cnvkit.py reference cnv_kit/read_counts/N/*.cnn -f $(REF_FASTA) --no-edge -o $(@)")
 
 define cnvkit-tumor-cnr
-cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/tumor/$1.targetcoverage.cnn cnv_kit/read_counts/tumor/$1.antitargetcoverage.cnn cnv_kit/normal_reference/reference.cnr
+cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/T/$1.targetcoverage.cnn cnv_kit/read_counts/T/$1.antitargetcoverage.cnn cnv_kit/read_counts/reference.cnr
 	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalized_log2 -N $1/fix,"set -o pipefail && \
 												      cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
 
@@ -77,7 +77,7 @@ endef
 		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 		
 define cnvkit-normal-cnr
-cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/normal/$1.targetcoverage.cnn cnv_kit/read_counts/normal/$1.antitargetcoverage.cnn cnv_kit/normal_reference/reference.cnr
+cnv_kit/normalized_log2/$1.txt : cnv_kit/read_counts/N/$1.targetcoverage.cnn cnv_kit/read_counts/N/$1.antitargetcoverage.cnn cnv_kit/read_counts/reference.cnr
 	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalized_log2 -N $1/fix,"set -o pipefail && \
 												      cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
 
@@ -133,4 +133,4 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 clean :
 	rm -f cnv_kit/bed_files/* && \
 	rm -f cnv_kit/read_counts/*/*.cnn && \
-	rm -f cnv_kit/normal_reference/*.cnr
+	rm -f cnv_kit/read_counts/*.cnr
