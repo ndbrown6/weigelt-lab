@@ -14,7 +14,6 @@ vcf : mutect/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pair)_ft_ann.maf) \
       mutect/mutation_summary.maf
       
-
 MUTECT_MAX_ALT_IN_NORMAL ?= 500
 MUTECT_MAX_ALT_IN_NORMAL_FRACTION ?= 0.05
 MUTECT_FILTERS = DuplicateRead \
