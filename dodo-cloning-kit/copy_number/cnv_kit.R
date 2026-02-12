@@ -89,7 +89,9 @@ if (as.numeric(opt$option) == 1) {
 	data = readr::read_tsv(file = as.character(opt$file_in), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       dplyr::mutate(Chromosome = ifelse(Chromosome == "X", "23", Chromosome)) %>%
 	       readr::type_convert() %>%
-	       dplyr::select(-Hugo_Symbol)
+	       dplyr::select(-Hugo_Symbol) %>%
+	       dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
+	       dplyr::arrange(Chromosome, Position)
 	if (length(sample_names) == 1) {
 		smoothed_log2 = data %>%
 				as.data.frame() %>%
@@ -137,8 +139,9 @@ if (as.numeric(opt$option) == 1) {
 	}
 	data = do.call(rbind, data) %>%
 	       reshape2::dcast(Chromosome + Position + Hugo_Symbol ~ Sample_Name, value.var = "Log2_Ratio") %>%
+	       dplyr::mutate(Chromosome = ifelse(Chromosome == "X", "23", Chromosome)) %>%
 	       readr::type_convert() %>%
-	       dplyr::mutate(Chromosome = factor(Chromosome, levels = c(1:22, "X"), ordered = TRUE)) %>%
+	       dplyr::mutate(Chromosome = factor(Chromosome, levels = 1:23, ordered = TRUE)) %>%
 	       dplyr::arrange(Chromosome, Position)
 	
 	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)

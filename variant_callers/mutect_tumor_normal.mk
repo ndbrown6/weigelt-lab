@@ -107,7 +107,8 @@ mutect/$1_$2/$1_$2_ft.maf : mutect/$1_$2/$1_$2_ft.vcf
 												       --filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
 												       --species homo_sapiens \
 												       --ncbi-build GRCh37 \
-												       --maf-center MSKCC")
+												       --maf-center MSKCC && \
+												       rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
 														   
 mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/mutect -N $1_$2/ann-maf,"set -o pipefail && \
@@ -128,4 +129,8 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: clean
 
 clean :
-	rm -f mutect/chunk_bed/*
+	rm -f mutect/chunk_bed/* && \
+	rm -f mutect/*/*--*.vcf && \
+	rm -f mutect/*/*--*.vcf.idx && \
+	rm -f mutect/*/*--*.wig && \
+	rm -f mutect/*/*--*.txt
