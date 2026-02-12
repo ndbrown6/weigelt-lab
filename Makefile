@@ -157,9 +157,53 @@ TARGETS += arriba_fusion
 arriba_fusion :
 	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
+
+#==================================================
+# VCF tools
+#==================================================
+
+TARGETS += annotate_vcf_maf
+annotate_vcf_maf :
+	$(call RUN_MAKE,modules/vcf_tools/annotate_vcf_maf.mk)
+	
+TARGETS += annotate_maf_vcf
+annotate_maf_vcf :
+	$(call RUN_MAKE,modules/vcf_tools/annotate_maf_vcf.mk)
 	
 #==================================================
-# Annotation
+# QC
+#==================================================
+
+TARGETS += idx_metrics
+idx_metrics :
+	$(call RUN_MAKE,modules/bam_tools/idx_metrics.mk)
+
+TARGETS += aln_metrics
+aln_metrics :
+	$(call RUN_MAKE,modules/bam_tools/aln_metrics.mk)
+
+TARGETS += insert_metrics
+insert_metrics :
+	$(call RUN_MAKE,modules/bam_tools/insert_metrics.mk)
+
+TARGETS += oxog_metrics
+oxog_metrics :
+	$(call RUN_MAKE,modules/bam_tools/oxog_metrics.mk)
+
+TARGETS += gc_metrics
+gc_metrics :
+	$(call RUN_MAKE,modules/bam_tools/gc_metrics.mk)
+
+TARGETS += hs_metrics
+hs_metrics :
+	$(call RUN_MAKE,modules/bam_tools/hs_metrics.mk)
+
+TARGETS += dup_metrics
+dup_metrics :
+	$(call RUN_MAKE,modules/bam_tools/dup_metrics.mk)
+
+#==================================================
+# Summary
 #==================================================
 
 TARGETS += mutation_summary
