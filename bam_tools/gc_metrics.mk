@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/gc_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
-	 summary/gc_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
+	  summary/gc_metrics.txt
 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)

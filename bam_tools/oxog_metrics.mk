@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/oxog_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
-	 summary/oxog_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
+	  summary/oxog_metrics.txt
 	 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)

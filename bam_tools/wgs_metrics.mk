@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/wgs_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt) \
-	 summary/wgs_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt) \
+	  summary/wgs_metrics.txt
 
 PROJECT_DIR := $(notdir $(CURDIR))
 

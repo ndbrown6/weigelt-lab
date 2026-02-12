@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/dup_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
-	 summary/duplicate_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
+	  summary/duplicate_metrics.txt
 	 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)

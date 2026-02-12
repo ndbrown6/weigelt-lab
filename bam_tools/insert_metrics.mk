@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/insert_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
-	 summary/insert_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
+	  summary/insert_metrics.txt
 	 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)
@@ -28,7 +28,7 @@ summary/insert_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).inser
 										     $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 3 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/idx_metrics.txt)
+	     echo "picard" >> version/insert_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/hs_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
-	 summary/hs_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt) \
+	  summary/hs_metrics.txt
 	 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)

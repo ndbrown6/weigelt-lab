@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/rnaseq_metrics.$(NOW)
 
-star : $(foreach sample,$(SAMPLES),metrics/$(sample)_rnaseq_metrics.txt) \
-       summary/rnaseq_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample)_rnaseq_metrics.txt) \
+	  summary/rnaseq_metrics.txt
        
 REF_FLAT ?= $(HOME)/share/lib/resource_files/refFlat_ensembl.v75.txt
 RIBOSOMAL_INTERVALS ?= $(HOME)/share/lib/resource_files/Homo_sapiens.GRCh37.75.rRNA.interval_list

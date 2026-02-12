@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/idx_metrics.$(NOW)
 
-bwamem : $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
-	 summary/idx_metrics.txt
+metrics : $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
+	  summary/idx_metrics.txt
 	 
 TARGETS_LIST := $(TARGETS_FILE:.bed=.list)
 BAITS_LIST := $(BAITS_FILE:.bed=.list)
