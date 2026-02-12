@@ -171,7 +171,7 @@ annotate_maf_vcf :
 	$(call RUN_MAKE,modules/vcf_tools/annotate_maf_vcf.mk)
 	
 #==================================================
-# QC
+# BAM tools
 #==================================================
 
 TARGETS += idx_metrics
@@ -201,6 +201,14 @@ hs_metrics :
 TARGETS += dup_metrics
 dup_metrics :
 	$(call RUN_MAKE,modules/bam_tools/dup_metrics.mk)
+	
+TARGETS += wgs_metrics
+wgs_metrics :
+	$(call RUN_MAKE,modules/bam_tools/wgs_metrics.mk)
+	
+TARGETS += rnaseq_metrics
+rnaseq_metrics :
+	$(call RUN_MAKE,modules/bam_tools/rnaseq_metrics.mk)
 
 #==================================================
 # Summary
