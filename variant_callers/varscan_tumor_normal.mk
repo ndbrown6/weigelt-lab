@@ -6,16 +6,7 @@ VARSCAN_NUM_CHUNKS = 100
 VARSCAN_CHUNKS = $(shell seq -w 1 $(VARSCAN_NUM_CHUNKS))
 
 vcf : varscan/chunk_bed/taskcomplete.txt \
-      $(foreach chr,$(CHROMOSOMES),$(foreach pair,$(SAMPLE_PAIRS),varscan/chr_tables/$(pair).$(chr).varscan_timestamp)) \
-      $(foreach chr,$(CHROMOSOMES),$(foreach pair,$(SAMPLE_PAIRS),varscan/chr_tables/$(pair).$(chr).snp.txt)) \
-      $(foreach chr,$(CHROMOSOMES),$(foreach pair,$(SAMPLE_PAIRS),varscan/chr_tables/$(pair).$(chr).indel.txt)) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/tables/$(pair).snp.txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/tables/$(pair).indel.txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/tables/$(pair).snp.Somatic.txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/tables/$(pair).indel.Somatic.txt) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/vcf/$(pair).snp.Somatic.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/vcf/$(pair).indel.Somatic.vcf) \
-      $(foreach type,$(VARSCAN_VARIANT_TYPES),$(foreach pair,$(SAMPLE_PAIRS),vcf/$(pair).$(type).vcf))
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),mutect/$(pair)/$(pair)--$(n).indel.vcf))
 	  
 IGNORE_FP_FILTER ?= true
 VALIDATION ?= false
@@ -40,7 +31,7 @@ varscan/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 
 
 define varscan-tumor-normal-chunk
-varscan/$1_$2/$1_$2--$3.indel.txt : bam/$1.bam bam/$2.bam varscan/chunk_bed/taskcomplete.txt
+varscan/$1_$2/$1_$2--$3.indel.vcf : bam/$1.bam bam/$2.bam varscan/chunk_bed/taskcomplete.txt
 	$$(call RUN,-c -n 1 -s 9G -m 12G -v $(VARSCAN_ENV) -p $(PROJECT_DIR)/varscan -N $1/$3,"set -o pipefail && \
 											       rm -rf varscan/$1_$2/$1_$2--$3.snp.txt && \
 											       rm -rf varscan/$1_$2/$1_$2--$3.indel.txt && \
