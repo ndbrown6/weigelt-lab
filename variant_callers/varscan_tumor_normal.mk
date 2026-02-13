@@ -6,7 +6,7 @@ VARSCAN_NUM_CHUNKS = 100
 VARSCAN_CHUNKS = $(shell seq -w 1 $(VARSCAN_NUM_CHUNKS))
 
 vcf : varscan/chunk_bed/taskcomplete.txt \
-      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),mutect/$(pair)/$(pair)--$(n).indel.vcf))
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf))
 	  
 IGNORE_FP_FILTER ?= true
 VALIDATION ?= false
