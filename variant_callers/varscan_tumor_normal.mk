@@ -39,8 +39,8 @@ varscan/$1_$2/$1_$2--$3.indel.vcf : bam/$1.bam bam/$2.bam varscan/chunk_bed/task
 											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<)  > $$$$tmp1 && \
 											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<<)  > $$$$tmp2 && \
 											       $$(VARSCAN) somatic \
-											       $$$$$$tmp2 \
-											       $$$$$$tmp1 \
+											       $$$$tmp2 \
+											       $$$$tmp1 \
 											       $$(VARSCAN_OPTS) \
 											       --output-snp varscan/$1_$2/$1_$2--$3.snp.vcf \
 											       --output-indel varscan/$1_$2/$1_$2--$3.indel.vcf \
