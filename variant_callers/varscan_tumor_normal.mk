@@ -33,11 +33,11 @@ varscan/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 
 define varscan-tumor-normal-chunk
 varscan/$1_$2/$1_$2--$3.indel.vcf : bam/$1.bam bam/$2.bam varscan/chunk_bed/taskcomplete.txt
-	$$(call RUN,-c -n 1 -s 9G -m 12G -v $(VARSCAN_ENV) -p $(PROJECT_DIR)/varscan -N $1/$3,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 9G -m 12G -v $(VARSCAN_ENV) -p $(PROJECT_DIR)/varscan -N $1/$3,"(set -o pipefail && \
 											       tmp1=$$$$(mktemp) && \
 											       tmp2=$$$$(mktemp) && \
-											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<)  > $$$$$$tmp1 && \
-											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<<)  > $$$$$$tmp2 && \
+											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<)  > $$$$tmp1 && \
+											       $$(SAMTOOLS) mpileup -A -l varscan/chunk_bed/chunk$3.bed -q $$(MIN_MAP_QUAL) -f $$(REF_FASTA) $$(<<)  > $$$$tmp2 && \
 											       $$(VARSCAN) somatic \
 											       $$$$$$tmp2 \
 											       $$$$$$tmp1 \
@@ -45,7 +45,7 @@ varscan/$1_$2/$1_$2--$3.indel.vcf : bam/$1.bam bam/$2.bam varscan/chunk_bed/task
 											       --output-snp varscan/$1_$2/$1_$2--$3.snp.vcf \
 											       --output-indel varscan/$1_$2/$1_$2--$3.indel.vcf \
 											       --output-vcf 1 && \
-											       rm -f $$$$$$tmp1 $$$$$$tmp2")
+											       rm -f $$$$tmp1 $$$$tmp2)")
 											       
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
