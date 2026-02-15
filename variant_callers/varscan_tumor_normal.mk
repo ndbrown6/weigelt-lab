@@ -55,7 +55,7 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 			$(eval $(call varscan-tumor-normal-chunk,$(tumor.$(pair)),$(normal.$(pair)),$(n)))))
 			
 define aggregate-pair-vcf
-varscan/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).vcf))
+varscan/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf))
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/aggregate-vcf,"set -o pipefail && \
 											    $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
 											   --option 2 \

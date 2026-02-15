@@ -63,7 +63,7 @@ if (as.numeric(opt$option) == 1) {
 	chunks = unlist(strsplit(as.character(opt$chunks), split = " ", fixed = TRUE))
 	vcf = list()
 	for (i in 1:length(chunks)) {
-		vcf[[i]] = readr::read_tsv(file = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".vcf"),
+		vcf[[i]] = readr::read_tsv(file = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".indel.vcf"),
 					   comment = "##", col_types = cols(.default = col_character()))
 	}
 	vcf = do.call(rbind, vcf)
