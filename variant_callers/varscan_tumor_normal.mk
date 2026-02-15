@@ -9,7 +9,9 @@ vcf : varscan/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf)) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_ann.maf) \
+      varscan/mutation_summary.maf
 	  
 FP_FILTER = $(PERL) $(HOME)/share/usr/bin/fpfilter.pl
 BAM_READCOUNT = $(HOME)/share/usr/bin/bam-readcount
@@ -32,7 +34,6 @@ varscan/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 								      --num_chunks $(VARSCAN_NUM_CHUNKS) \
 								      --output_dir varscan/chunk_bed/ && \
 								      echo 'completed!' > $(@)")
-
 
 define varscan-tumor-normal-chunk
 varscan/$1_$2/$1_$2--$3.indel.vcf : bam/$1.bam bam/$2.bam varscan/chunk_bed/taskcomplete.txt
@@ -71,8 +72,6 @@ varscan/$1_$2/$1_$2_ft.vcf : varscan/$1_$2/$1_$2.vcf
 											--file_in $$(<) \
 											--file_out $$(@)")
 
-
-    
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
@@ -98,9 +97,23 @@ varscan/$1_$2/$1_$2_ft.maf : varscan/$1_$2/$1_$2_ft.vcf
 													--maf-center MSKCC && \
 													rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
 														   
+varscan/$1_$2/$1_$2_ft_ann.maf : varscan/$1_$2/$1_$2_ft.maf
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/ann-maf,"set -o pipefail && \
+										      $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
+										      --option 4 \
+										      --file_in $$(<) \
+										      --file_out $$(@)")
+
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+
+varscan/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_ann.maf)
+	$(call RUN, -c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N summary,"set -o pipefail && \
+										$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
+										--option 5 \
+										--sample_name '$(SAMPLE_PAIRS)' \
+										--file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt)
@@ -109,5 +122,5 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: clean
 
 clean :
-	rm -f varscan/chunk_bed/*
+	rm -f varscan/chunk_bed/* && \
 	rm -f varscan/*/*--*.vcf

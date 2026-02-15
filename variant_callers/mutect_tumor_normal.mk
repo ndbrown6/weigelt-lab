@@ -85,8 +85,6 @@ mutect/$1_$2/$1_$2_ft.vcf : mutect/$1_$2/$1_$2.vcf
 											--file_in $$(<) \
 											--file_out $$(@)")
 
-
-    
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
@@ -116,7 +114,6 @@ mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
 										     --option 5 \
 										     --file_in $$(<) \
 										     --file_out $$(@)")
-
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
