@@ -1,22 +1,13 @@
-# Run strelka on tumour-normal matched pairs
+include weigeltlab/Makefile.inc
 
-include modules/Makefile.inc
-include modules/variant_callers/gatk.inc
-##### DEFAULTS ######
+LOGDIR ?= log/strelka_tumor_normal.$(NOW)
 
-
-LOGDIR ?= log/strelka.$(NOW)
-PHONY += strelka strelka_vcfs strelka_mafs
+vcf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(pair).vcf)
 
 CONFIGURE_STRELKA = $(PERL) $(HOME)/share/usr/bin/configureStrelkaWorkflow.pl
 STRELKA_CONFIG = $(HOME)/share/usr/etc/strelka_config.ini
-STRELKA_SOURCE_ANN_VCF = python modules/vcf_tools/annotate_source_vcf.py --source strelka
 
-strelka : strelka_vcfs #strelka_mafs
-	
-STRELKA_VARIANT_TYPES := strelka_snps strelka_indels
-strelka_vcfs : $(foreach type,$(STRELKA_VARIANT_TYPES),$(foreach pair,$(SAMPLE_PAIRS),vcf/$(pair).$(type).vcf))
-strelka_mafs : $(foreach type,$(STRELKA_VARIANT_TYPES),$(foreach pair,$(SAMPLE_PAIRS),maf/$(pair).$(type).maf))
+PROJECT_DIR := $(notdir $(CURDIR))
 
 define strelka-tumor-normal
 strelka/$1_$2/Makefile : bam/$1.bam bam/$2.bam
@@ -40,9 +31,12 @@ strelka/vcf/$1_$2.strelka_indels.vcf : strelka/$1_$2/task.complete
 endef
 $(foreach pair,$(SAMPLE_PAIRS),$(eval $(call strelka-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 
-include modules/vcf_tools/vcftools.mk
-
-.DELETE_ON_ERROR:
+..DUMMY := $(shell mkdir -p version; \
+	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt)
 .SECONDARY:
-.PHONY: $(PHONY)
+.DELETE_ON_ERROR:
+.PHONY: clean
 
+clean :
+	rm -f varscan/chunk_bed/* && \
+	rm -f varscan/*/*--*.vcf

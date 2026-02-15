@@ -13,10 +13,6 @@ vcf : varscan/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_ann.maf) \
       varscan/mutation_summary.maf
 	  
-FP_FILTER = $(PERL) $(HOME)/share/usr/bin/fpfilter.pl
-BAM_READCOUNT = $(HOME)/share/usr/bin/bam-readcount
-VARSCAN_TO_VCF = $(PERL) modules/variant_callers/somatic/varscanTNtoVcf.pl
-
 MIN_MAP_QUAL ?= 1
 IGNORE_FP_FILTER ?= true
 VALIDATION ?= false
