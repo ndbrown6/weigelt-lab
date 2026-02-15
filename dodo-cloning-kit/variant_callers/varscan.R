@@ -59,4 +59,35 @@ if (as.numeric(opt$option) == 1) {
 		readr::write_tsv(x = chunk_data, path = output_file, col_names = FALSE, append = FALSE)
 	}
 
+} else if (as.numeric(opt$option) == 2) {
+	chunks = unlist(strsplit(as.character(opt$chunks), split = " ", fixed = TRUE))
+	vcf = list()
+	for (i in 1:length(chunks)) {
+		vcf[[i]] = readr::read_tsv(file = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".vcf"),
+					   comment = "##", col_types = cols(.default = col_character()))
+	}
+	vcf = do.call(rbind, vcf)
+	
+	chr_levels = c(as.character(1:22), "X", "Y")
+	if (any(grepl("^chr", vcf$'#CHROM'))) {
+		chr_levels = paste0("chr", chr_levels)
+	}
+	other_chrs = setdiff(unique(vcf$'#CHROM'), chr_levels)
+	chr_levels = c(chr_levels, sort(other_chrs))
+	
+	vcf = vcf %>%
+	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels)) %>%
+	      dplyr::arrange(`#CHROM`, POS)
+	
+	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
+
+}  else if (as.numeric(opt$option) == 3) {
+	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	      readr::type_convert() %>%
+	      dplyr::filter(FILTER=="PASS")
+	
+	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
+	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
+
 }

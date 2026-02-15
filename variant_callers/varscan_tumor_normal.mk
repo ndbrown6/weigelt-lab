@@ -6,7 +6,9 @@ VARSCAN_NUM_CHUNKS = 100
 VARSCAN_CHUNKS = $(shell seq -w 1 $(VARSCAN_NUM_CHUNKS))
 
 vcf : varscan/chunk_bed/taskcomplete.txt \
-      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf))
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf)) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair).vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf)
 	  
 FP_FILTER = $(PERL) $(HOME)/share/usr/bin/fpfilter.pl
 BAM_READCOUNT = $(HOME)/share/usr/bin/bam-readcount
@@ -51,6 +53,28 @@ endef
 $(foreach pair,$(SAMPLE_PAIRS), \
 	$(foreach n,$(VARSCAN_CHUNKS), \
 			$(eval $(call varscan-tumor-normal-chunk,$(tumor.$(pair)),$(normal.$(pair)),$(n)))))
+			
+define aggregate-pair-vcf
+varscan/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).vcf))
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/aggregate-vcf,"set -o pipefail && \
+											    $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
+											   --option 2 \
+											   --sample_name $1_$2 \
+											   --chunks '$(VARSCAN_CHUNKS)' \
+											   --file_out $$(@)")
+
+varscan/$1_$2/$1_$2_ft.vcf : varscan/$1_$2/$1_$2.vcf
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/filter-vcf,"set -o pipefail && \
+											$$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
+											--option 3 \
+											--file_in $$(<) \
+											--file_out $$(@)")
+
+
+    
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 
 ..DUMMY := $(shell mkdir -p version; \
