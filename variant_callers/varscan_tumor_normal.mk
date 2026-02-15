@@ -8,7 +8,8 @@ VARSCAN_CHUNKS = $(shell seq -w 1 $(VARSCAN_NUM_CHUNKS))
 vcf : varscan/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf)) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair).vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf)
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf)
 	  
 FP_FILTER = $(PERL) $(HOME)/share/usr/bin/fpfilter.pl
 BAM_READCOUNT = $(HOME)/share/usr/bin/bam-readcount
@@ -76,6 +77,30 @@ endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
+define annotate-pair-vcf
+varscan/$1_$2/$1_$2_ft.maf : varscan/$1_$2/$1_$2_ft.vcf
+	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/varscan -N $1_$2/vcf2maf ,"set -o pipefail && \
+													$$(VCF2MAF) \
+													--input-vcf $$(<) \
+													--output-maf $$(@) \
+													--tmp-dir $$(TMPDIR) \
+													--tumor-id $1 \
+													--normal-id $2 \
+													--vcf-tumor-id TUMOR \
+													--vcf-normal-id NORMAL \
+													--vep-path $$(VCF2MAF_ENV)/bin \
+													--vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
+													--vep-forks 12 \
+													--ref-fasta $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.gz \
+													--filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
+													--species homo_sapiens \
+													--ncbi-build GRCh37 \
+													--maf-center MSKCC && \
+													rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
+														   
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt)
@@ -85,3 +110,4 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 
 clean :
 	rm -f varscan/chunk_bed/*
+	rm -f varscan/*/*--*.vcf
