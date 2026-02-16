@@ -13,6 +13,7 @@ CNVKIT_ENV ?= $(HOME)/share/env/cnvkit-0.9.9
 MUTECT_ENV ?= $(HOME)/share/env/mutect-1.1.6
 VARSCAN_ENV ?= $(HOME)/share/env/varscan-2.3.7
 VCF2MAF_ENV ?= $(HOME)/share/env/vcf2maf-1.6.17
+UPSINDEL_ENV ?= $(HOME)/share/env/ups-indel-20170908
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 
