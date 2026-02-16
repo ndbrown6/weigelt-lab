@@ -78,7 +78,7 @@ varscan/$1_$2/$1_$2_ft.uvcf : varscan/$1_$2/$1_$2_ft.vcf
 	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/varscan -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
 													  mkdir ext && \
 													  cp $(UPSINDEL_ENV)/opt/snpEff-4.3/SnpSift.jar ext/SnpSift.jar && \
-													  ups_indel $$(REF_FASTA) $$(<) $$(*) -hd=true")
+													  ups_indel $$(REF_FASTA) $$(<) $(*) -hd=true")
 
 varscan/$1_$2/$1_$2_ft.maf : varscan/$1_$2/$1_$2_ft.vcf
 	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/varscan -N $1_$2/vcf2maf ,"set -o pipefail && \
