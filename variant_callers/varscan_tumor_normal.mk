@@ -9,9 +9,10 @@ vcf : varscan/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf)) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_ann.maf) \
-      varscan/mutation_summary.maf
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.uvcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_vt.maf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_vt_ann.maf) \
+#      varscan/mutation_summary.maf
 	  
 MIN_MAP_QUAL ?= 1
 IGNORE_FP_FILTER ?= true
@@ -56,23 +57,29 @@ define aggregate-pair-vcf
 varscan/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(VARSCAN_CHUNKS),varscan/$(pair)/$(pair)--$(n).indel.vcf))
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/aggregate-vcf,"set -o pipefail && \
 											    $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
-											   --option 2 \
-											   --sample_name $1_$2 \
-											   --chunks '$(VARSCAN_CHUNKS)' \
-											   --file_out $$(@)")
+											    --option 2 \
+											    --sample_name $1_$2 \
+											    --chunks '$(VARSCAN_CHUNKS)' \
+											    --file_out $$(@)")
 
 varscan/$1_$2/$1_$2_ft.vcf : varscan/$1_$2/$1_$2.vcf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/filter-vcf,"set -o pipefail && \
-											$$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
-											--option 3 \
-											--file_in $$(<) \
-											--file_out $$(@)")
-
+											 $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
+											 --option 3 \
+											 --file_in $$(<) \
+											 --file_out $$(@)")
+											 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 define annotate-pair-vcf
+varscan/$1_$2/$1_$2_ft.uvcf : varscan/$1_$2/$1_$2_ft.vcf
+	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/varscan -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
+													  mkdir ext && \
+													  cp $(UPSINDEL_ENV)/opt/snpEff-4.3/SnpSift.jar ext/SnpSift.jar && \
+													  ups_indel $$(REF_FASTA) $$(<) $$(*) -hd=true")
+
 varscan/$1_$2/$1_$2_ft.maf : varscan/$1_$2/$1_$2_ft.vcf
 	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/varscan -N $1_$2/vcf2maf ,"set -o pipefail && \
 													$$(VCF2MAF) \
@@ -119,4 +126,5 @@ varscan/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(
 
 clean :
 	rm -f varscan/chunk_bed/* && \
-	rm -f varscan/*/*--*.vcf
+	rm -f varscan/*/*--*.vcf && \
+	rm -rf ext

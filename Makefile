@@ -59,8 +59,8 @@ mutect_tumor_normal :
 	
 TARGETS += varscan_tumor_normal
 varscan_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/variant_callers/varscan_tumor_normal.mk) && \
-	$(MAKE) -f weigelt-lab/variant_callers/varscan_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/variant_callers/varscan_tumor_normal.mk)
+#	$(MAKE) -f weigelt-lab/variant_callers/varscan_tumor_normal.mk clean
 	
 TARGETS += strelka_tumor_normal
 strelka_tumor_normal :
