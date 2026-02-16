@@ -99,6 +99,9 @@ if (as.numeric(opt$option) == 1) {
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
 			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
 			    `is_mutect?` = "yes") %>%
+	      dplyr::bind_rows(readr::read_tsv(file = gsub(pattern = ".maf", replacement = ".uvcf", x = opt$file_in, fixed = TRUE),
+					       comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+			       dplyr::select(`#CHROM`, POS, REF, `UPS-COORDINATE`)) %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/CMO_Hotspots_ngsFilters.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			       dplyr::select(-Existing_variation) %>%
