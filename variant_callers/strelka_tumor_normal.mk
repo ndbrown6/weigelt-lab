@@ -1,42 +1,44 @@
-include weigeltlab/Makefile.inc
+include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/strelka_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(pair).vcf)
-
-CONFIGURE_STRELKA = $(PERL) $(HOME)/share/usr/bin/configureStrelkaWorkflow.pl
-STRELKA_CONFIG = $(HOME)/share/usr/etc/strelka_config.ini
+vcf : strelka/chunk_bed/target.bed.gz
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
+strelka/chunk_bed/target.bed.gz : $(TARGETS_FILE)
+	$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N bed_file,"set -o pipefail && \
+								      bgzip -c $(<) > $(@) && \
+								      tabix $(@)")
+
+
 define strelka-tumor-normal
-strelka/$1_$2/Makefile : bam/$1.bam bam/$2.bam
-	$$(call RUN,-N strelka_$1_$2,"rm -rf $$(@D) && $$(CONFIGURE_STRELKA) --tumor=$$< --normal=$$(<<) --ref=$$(REF_FASTA) --config=$$(STRELKA_CONFIG) --output-dir=$$(@D)")
+strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.bed.gz
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/strelka -N $1_$2/configure -v $(STRELKA_ENV),"set -o pipefail && \
+													rm -rf $$(@D) && \
+													$$(CONFIGURE_STRELKA) \
+													--callRegions $$(<<<) \
+													--normalBam $$(<<) \
+													--tumorBam $$(<) \
+													--referenceFasta $$(REF_FASTA) \
+													--runDir $$(@D)")
 
 strelka/$1_$2/task.complete : strelka/$1_$2/Makefile
-	$$(call RUN,-N $1_$2.strelka -n 10 -s 1G -m 1.5G,"make -j 10 -C $$(<D)")
-
-strelka/vcf/$1_$2.%.vcf.tmp : strelka/vcf/$1_$2.%.vcf
-	$$(call RUN,-s 1G -m 2G,"$$(RSCRIPT) modules/scripts/swapvcf.R --file $$< --tumor $1 --normal $2")
-
-vcf/$1_$2.%.vcf : strelka/vcf/$1_$2.%.vcf.tmp
-	$$(INIT) perl -ne 'if (/^#CHROM/) { s/NORMAL/$2/; s/TUMOR/$1/; } print;' $$< > $$@ && $$(RM) $$<
-	
-strelka/vcf/$1_$2.strelka_snps.vcf : strelka/$1_$2/task.complete
-	$$(INIT) $$(STRELKA_SOURCE_ANN_VCF) < strelka/$1_$2/results/all.somatic.snvs.vcf > $$@
-
-strelka/vcf/$1_$2.strelka_indels.vcf : strelka/$1_$2/task.complete
-	$$(INIT) $$(STRELKA_SOURCE_ANN_VCF) < strelka/$1_$2/results/all.somatic.indels.vcf > $$@
+	$$(call RUN,-c -n 10 -s 1G -m 1.5G -p $(PROJECT_DIR)/strelka -N $1_$2/run,"set -o pipefail && \
+										   strelka/$1_$2/runWorkflow.py -m local -j 10
+										   touch $$(@)")
 
 endef
-$(foreach pair,$(SAMPLE_PAIRS),$(eval $(call strelka-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
+$(foreach pair,$(SAMPLE_PAIRS),\
+    $(eval $(call strelka-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
+
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt)
+	$(CONFIGURE_STRELKA) --version &> version/strelka_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
 
 clean :
-	rm -f varscan/chunk_bed/* && \
-	rm -f varscan/*/*--*.vcf
+    rm -rf strelka/*/Makefile
+    

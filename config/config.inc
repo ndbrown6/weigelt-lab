@@ -14,8 +14,10 @@ MUTECT_ENV ?= $(HOME)/share/env/mutect-1.1.6
 VARSCAN_ENV ?= $(HOME)/share/env/varscan-2.3.7
 VCF2MAF_ENV ?= $(HOME)/share/env/vcf2maf-1.6.17
 UPSINDEL_ENV ?= $(HOME)/share/env/ups-indel-20170908
+STRELKA_ENV ?= $(HOME)/share/env/strelka-2.9.10
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
+
 
 # aliases
 PYTHON ?= python
@@ -33,6 +35,7 @@ VARSCAN ?= varscan
 VCF2MAF ?= vcf2maf.pl
 MAF2VCF ?= maf2vcf.pl
 MAF2MAF ?= maf2maf.pl
+STRELKA ?= $(STRELKA_ENV)/bin/configureStrelkaSomaticWorkflow.py
 
 # picard command lines
 PICARD_MEM = 8G
