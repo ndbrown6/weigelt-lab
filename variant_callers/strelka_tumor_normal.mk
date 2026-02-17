@@ -105,5 +105,10 @@ strelka/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(
 .PHONY: clean
 
 clean :
-	rm -rf strelka/*/Makefile
+	rm -f strelka/chunk_bed/* && \
+	rm -f strelka/*/*.py && \
+	rm -f strelka/*/*.pickle && \
+	rm -f strelka/*/*.txt && \
+	rm -rf strelka/*/results && \
+	rm -rf strelka/*/workspace
     
