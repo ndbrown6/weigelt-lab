@@ -27,7 +27,10 @@ strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.be
 
 strelka/$1_$2/taskcomplete.txt : strelka/$1_$2/runWorkflow.py
 	$$(call RUN,-c -n 10 -s 1G -m 1.5G -p $(PROJECT_DIR)/strelka -N $1_$2/run -v $(STRELKA_ENV),"set -o pipefail && \
-												     strelka/$1_$2/runWorkflow.py -m local -j 10 && \
+												     strelka/$1_$2/runWorkflow.py \
+												     -m local \
+												     -j 10 \
+												     -g 10 && \
 												     touch $$(@)")
 
 endef
