@@ -35,7 +35,7 @@ VARSCAN ?= varscan
 VCF2MAF ?= vcf2maf.pl
 MAF2VCF ?= maf2vcf.pl
 MAF2MAF ?= maf2maf.pl
-CONFIGURE_STRELKA ?= $(STRELKA_ENV)/bin/configureStrelkaSomaticWorkflow.py
+CONFIGURE_STRELKA ?= $(STRELKA_ENV)/opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py
 
 # picard command lines
 PICARD_MEM = 8G
