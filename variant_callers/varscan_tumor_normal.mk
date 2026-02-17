@@ -10,9 +10,9 @@ vcf : varscan/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.uvcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf)
-#      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_vt_ann.maf) \
-#      varscan/mutation_summary.maf
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(pair)_ft_ann.maf) \
+      varscan/mutation_summary.maf
 	  
 MIN_MAP_QUAL ?= 1
 IGNORE_FP_FILTER ?= true
