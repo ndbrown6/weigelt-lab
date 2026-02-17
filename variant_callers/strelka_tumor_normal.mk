@@ -3,7 +3,8 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/strelka_tumor_normal.$(NOW)
 
 vcf : strelka/chunk_bed/target.bed.gz \
-      $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/runWorkflow.py)
+      $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/runWorkflow.py) \
+      $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/taskcomplete.txt) 
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -23,7 +24,7 @@ strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.be
 													--referenceFasta $$(REF_FASTA) \
 													--runDir $$(@D)")
 
-strelka/$1_$2/$1_$2.vcf : strelka/$1_$2/runWorkflow.py
+strelka/$1_$2/taskcomplete.txt : strelka/$1_$2/runWorkflow.py
 	$$(call RUN,-c -n 10 -s 1G -m 1.5G -p $(PROJECT_DIR)/strelka -N $1_$2/run -v $(STRELKA_ENV),"set -o pipefail && \
 												     strelka/$1_$2/runWorkflow.py -m local -j 10 && \
 												     touch $$(@)")
