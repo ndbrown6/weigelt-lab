@@ -80,7 +80,8 @@ if (as.numeric(opt$option) == 1) {
 	chr_levels = c(chr_levels, sort(other_chrs))
 	
 	vcf = vcf %>%
-	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels)) %>%
+	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels),
+			    POS = as.numeric(POS)) %>%
 	      dplyr::arrange(`#CHROM`, POS)
 	
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
