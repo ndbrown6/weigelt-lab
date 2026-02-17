@@ -25,7 +25,7 @@ strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.be
 
 strelka/$1_$2/task.complete : strelka/$1_$2/Makefile
 	$$(call RUN,-c -n 10 -s 1G -m 1.5G -p $(PROJECT_DIR)/strelka -N $1_$2/run,"set -o pipefail && \
-										   strelka/$1_$2/runWorkflow.py -m local -j 10
+										   strelka/$1_$2/runWorkflow.py -m local -j 10 && \
 										   touch $$(@)")
 
 endef
@@ -34,7 +34,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(CONFIGURE_STRELKA) --version &> version/strelka_tumor_normal.txt)
+	$(CONFIGURE_STRELKA) --version > version/strelka_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
