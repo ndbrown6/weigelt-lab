@@ -101,11 +101,11 @@ varscan/$1_$2/$1_$2_ft.maf : varscan/$1_$2/$1_$2_ft.vcf
 													--maf-center MSKCC && \
 													rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
 														   
-varscan/$1_$2/$1_$2_ft_ann.maf : varscan/$1_$2/$1_$2_ft.maf
+varscan/$1_$2/$1_$2_ft_ann.maf : varscan/$1_$2/$1_$2_ft.maf varscan/$1_$2/$1_$2_ft.uvcf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/ann-maf,"set -o pipefail && \
 										      $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
 										      --option 4 \
-										      --file_in $$(<) \
+										      --file_in $$(<) $$(<<) \
 										      --file_out $$(@)")
 
 endef

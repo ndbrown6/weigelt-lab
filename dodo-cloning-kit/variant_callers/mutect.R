@@ -121,15 +121,15 @@ if (as.numeric(opt$option) == 1) {
 	maf = readr::read_tsv(file = opt$file_in, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
 			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
-			    `is_mutect?` = "yes") %>%
+			    `Is_mutect?` = "yes") %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/CMO_Hotspots_ngsFilters.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			       dplyr::select(-Existing_variation) %>%
-			       dplyr::mutate(`cmo_hotspot?` = "yes"),
+			       dplyr::mutate(`Is_cmo_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "HGVSp_Short")) %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/Cancer_Hotspots_v1-v2.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
-			       dplyr::mutate(`cancer_hotspot?` = "yes"),
+			       dplyr::mutate(`Is_cancer_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "HGVSp_Short")) %>%
 	      readr::type_convert()
 	
@@ -145,9 +145,9 @@ if (as.numeric(opt$option) == 1) {
 	}
 	maf = do.call(rbind, maf) %>%
 	      readr::type_convert() %>%
-	      dplyr::mutate(`is_mutect?` = ifelse(is.na(`is_mutect?`), "no", `is_mutect?`)) %>%
-	      dplyr::mutate(`cmo_hotspot?` = ifelse(is.na(`cmo_hotspot?`), "no", `cmo_hotspot?`)) %>%
-	      dplyr::mutate(`cancer_hotspot?` = ifelse(is.na(`cancer_hotspot?`), "no", `cancer_hotspot?`))
+	      dplyr::mutate(`Is_mutect?` = ifelse(is.na(`Is_mutect?`), "no", `Is_mutect?`)) %>%
+	      dplyr::mutate(`Is_cmo_hotspot?` = ifelse(is.na(`Is_cmo_hotspot?`), "no", `Is_cmo_hotspot?`)) %>%
+	      dplyr::mutate(`Is_cancer_hotspot?` = ifelse(is.na(`Is_cancer_hotspot?`), "no", `Is_cancer_hotspot?`))
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)

@@ -96,21 +96,23 @@ if (as.numeric(opt$option) == 1) {
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
 } else if (as.numeric(opt$option) == 4) {
-	maf = readr::read_tsv(file = opt$file_in, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	file_names = unlist(strsplit(x = opt$file_in, split = " ", fixed = TRUE))
+	maf = readr::read_tsv(file = file_names[1], comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
+	uvcf = readr::read_tsv(file = file_names[2], comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	       dplyr::select(Chromosome = `#CHROM`, vcf_pos = POS, UPS_coordinate = `UPS-COORDINATE`)
+	maf = maf %>%
+	      dplyr::left_join(uvcf, by = c("Chromosome", "vcf_pos")) %>%
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
 			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
-			    `is_mutect?` = "yes") %>%
-	      dplyr::bind_rows(readr::read_tsv(file = gsub(pattern = ".maf", replacement = ".uvcf", x = opt$file_in, fixed = TRUE),
-					       comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
-			       dplyr::select(`#CHROM`, POS, REF, `UPS-COORDINATE`)) %>%
+			    `Is_varscan?` = "yes") %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/CMO_Hotspots_ngsFilters.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			       dplyr::select(-Existing_variation) %>%
-			       dplyr::mutate(`cmo_hotspot?` = "yes"),
+			       dplyr::mutate(`Is_cmo_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "HGVSp_Short")) %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/Cancer_Hotspots_v1-v2.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
-			       dplyr::mutate(`cancer_hotspot?` = "yes"),
+			       dplyr::mutate(`Is_cancer_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "HGVSp_Short")) %>%
 	      readr::type_convert()
 	
@@ -126,9 +128,9 @@ if (as.numeric(opt$option) == 1) {
 	}
 	maf = do.call(rbind, maf) %>%
 	      readr::type_convert() %>%
-	      dplyr::mutate(`is_mutect?` = ifelse(is.na(`is_mutect?`), "no", `is_mutect?`)) %>%
-	      dplyr::mutate(`cmo_hotspot?` = ifelse(is.na(`cmo_hotspot?`), "no", `cmo_hotspot?`)) %>%
-	      dplyr::mutate(`cancer_hotspot?` = ifelse(is.na(`cancer_hotspot?`), "no", `cancer_hotspot?`))
+	      dplyr::mutate(`Is_varscan?` = ifelse(is.na(`Is_varscan?`), "no", `Is_varscan?`)) %>%
+	      dplyr::mutate(`Is_cmo_hotspot?` = ifelse(is.na(`Is_cmo_hotspot?`), "no", `Is_cmo_hotspot?`)) %>%
+	      dplyr::mutate(`Is_cancer_hotspot?` = ifelse(is.na(`Is_cancer_hotspot?`), "no", `Is_cancer_hotspot?`))
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
