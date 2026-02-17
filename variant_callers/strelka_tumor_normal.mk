@@ -52,14 +52,14 @@ $(foreach pair,$(SAMPLE_PAIRS),\
     
 define annotate-pair-vcf
 strelka/$1_$2/$1_$2_ft.uvcf : strelka/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/varscan -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/strelka -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
 													  ups_indel $$(REF_FASTA) \
 													  $$(<) \
 													  strelka/$1_$2/$1_$2_ft \
 													  -hd=true")
 
 strelka/$1_$2/$1_$2_ft.maf : strelka/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/varscan -N $1_$2/vcf2maf ,"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/strelka -N $1_$2/vcf2maf ,"set -o pipefail && \
 													$$(VCF2MAF) \
 													--input-vcf $$(<) \
 													--output-maf $$(@) \
@@ -79,7 +79,7 @@ strelka/$1_$2/$1_$2_ft.maf : strelka/$1_$2/$1_$2_ft.vcf
 													rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
 														   
 strelka/$1_$2/$1_$2_ft_ann.maf : strelka/$1_$2/$1_$2_ft.maf strelka/$1_$2/$1_$2_ft.uvcf
-	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/ann-maf,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/strelka -N $1_$2/ann-maf,"set -o pipefail && \
 										      $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/strelka.R \
 										      --option 2 \
 										      --sample_name $1_$2 \
@@ -91,7 +91,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	
 
 strelka/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(pair)_ft_ann.maf)
-	$(call RUN, -c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N summary,"set -o pipefail && \
+	$(call RUN, -c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/strelka -N summary,"set -o pipefail && \
 										$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/strelka.R \
 										--option 3 \
 										--sample_name '$(SAMPLE_PAIRS)' \
