@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/strelka_tumor_normal.$(NOW)
 
-vcf : strelka/chunk_bed/target.bed.gz \
-      $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(pair).vcf) \
+vcf : strelka/chunk_bed/target.bed.gz
+#      $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(pair).vcf) \
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
