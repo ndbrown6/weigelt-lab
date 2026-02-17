@@ -96,9 +96,10 @@ if (as.numeric(opt$option) == 1) {
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
 } else if (as.numeric(opt$option) == 4) {
-	file_names = unlist(strsplit(x = opt$file_in, split = " ", fixed = TRUE))
-	maf = readr::read_tsv(file = file_names[1], comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	uvcf = readr::read_tsv(file = file_names[2], comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	maf_file_name = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "_ft.maf")
+	vcf_file_name = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "_ft.uvcf")
+	maf = readr::read_tsv(file = maf_file_name, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
+	uvcf = readr::read_tsv(file = vcf_file_name, comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       dplyr::select(Chromosome = `#CHROM`, vcf_pos = POS, UPS_coordinate = `UPS-COORDINATE`)
 	maf = maf %>%
 	      dplyr::left_join(uvcf, by = c("Chromosome", "vcf_pos")) %>%

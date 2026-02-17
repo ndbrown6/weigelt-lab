@@ -105,7 +105,7 @@ varscan/$1_$2/$1_$2_ft_ann.maf : varscan/$1_$2/$1_$2_ft.maf varscan/$1_$2/$1_$2_
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/varscan -N $1_$2/ann-maf,"set -o pipefail && \
 										      $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/varscan.R \
 										      --option 4 \
-										      --file_in $$(<) $$(<<) \
+										      --sample_name $1_$2 \
 										      --file_out $$(@)")
 
 endef
