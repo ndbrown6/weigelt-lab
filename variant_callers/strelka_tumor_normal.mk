@@ -33,7 +33,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(CONFIGURE_STRELKA) --version > version/strelka_tumor_normal.txt)
+	~/share/env/strelka-2.9.10/bin/configureStrelkaSomaticWorkflow.py --version > version/strelka_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
