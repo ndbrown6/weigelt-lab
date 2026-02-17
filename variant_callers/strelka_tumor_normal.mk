@@ -11,7 +11,6 @@ strelka/chunk_bed/target.bed.gz : $(TARGETS_FILE)
 								      bgzip -c $(<) > $(@) && \
 								      tabix $(@)")
 
-
 define strelka-tumor-normal
 strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.bed.gz
 	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/strelka -N $1_$2/configure -v $(STRELKA_ENV),"set -o pipefail && \
@@ -40,5 +39,5 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: clean
 
 clean :
-    rm -rf strelka/*/Makefile
+	rm -rf strelka/*/Makefile
     
