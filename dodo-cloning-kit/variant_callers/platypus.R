@@ -94,7 +94,7 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(as.character(opt$sample_name), split = " ", fixed = TRUE))
 	maf = list()
 	for (i in 1:length(sample_names)) {
-		maf[[i]] = readr::read_tsv(file = paste0("scalpel/", sample_names[i], "/", sample_names[i], "_ft_ann.maf"),
+		maf[[i]] = readr::read_tsv(file = paste0("platypus/", sample_names[i], "/", sample_names[i], "_ft_ann.maf"),
 					   comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
 	}
 	maf = do.call(rbind, maf) %>%

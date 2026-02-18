@@ -8,7 +8,9 @@ vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(p
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf) \
+      platypus/mutation_summary.maf
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -85,13 +87,20 @@ platypus/$1_$2/$1_$2_ft.maf : platypus/$1_$2/$1_$2_ft.vcf
 platypus/$1_$2/$1_$2_ft_ann.maf : platypus/$1_$2/$1_$2_ft.maf platypus/$1_$2/$1_$2_ft.uvcf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/ann-maf,"set -o pipefail && \
 										       $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
-										       --option 4 \
+										       --option 3 \
 										       --sample_name $1_$2 \
 										       --file_out $$(@)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+
+platypus/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf)
+	$(call RUN, -c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N summary,"set -o pipefail && \
+										 $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
+										 --option 4 \
+										 --sample_name '$(SAMPLE_PAIRS)' \
+										 --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version)
 .SECONDARY:
