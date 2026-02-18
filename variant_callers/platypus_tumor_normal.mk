@@ -2,7 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/platypus_tumor_normal.$(NOW)
 
-PLATYPUS_CHUNKS = $($(shell seq 1 22) X Y)
+PLATYPUS_CHUNKS := $(shell seq 1 22) X Y
 
 vcf: $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf))
 
