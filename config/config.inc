@@ -16,7 +16,7 @@ VCF2MAF_ENV ?= $(HOME)/share/env/vcf2maf-1.6.17
 UPSINDEL_ENV ?= $(HOME)/share/env/ups-indel-20170908
 STRELKA_ENV ?= $(HOME)/share/env/strelka-2.9.10
 SCALPEL_ENV ?= $(HOME)/share/env/scalpel-0.5.3
-PLATYPUS_ENV = $(HOME)/share/env/platypus-0.8.1
+PLATYPUS_ENV = $(HOME)/share/env/platypus-variant-0.8.1
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 

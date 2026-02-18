@@ -6,6 +6,8 @@ PLATYPUS_CHUNKS := $(shell seq 1 22) X Y
 
 vcf: $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf))
 
+PROJECT_DIR := $(notdir $(CURDIR))
+
 define platypus-tumor-normal-chunk
 platypus/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -n 4 -s 2G -m 3G -v $(PLATYPUS_ENV) -p $(PROJECT_DIR)/platypus -N $1/$3,"set -o pipefail && \
