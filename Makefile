@@ -64,13 +64,13 @@ varscan_tumor_normal :
 	
 TARGETS += strelka_tumor_normal
 strelka_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/variant_callers/strelka_tumor_normal.mk)
-#	$(MAKE) -f weigelt-lab/variant_callers/strelka_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/variant_callers/strelka_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/variant_callers/strelka_tumor_normal.mk clean
 	
 TARGETS += scalpel_tumor_normal
 scalpel_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/variant_callers/scalpel_tumor_normal.mk) && \
-	$(MAKE) -f weigelt-lab/variant_callers/scalpel_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/variant_callers/scalpel_tumor_normal.mk)
+#	$(MAKE) -f weigelt-lab/variant_callers/scalpel_tumor_normal.mk clean
 	
 TARGETS += platypus_tumor_normal
 platypus_tumor_normal :
