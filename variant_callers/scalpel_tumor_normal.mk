@@ -115,3 +115,8 @@ scalpel/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
+
+clean :
+	rm -f scalpel/chunk_bed/* && \
+	rm -rf scalpel/*/*/main
+	
