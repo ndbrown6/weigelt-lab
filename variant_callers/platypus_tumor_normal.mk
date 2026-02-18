@@ -44,10 +44,11 @@ platypus/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS
 											     --chunks '$(PLATYPUS_CHUNKS)' \
 											     --file_out $$(@)")
 
-platypus/$1_$2/$1_$2_ft.vcf : platypus/$1_$2/$1_$2.vcf
+platypus/$1_$2/$1_$2_ft.vcf : platypus/$1_$2/$1_$2.vcf $(TARGETS_FILE)
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/filter-vcf,"set -o pipefail && \
 											  $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
 											  --option 2 \
+											  --input $$(<<) \
 											  --file_in $$(<) \
 											  --file_out $$(@)")
 											 

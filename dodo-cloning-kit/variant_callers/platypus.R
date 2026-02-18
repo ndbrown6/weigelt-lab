@@ -5,12 +5,14 @@ suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("magrittr"))
 suppressPackageStartupMessages(library("reshape2"))
+suppressPackageStartupMessages(library("fuzzyjoin"))
 
 if (!interactive()) {
 	options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
 args_list <- list(make_option("--option", default = NA, type = 'character', help = "type of analysis"),
+		  make_option(c("-i", "--input"), default = NULL, type = "character", help = "Input BED file path", metavar = "character"),
 		  make_option(c("-s", "--sample_name"), default = ".", type = "character", help = "Sample name [default = %default]", metavar = "character"),
 		  make_option(c("-c", "--chunks"), default = ".", type = "character", help = "List of chunks [default = %default]", metavar = "character"),
 		  make_option(c("-fi", "--file_in"), default = ".", type = "character", help = "Input file name [default = %default]", metavar = "character"),
@@ -45,8 +47,19 @@ if (as.numeric(opt$option) == 1) {
 
 }  else if (as.numeric(opt$option) == 2) {
 	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
-	      readr::type_convert() %>%
-	      dplyr::filter(FILTER=="PASS")
+	      dplyr::filter(FILTER=="PASS") %>%
+	      dplyr::mutate(Chromosome = `#CHROM`,
+			    Start_Position = as.numeric(`POS`),
+			    End_Position = as.numeric(`POS`)+1) %>%
+	      fuzzyjoin::genome_left_join(readr::read_tsv(file = as.character(opt$input), col_names = FALSE, col_types = cols(.default = col_character())) %>%
+					  dplyr::mutate(Chromosome = `X1`,
+							Start_Position = as.numeric(`X2`),
+							End_Position = as.numeric(`X3`),
+							in_bed = "yes") %>%
+					  dplyr::select(Chromosome, Start_Position, End_Position, in_bed),
+					  by = c("Chromosome", "Start_Position", "End_Position")) %>%
+	      dplyr::filter(in_bed == "yes") %>%
+	      dplyr::select(-Chromosome.x, -Chromosome.y, -Start_Position.x, -Start_Position.y, -End_Position.x, -End_Position.y, -in_bed)
 	
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
