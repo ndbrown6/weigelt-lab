@@ -45,7 +45,7 @@ if (as.numeric(opt$option) == 1) {
 	bed = bed %>%
 	      dplyr::mutate(chr = factor(chr, levels = chr_levels),
 			    start = as.numeric(start),
-			    end  as.numeric(end)) %>%
+			    end = as.numeric(end)) %>%
 	      dplyr::arrange(chr, start, end) %>%
 	      dplyr::mutate(chunk_id = rep(1:as.numeric(opt$num_chunks), length.out = n()))
 
