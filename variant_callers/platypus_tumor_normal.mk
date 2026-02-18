@@ -16,8 +16,8 @@ platypus/$1_$2/$1_$2--$3.vcf : bam/$1.bam bam/$2.bam
 												--logFileName=platypus/$1_$2/$1_$2--$3.log \
 												--nCPU=4 \
 												--skipDifficultWindows=1 \
-												--genSNPs=FALSE \
-												--genIndels=TRUE \
+												--genSNPs=0 \
+												--genIndels=1 \
 												--mergeClusteredVariants=1 \
 												--trimOverlapping=1 \
 												--trimAdapter=1 \
@@ -35,5 +35,4 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 .PHONY: clean
 
 clean :
-	rm -f scalpel/chunk_bed/* && \
-	rm -rf scalpel/*/*/
+	rm -f platypus/*/*--*.log
