@@ -118,5 +118,5 @@ scalpel/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(
 
 clean :
 	rm -f scalpel/chunk_bed/* && \
-	rm -rf scalpel/*/*/main
+	rm -rf scalpel/*/*/
 	
