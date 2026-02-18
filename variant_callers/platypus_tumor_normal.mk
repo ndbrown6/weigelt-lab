@@ -5,10 +5,10 @@ LOGDIR ?= log/platypus_tumor_normal.$(NOW)
 PLATYPUS_CHUNKS := $(shell seq 1 22) X Y
 
 vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf)) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair).vcf)
-#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf)
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair).vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
