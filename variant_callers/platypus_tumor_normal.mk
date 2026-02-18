@@ -4,7 +4,11 @@ LOGDIR ?= log/platypus_tumor_normal.$(NOW)
 
 PLATYPUS_CHUNKS := $(shell seq 1 22) X Y
 
-vcf: $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf))
+vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf)) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair).vcf)
+#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.vcf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.uvcf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.maf)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -31,10 +35,68 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	$(foreach n,$(PLATYPUS_CHUNKS), \
 			$(eval $(call platypus-tumor-normal-chunk,$(tumor.$(pair)),$(normal.$(pair)),$(n)))))
 
+define aggregate-pair-vcf
+platypus/$1_$2/$1_$2.vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf))
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/aggregate-vcf,"set -o pipefail && \
+											     $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
+											     --option 1 \
+											     --sample_name $1_$2 \
+											     --chunks '$(PLATYPUS_CHUNKS)' \
+											     --file_out $$(@)")
+
+platypus/$1_$2/$1_$2_ft.vcf : platypus/$1_$2/$1_$2.vcf
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/filter-vcf,"set -o pipefail && \
+											  $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
+											  --option 2 \
+											  --file_in $$(<) \
+											  --file_out $$(@)")
+											 
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call aggregate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+
+define annotate-pair-vcf
+platypus/$1_$2/$1_$2_ft.uvcf : platypus/$1_$2/$1_$2_ft.vcf
+	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/platypus -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
+													   ups_indel $$(REF_FASTA) \
+													   $$(<) \
+													   platypus/$1_$2/$1_$2_ft \
+													   -hd=true")
+
+platypus/$1_$2/$1_$2_ft.maf : platypus/$1_$2/$1_$2_ft.vcf
+	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/platypus -N $1_$2/vcf2maf ,"set -o pipefail && \
+													 $$(VCF2MAF) \
+													 --input-vcf $$(<) \
+													 --output-maf $$(@) \
+													 --tmp-dir $$(TMPDIR) \
+													 --tumor-id $1 \
+													 --normal-id $2 \
+													 --vep-path $$(VCF2MAF_ENV)/bin \
+													 --vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
+													 --vep-forks 12 \
+													 --ref-fasta $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.gz \
+													 --filter-vcf $$(HOME)/share/lib/resource_files/VEP/GRCh37/homo_sapiens/99_GRCh37/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
+													 --species homo_sapiens \
+													 --ncbi-build GRCh37 \
+													 --maf-center MSKCC && \
+													 rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
+														   
+platypus/$1_$2/$1_$2_ft_ann.maf : platypus/$1_$2/$1_$2_ft.maf platypus/$1_$2/$1_$2_ft.uvcf
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/ann-maf,"set -o pipefail && \
+										       $$(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/platypus.R \
+										       --option 4 \
+										       --sample_name $1_$2 \
+										       --file_out $$(@)")
+
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call annotate-pair-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
+
 ..DUMMY := $(shell mkdir -p version)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
 
 clean :
-	rm -f platypus/*/*--*.log
+	rm -f platypus/*/*--*.log && \
+	rm -f platypus/*/*--*.vcf
