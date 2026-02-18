@@ -43,7 +43,9 @@ if (as.numeric(opt$option) == 1) {
 	chr_levels = c(chr_levels, sort(other_chrs))
 
 	bed = bed %>%
-	      dplyr::mutate(chr = factor(chr, levels = chr_levels)) %>%
+	      dplyr::mutate(chr = factor(chr, levels = chr_levels),
+			    start = as.numeric(start),
+			    end = as.numeric(end)) %>%
 	      dplyr::arrange(chr, start, end) %>%
 	      dplyr::mutate(chunk_id = rep(1:as.numeric(opt$num_chunks), length.out = n()))
 
@@ -54,7 +56,9 @@ if (as.numeric(opt$option) == 1) {
 			     dplyr::mutate(chr = as.character(chr))
         
 		chunk_data = chunk_data %>%
-			     dplyr::mutate(chr = factor(chr, levels = chr_levels)) %>%
+			     dplyr::mutate(chr = factor(chr, levels = chr_levels),
+					   start = as.numeric(start),
+					   end = as.numeric(end)) %>%
 			     dplyr::arrange(chr, start, end) %>%
 			     dplyr::mutate(chr = as.character(chr))
 

@@ -23,7 +23,8 @@ scalpel/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
 define scalpel-tumor-normal-chunk
 scalpel/$1_$2/$3/main/somatic.indel.vcf : bam/$1.bam bam/$2.bam scalpel/chunk_bed/taskcomplete.txt
 	$$(call RUN,-c -n 4 -s 2G -m 3G -v $(SCALPEL_ENV) -p $(PROJECT_DIR)/scalpel -N $1/$3,"set -o pipefail && \
-											      scalpel-dsicovery \
+											      mkdir -p scalpel/$1_$2/$3 && \
+											      scalpel-discovery \
 											      --somatic \
 											      --tumor $$(<) \
 											      --normal $$(<<) \
