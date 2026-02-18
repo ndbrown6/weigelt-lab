@@ -40,8 +40,7 @@ if (as.numeric(opt$option) == 1) {
 	vcf = vcf %>%
 	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels),
 			    POS = as.numeric(POS)) %>%
-	      dplyr::arrange(`#CHROM`, POS) %>%
-	      dplyr::distinct(`#CHROM`, POS, REF, ALT)
+	      dplyr::arrange(`#CHROM`, POS)
 	
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
@@ -71,6 +70,7 @@ if (as.numeric(opt$option) == 1) {
 	maf = readr::read_tsv(file = maf_file_name, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
 	uvcf = readr::read_tsv(file = vcf_file_name, comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       dplyr::select(Chromosome = `#CHROM`, vcf_pos = POS, UPS_coordinate = `UPS-COORDINATE`)
+	       
 	maf = maf %>%
 	      dplyr::left_join(uvcf, by = c("Chromosome", "vcf_pos")) %>%
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
