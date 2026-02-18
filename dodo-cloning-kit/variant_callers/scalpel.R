@@ -71,7 +71,7 @@ if (as.numeric(opt$option) == 1) {
 	chunks = unlist(strsplit(as.character(opt$chunks), split = " ", fixed = TRUE))
 	vcf = list()
 	for (i in 1:length(chunks)) {
-		vcf[[i]] = readr::read_tsv(file = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "--", chunks[i], ".indel.vcf"),
+		vcf[[i]] = readr::read_tsv(file = paste0("scalpel/", opt$sample_name, "/", chunks[i], "/main/somatic.indel.vcf"),
 					   comment = "##", col_types = cols(.default = col_character()))
 	}
 	vcf = do.call(rbind, vcf)
@@ -100,8 +100,8 @@ if (as.numeric(opt$option) == 1) {
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
 
 } else if (as.numeric(opt$option) == 4) {
-	maf_file_name = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "_ft.maf")
-	vcf_file_name = paste0("varscan/", opt$sample_name, "/", opt$sample_name, "_ft.uvcf")
+	maf_file_name = paste0("scalpel/", opt$sample_name, "/", opt$sample_name, "_ft.maf")
+	vcf_file_name = paste0("scalpel/", opt$sample_name, "/", opt$sample_name, "_ft.uvcf")
 	maf = readr::read_tsv(file = maf_file_name, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
 	uvcf = readr::read_tsv(file = vcf_file_name, comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       dplyr::select(Chromosome = `#CHROM`, vcf_pos = POS, UPS_coordinate = `UPS-COORDINATE`)
@@ -109,7 +109,7 @@ if (as.numeric(opt$option) == 1) {
 	      dplyr::left_join(uvcf, by = c("Chromosome", "vcf_pos")) %>%
 	      dplyr::mutate(Tumor_Sample_UUID = Tumor_Sample_Barcode,
 			    Matched_Norm_Sample_UUID = Matched_Norm_Sample_Barcode,
-			    `Is_varscan?` = "yes") %>%
+			    `Is_scalpel?` = "yes") %>%
 	      dplyr::left_join(readr::read_tsv(file = "~/share/lib/resource_files/CMO_Hotspots_ngsFilters.txt",
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			       dplyr::select(-Existing_variation) %>%
@@ -128,12 +128,12 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(as.character(opt$sample_name), split = " ", fixed = TRUE))
 	maf = list()
 	for (i in 1:length(sample_names)) {
-		maf[[i]] = readr::read_tsv(file = paste0("varscan/", sample_names[i], "/", sample_names[i], "_ft_ann.maf"),
+		maf[[i]] = readr::read_tsv(file = paste0("scalpel/", sample_names[i], "/", sample_names[i], "_ft_ann.maf"),
 					   comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
 	}
 	maf = do.call(rbind, maf) %>%
 	      readr::type_convert() %>%
-	      dplyr::mutate(`Is_varscan?` = ifelse(is.na(`Is_varscan?`), "no", `Is_varscan?`)) %>%
+	      dplyr::mutate(`Is_scalpel?` = ifelse(is.na(`Is_scalpel?`), "no", `Is_scalpel?`)) %>%
 	      dplyr::mutate(`Is_cmo_hotspot?` = ifelse(is.na(`Is_cmo_hotspot?`), "no", `Is_cmo_hotspot?`)) %>%
 	      dplyr::mutate(`Is_cancer_hotspot?` = ifelse(is.na(`Is_cancer_hotspot?`), "no", `Is_cancer_hotspot?`))
 	
