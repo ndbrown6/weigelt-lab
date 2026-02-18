@@ -25,8 +25,8 @@ scalpel/$1_$2/$3/main/somatic.indel.vcf : bam/$1.bam bam/$2.bam scalpel/chunk_be
 	$$(call RUN,-c -n 4 -s 2G -m 3G -v $(SCALPEL_ENV) -p $(PROJECT_DIR)/scalpel -N $1/$3,"set -o pipefail && \
 											      scalpel-dsicovery \
 											      --somatic \
-											      --normal $$(<<) \
 											      --tumor $$(<) \
+											      --normal $$(<<) \
 											      --bed scalpel/chunk_bed/chunk$3.bed \
 											      --ref $$(REF_FASTA) \
 											      --format vcf \
