@@ -5,8 +5,8 @@ LOGDIR ?= log/scalpel_tumor_normal.$(NOW)
 SCALPEL_NUM_CHUNKS = 100
 SCALPEL_CHUNKS = $(shell seq -w 1 $(SCALPEL_NUM_CHUNKS))
 
-vcf : scalpel/chunk_bed/taskcomplete.txt \
-      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(SCALPEL_CHUNKS),scalpel/$(pair)/$(n)/main/somatic.indel.vcf))
+vcf : scalpel/chunk_bed/taskcomplete.txt
+#      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(SCALPEL_CHUNKS),scalpel/$(pair)/$(n)/main/somatic.indel.vcf))
       
 PROJECT_DIR := $(notdir $(CURDIR))
 
