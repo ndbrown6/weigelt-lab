@@ -5,17 +5,15 @@ LOGDIR ?= log/scalpel_tumor_normal.$(NOW)
 SCALPEL_NUM_CHUNKS = 100
 SCALPEL_CHUNKS = $(shell seq -w 1 $(SCALPEL_NUM_CHUNKS))
 
-#vcf : scalpel/chunk_bed/taskcomplete.txt \
-#      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(SCALPEL_CHUNKS),scalpel/$(pair)/$(n)/main/somatic.indel.vcf)) \
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair).vcf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.vcf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.uvcf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.maf) \
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft_ann.maf) \
-#      scalpel/mutation_summary.maf
+vcf : scalpel/chunk_bed/taskcomplete.txt \
+      $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(SCALPEL_CHUNKS),scalpel/$(pair)/$(n)/main/somatic.indel.vcf)) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair).vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.uvcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft_ann.maf) \
+      scalpel/mutation_summary.maf
 
-vcf : scalpel/mutation_summary.maf
-      
 PROJECT_DIR := $(notdir $(CURDIR))
 
 scalpel/chunk_bed/taskcomplete.txt : $(TARGETS_FILE)
