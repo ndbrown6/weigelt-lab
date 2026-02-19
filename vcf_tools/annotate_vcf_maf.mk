@@ -37,7 +37,8 @@ maf/summary.maf : $(foreach sample,$(SAMPLES),maf/$(sample).maf)
 									    --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(VCF2MAF_ENV)/bin/vcf2maf.pl --help > version/annotate_vcf_maf.txt)
+	$(VCF2MAF_ENV)/bin/vcf2maf.pl --help > version/annotate_vcf_maf.txt; \
+	R --version >> version/annotate_vcf_maf.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

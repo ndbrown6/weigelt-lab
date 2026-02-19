@@ -125,7 +125,8 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 													    --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-         python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnv_kit.txt)
+         python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnv_kit.txt; \
+	 $(COPYNUMBER_ENV)/bin/R --version >> version/cnv_kit.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

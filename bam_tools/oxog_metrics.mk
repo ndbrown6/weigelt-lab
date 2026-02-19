@@ -27,7 +27,8 @@ summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_me
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 4 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/oxog_metrics.txt)
+	echo "picard" >> version/oxog_metrics.txt; \
+	R --version >> version/oxog_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

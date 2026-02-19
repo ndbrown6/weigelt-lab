@@ -26,7 +26,8 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 										  $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 7 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/dup_metrics.txt)
+	echo "picard" >> version/dup_metrics.txt; \
+	R --version >> version/dup_metrics.txt)	
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

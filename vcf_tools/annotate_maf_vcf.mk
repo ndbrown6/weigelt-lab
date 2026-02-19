@@ -21,7 +21,8 @@ $(foreach sample,$(SAMPLES),\
 
 							  
 ..DUMMY := $(shell mkdir -p version; \
-	$(VCF2MAF_ENV)/bin/maf2vcf.pl --help > version/annotate_maf_vcf.txt)
+	$(VCF2MAF_ENV)/bin/maf2vcf.pl --help > version/annotate_maf_vcf.txt; \
+	R --version >> version/annotate_maf_vcf.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

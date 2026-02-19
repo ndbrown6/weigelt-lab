@@ -120,7 +120,8 @@ varscan/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),varscan/$(pair)/$(
 										--file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt)
+	$(VARSCAN_ENV)/bin/varscan --version &> version/varscan_tumor_normal.txt; \
+	R --version >> version/varscan_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

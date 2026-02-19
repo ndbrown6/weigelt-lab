@@ -93,7 +93,8 @@ facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIR
 														  --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-         $(FACETS_SUITE_ENV)/bin/R --version > version/facets_suite.txt)
+         $(FACETS_SUITE_ENV)/bin/R --version > version/facets_suite.txt; \
+	 R --version >> version/facets_suite.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

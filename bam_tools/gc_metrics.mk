@@ -29,7 +29,8 @@ summary/gc_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metric
 										 $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 5 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/gc_metrics.txt)
+	echo "picard" >> version/gc_metrics.txt; \
+	R --version >> version/gc_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

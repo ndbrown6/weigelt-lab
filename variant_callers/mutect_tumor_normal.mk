@@ -127,7 +127,8 @@ mutect/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),mutect/$(pair)/$(pa
 									       --file_out $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt)
+	$(MUTECT_ENV)/bin/mutect --version &> version/mutect_tumor_normal.txt; \
+	R --version >> version/mutect_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

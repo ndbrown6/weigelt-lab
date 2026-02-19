@@ -102,7 +102,8 @@ platypus/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/
 										 --sample_name '$(SAMPLE_PAIRS)' \
 										 --file_out $(@)")
 
-..DUMMY := $(shell mkdir -p version)
+..DUMMY := $(shell mkdir -p version; \
+	R --version >> version/platypus_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean

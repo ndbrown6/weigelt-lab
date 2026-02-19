@@ -27,7 +27,8 @@ summary/aln_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metr
 										  $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 2 --sample_names '$(SAMPLES)'")
 					  
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/aln_metrics.txt)
+	echo "picard" >> version/aln_metrics.txt; \
+	R --version >> version/aln_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:

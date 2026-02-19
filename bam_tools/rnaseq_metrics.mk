@@ -31,7 +31,8 @@ summary/rnaseq_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample)_rnase
 										     $(RSCRIPT) $(SCRIPTS_DIR)/summary/rnaseq_metrics.R --option 1 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     echo "picard" >> version/rnaseq_metrics.txt)
+	echo "picard" >> version/rnaseq_metrics.txt; \
+	R --version >> version/rnaseq_metrics.txt)	     
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:
