@@ -216,7 +216,8 @@ rnaseq_metrics :
 
 TARGETS += mutation_summary
 mutation_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/mutation_summary.mk)
+	$(call RUN_MAKE,weigelt-lab/summary/mutation_summary.mk) && \
+	$(MAKE) -f weigelt-lab/summary/mutation_summary.mk clean
 	
 TARGETS += sv_summary
 sv_summary :
