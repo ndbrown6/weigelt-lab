@@ -98,6 +98,10 @@ if (length(maf_list) == 0) {
 			       dplyr::mutate(`Is_mutect?` = case_when(
 				       is.na(`Is_mutect?`) ~ "no",
 				       TRUE ~ `Is_mutect?`
+			       )) %>%
+			       dplyr::mutate(UPS_coordinate = case_when(
+				       is.na(UPS_coordinate) ~ "-",
+				       TRUE ~ UPS_coordinate
 			       ))
 	}
 
