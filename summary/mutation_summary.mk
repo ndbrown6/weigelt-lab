@@ -34,7 +34,7 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 										   mkdir -p summary && \
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
 										   $(maf-args) \
-										   --output $$@")
+										   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	R --version >> version/mutation_summary.txt)
