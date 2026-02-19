@@ -44,4 +44,10 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 	R --version >> version/mutation_summary.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: smry
+.PHONY: smry clean
+
+clean:
+    @echo "Cleaning mutation callers..." && \
+    $(foreach caller,$(CALLERS),$(MAKE) -f $(call get_makefile,$(caller)) clean;) && \
+    @echo "Cleaning facets suite..." && \
+    $(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
