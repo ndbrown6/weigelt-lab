@@ -29,7 +29,7 @@ endef
 summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf)
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N combine-maf,"set -o pipefail && \
 										   mkdir -p summary && \
-										   $(RSCRIPT) $(SCRIPTS_DIR)/combine_caller_mafs.R \
+										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
 										   $(maf-args) \
 										   --output summary/mutation_summary.maf")
 
