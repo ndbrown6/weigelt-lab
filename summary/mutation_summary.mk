@@ -2,8 +2,11 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/mutation_summary.$(NOW)
 
-PROJECT_DIR := $(notdir $(CURDIR))
-CALLERS = mutect strelka varscan scalpel platypus
+smry : summary/mutation_summary.maf
+
+REQUIRED_CALLERS = mutect
+OPTIONAL_CALLERS = strelka varscan scalpel platypus
+CALLERS = $(REQUIRED_CALLERS) $(OPTIONAL_CALLERS)
 CALLER_MAKEFILES = mutect:weigelt-lab/variant_caller/mutect_tumor_normal.mk \
 		   strelka:weigelt-lab/variant_caller/strelka_tumor_normal.mk \
 		   varscan:weigelt-lab/variant_caller/varscan_tumor_normal.mk \
@@ -12,7 +15,7 @@ CALLER_MAKEFILES = mutect:weigelt-lab/variant_caller/mutect_tumor_normal.mk \
 
 get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 
-smry : summary/mutation_summary.maf
+PROJECT_DIR := $(notdir $(CURDIR))
 
 define caller-rule
 $(1)/mutation_summary.maf :
@@ -33,6 +36,7 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 										   $(maf-args) \
 										   --output summary/mutation_summary.maf")
 
+..DUMMY := $(shell mkdir -p version)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: smry
