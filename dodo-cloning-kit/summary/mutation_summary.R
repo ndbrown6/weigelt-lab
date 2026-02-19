@@ -10,42 +10,14 @@ if (!interactive()) {
 }
 
 optList = list(make_option(c("--mutect_maf"), type="character", default=NULL, help="MuTect MAF file"),
-	       make_option(c("--strelka_maf"), type="character", default=NULL, help="Strelka MAF file"),
-	       make_option(c("--varscan_maf"), type="character", default=NULL, help="VarScan MAF file"),
-	       make_option(c("--scalpel_maf"), type="character", default=NULL, help="Scalpel MAF file"),
-	       make_option(c("--platypus_maf"), type="character", default=NULL, help="Platypus MAF file"),
-	       make_option(c("--output"), type="character", help="Output combined MAF file"))
+               make_option(c("--strelka_maf"), type="character", default=NULL, help="Strelka MAF file"),
+               make_option(c("--varscan_maf"), type="character", default=NULL, help="VarScan MAF file"),
+               make_option(c("--scalpel_maf"), type="character", default=NULL, help="Scalpel MAF file"),
+               make_option(c("--platypus_maf"), type="character", default=NULL, help="Platypus MAF file"),
+               make_option(c("--output"), type="character", help="Output combined MAF file"))
 parser = OptionParser(usage = "%prog", option_list = optList)
 arguments = parse_args(parser, positional_arguments = T)
 opt = arguments$options
-
-maf_list = list()
-caller_names = c()
-
-if (!is.null(opt$mutect_maf)) {
-	maf_list[["mutect"]] = readr::read_tsv(file = opt$mutect_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	caller_names = c(caller_names, "mutect")
-}
-if (!is.null(opt$strelka_maf)) {
-	maf_list[["strelka"]] = readr::read_tsv(file = opt$strelka_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	caller_names = c(caller_names, "strelka")
-}
-if (!is.null(opt$varscan_maf)) {
-	maf_list[["varscan"]] = readr::read_tsv(file = opt$varscan_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	caller_names = c(caller_names, "varscan")
-}
-if (!is.null(opt$scalpel_maf)) {
-	maf_list[["scalpel"]] = readr::read_tsv(file = opt$scalpel_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	caller_names = c(caller_names, "scalpel")
-}
-if (!is.null(opt$platypus_maf)) {
-	maf_list[["platypus"]] = readr::read_tsv(file = opt$platypus_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character()))
-	caller_names = c(caller_names, "platypus")
-}
-
-if (length(maf_list) == 0) {
-	stop("ERROR: No MAF files provided")
-}
 
 if (is.null(opt$mutect_maf)) {
 	stop("ERROR: Mutect MAF file is required. Mutect is indispensable for this analysis")
@@ -55,36 +27,112 @@ if (!file.exists(opt$mutect_maf)) {
 	stop("ERROR: Mutect MAF file not found: ", opt$mutect_maf)
 }
 
-# Start with the first MAF
-combined_maf <- maf_list[[1]]
+maf_list = list()
+indel_caller_names = c()
 
-# Iteratively join remaining MAFs
-if (length(maf_list) > 1) {
-    for (i in 2:length(maf_list)) {
-        combined_maf <- full_join(combined_maf, maf_list[[i]],
-                                 by = c("Tumor_Sample_Barcode", 
-                                       "Matched_Norm_Sample_Barcode",
-                                       "Chromosome", 
-                                       "UPS_coordinate"),
-                                 suffix = c("", paste0("_", caller_names[i])))
-    }
+mutect_maf = readr::read_tsv(file = opt$mutect_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	     dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
+			   Is_cancer_hotspot = `Is_cancer_hotspot?`)
+
+# Read indel callers
+if (!is.null(opt$strelka_maf)) {
+	maf_list[["strelka"]] = readr::read_tsv(file = opt$strelka_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+				dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
+					      Is_cancer_hotspot = `Is_cancer_hotspot?`)
+	indel_caller_names = c(indel_caller_names, "strelka")
+}
+if (!is.null(opt$varscan_maf)) {
+	maf_list[["varscan"]] = readr::read_tsv(file = opt$varscan_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+				dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
+					      Is_cancer_hotspot = `Is_cancer_hotspot?`)
+	indel_caller_names = c(indel_caller_names, "varscan")
+}
+if (!is.null(opt$scalpel_maf)) {
+	maf_list[["scalpel"]] = readr::read_tsv(file = opt$scalpel_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+				dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
+					      Is_cancer_hotspot = `Is_cancer_hotspot?`)
+	indel_caller_names = c(indel_caller_names, "scalpel")
+}
+if (!is.null(opt$platypus_maf)) {
+	maf_list[["platypus"]] = readr::read_tsv(file = opt$platypus_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+				 dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
+					       Is_cancer_hotspot = `Is_cancer_hotspot?`)
+	indel_caller_names = c(indel_caller_names, "platypus")
 }
 
-# Consolidate duplicate columns
-pattern <- paste0("_(", paste(caller_names, collapse="|"), ")$")
-cols_with_suffix <- grep(pattern, names(combined_maf), value = TRUE)
-base_cols <- unique(sub(pattern, "", cols_with_suffix))
+if (length(maf_list) == 0) {
+	combined_maf = mutect_maf
+} else {
+	combined_indels = maf_list[[1]]
+	if (length(maf_list) > 1) {
+		for (i in 2:length(maf_list)) {
+			combined_indels = dplyr::full_join(combined_indels, maf_list[[i]],
+							   by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Chromosome", "UPS_coordinate"),
+							   suffix = c("", paste0("_", indel_caller_names[i])))
+		}
+	}
 
-for (col in base_cols) {
-    matching_cols <- grep(paste0("^", col, "(_|$)"), names(combined_maf), value = TRUE)
-    if (length(matching_cols) > 1) {
-        combined_maf[[col]] <- do.call(coalesce, combined_maf[matching_cols])
-        combined_maf <- combined_maf %>% select(-all_of(matching_cols[matching_cols != col]))
-    }
+	pattern = paste0("_(", paste(indel_caller_names[-1], collapse="|"), ")$")
+	cols_with_suffix = grep(pattern, names(combined_indels), value = TRUE)
+	base_cols = unique(sub(pattern, "", cols_with_suffix))
+
+	for (col in base_cols) {
+		caller_pattern = paste0("_(", paste(indel_caller_names[-1], collapse="|"), ")$")
+		matching_cols = c(
+			col,
+			grep(paste0("^", col, caller_pattern), names(combined_indels), value = TRUE)
+		)
+		matching_cols = matching_cols[matching_cols %in% names(combined_indels)]
+		if (length(matching_cols) > 1) {
+			combined_indels[[col]] = do.call(coalesce, combined_indels[matching_cols])
+			combined_indels = combined_indels %>%
+					  dplyr::select(-all_of(matching_cols[matching_cols != col]))
+		}
+	}
+
+	combined_maf = dplyr::bind_rows(mutect_maf, combined_indels) %>%
+		       dplyr::distinct()
+
+	if (!is.null(opt$mutect_maf)) {
+		combined_maf = combined_maf %>%
+			       dplyr::mutate(`Is_mutect?` = case_when(
+				       is.na(`Is_mutect?`) ~ "no",
+				       TRUE ~ `Is_mutect?`
+			       ))
+	}
+
+	if (!is.null(opt$varscan_maf)) {
+		combined_maf = combined_maf %>%
+			       dplyr::mutate(`Is_varscan?` = case_when(
+				       is.na(`Is_varscan?`) ~ "no",
+				       TRUE ~ `Is_varscan?`
+			       ))
+	}
+
+	if (!is.null(opt$strelka_maf)) {
+		combined_maf = combined_maf %>%
+			       dplyr::mutate(`Is_strelka?` = case_when(
+				       is.na(`Is_strelka?`) ~ "no",
+				       TRUE ~ `Is_strelka?`
+			       ))
+	}
+
+	if (!is.null(opt$scalpel_maf)) {
+		combined_maf = combined_maf %>%
+			       dplyr::mutate(`Is_scalpel?` = case_when(
+				       is.na(`Is_scalpel?`) ~ "no",
+				       TRUE ~ `Is_scalpel?`
+			       ))
+	}
+
+	if (!is.null(opt$platypus_maf)) {
+		combined_maf = combined_maf %>%
+			       dplyr::mutate(`Is_platypus?` = case_when(
+				       is.na(`Is_platypus?`) ~ "no",
+				       TRUE ~ `Is_platypus?`
+			       ))
+	}
 }
 
-# Remove exact duplicates
-combined_maf <- combined_maf %>% distinct()
-
-# Write output
-write.table(combined_maf, opt$output, sep="\t", quote=FALSE, row.names=FALSE)
+cat("#version 2.4\n", file = opt$output, append = FALSE)
+readr::write_tsv(x = combined_maf, path = opt$output, col_names = TRUE, append = TRUE)
