@@ -31,4 +31,4 @@ summary/aln_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metr
 	R --version >> version/aln_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics
