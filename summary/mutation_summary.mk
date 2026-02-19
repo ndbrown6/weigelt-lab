@@ -1,6 +1,6 @@
 include weigelt-lab/Makefile.inc
 
-LOGDIR ?= log/combine_callers.$(NOW)
+LOGDIR ?= log/mutation_summary.$(NOW)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 CALLERS = mutect strelka varscan scalpel platypus
