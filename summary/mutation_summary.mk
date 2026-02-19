@@ -36,8 +36,8 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 										   $(maf-args) \
 										   --output summary/mutation_summary.maf")
 
-#..DUMMY := $(shell mkdir -p version;
-#	R --version >> version/mutation_summary.txt)
+..DUMMY := $(shell mkdir -p version; \
+	R --version >> version/mutation_summary.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: smry
