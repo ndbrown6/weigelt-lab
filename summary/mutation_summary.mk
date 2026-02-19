@@ -7,11 +7,11 @@ smry : summary/mutation_summary.maf
 REQUIRED_CALLERS = mutect
 OPTIONAL_CALLERS = strelka varscan scalpel platypus
 CALLERS = $(REQUIRED_CALLERS) $(OPTIONAL_CALLERS)
-CALLER_MAKEFILES = mutect:weigelt-lab/variant_caller/mutect_tumor_normal.mk \
-		   strelka:weigelt-lab/variant_caller/strelka_tumor_normal.mk \
-		   varscan:weigelt-lab/variant_caller/varscan_tumor_normal.mk \
-		   scalpel:weigelt-lab/variant_caller/scalpel_tumor_normal.mk \
-		   platypus:weigelt-lab/variant_caller/platypus_tumor_normal.mk
+CALLER_MAKEFILES = mutect:weigelt-lab/variant_callers/mutect_tumor_normal.mk \
+		   strelka:weigelt-lab/variant_callers/strelka_tumor_normal.mk \
+		   varscan:weigelt-lab/variant_callers/varscan_tumor_normal.mk \
+		   scalpel:weigelt-lab/variant_callers/scalpel_tumor_normal.mk \
+		   platypus:weigelt-lab/variant_callers/platypus_tumor_normal.mk
 
 get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 
