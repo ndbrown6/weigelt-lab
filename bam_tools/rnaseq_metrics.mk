@@ -35,4 +35,4 @@ summary/rnaseq_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample)_rnase
 	R --version >> version/rnaseq_metrics.txt)	     
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

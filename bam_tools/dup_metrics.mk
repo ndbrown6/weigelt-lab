@@ -30,4 +30,4 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 	R --version >> version/dup_metrics.txt)	
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

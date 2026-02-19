@@ -31,4 +31,4 @@ summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_me
 	R --version >> version/oxog_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

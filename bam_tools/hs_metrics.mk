@@ -33,4 +33,4 @@ summary/hs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metric
 	R --version >> version/hs_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

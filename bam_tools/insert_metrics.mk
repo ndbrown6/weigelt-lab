@@ -32,4 +32,4 @@ summary/insert_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).inser
 	R --version >> version/insert_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

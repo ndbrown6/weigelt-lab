@@ -30,4 +30,4 @@ summary/idx_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stat
 	R --version >> version/idx_metrics.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics

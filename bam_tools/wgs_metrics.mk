@@ -28,4 +28,4 @@ summary/wgs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metr
 	R --version >> version/wgs_metrics.txt)	
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: metrics
