@@ -3,8 +3,7 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/mutation_summary.$(NOW)
 
 PROJECT_DIR := $(notdir $(CURDIR))
-#CALLERS = mutect strelka varscan scalpel platypus
-CALLERS = mutect strelka varscan scalpel
+CALLERS = mutect strelka varscan scalpel platypus
 CALLER_MAKEFILES = mutect:weigelt-lab/variant_caller/mutect_tumor_normal.mk \
 		   strelka:weigelt-lab/variant_caller/strelka_tumor_normal.mk \
 		   varscan:weigelt-lab/variant_caller/varscan_tumor_normal.mk \
