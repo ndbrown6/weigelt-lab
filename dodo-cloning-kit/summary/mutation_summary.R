@@ -28,6 +28,14 @@ if (!file.exists(opt$mutect_maf)) {
 	stop("ERROR: Mutect MAF file not found: ", opt$mutect_maf)
 }
 
+if (is.null(opt$facets_gene)) {
+	stop("ERROR: Facets file is required. Facets is indispensable for this analysis")
+}
+
+if (!file.exists(opt$facets_gene)) {
+	stop("ERROR: facets file not found: ", opt$facets_gene)
+}
+
 maf_list = list()
 indel_caller_names = c()
 
@@ -35,6 +43,20 @@ mutect_maf = readr::read_tsv(file = opt$mutect_maf, comment = "#", col_names = T
 	     dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
 			   Is_cancer_hotspot = `Is_cancer_hotspot?`)
 
+facets_gene = readr::read_tsv(file = opt$facets_gene, col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	      dplyr::mutate(Tumor_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[1] } ))) %>%
+	      dplyr::mutate(Matched_Norm_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[2] } ))) %>%
+	      dplyr::select(Tumor_Sample_Barcode,
+			    Matched_Norm_Sample_Barcode,
+			    Hugo_Symbol = gene,
+			    total_SNPs = gene_snps,
+			    het_SNPs = gene_het_snps,
+			    CN_state = cn_state,
+			    qt = tcn,
+			    q1 = lcn) %>%
+	      readr::type_convert() %>%
+	      dplyr::mutate(q2 = qt - q1)
+	      
 if (!is.null(opt$strelka_maf)) {
 	maf_list[["strelka"]] = readr::read_tsv(file = opt$strelka_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
@@ -93,7 +115,8 @@ if (length(maf_list) == 0) {
 	}
 
 	combined_maf = dplyr::bind_rows(mutect_maf, combined_indels) %>%
-		       dplyr::distinct()
+		       dplyr::distinct() %>%
+		       dplyr::left_join(facets_gene, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
 
 	if (!is.null(opt$mutect_maf)) {
 		combined_maf = combined_maf %>%
