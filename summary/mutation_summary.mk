@@ -19,7 +19,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define caller-rule
 $(1)/mutation_summary.maf :
-	$$(MAKE) -f $$(call get_makefile,$(1)) $(1)/mutation_summary.maf
+	$$(MAKE) -f $$(call get_makefile,$(1)) $$(@)
 
 endef
 $(foreach caller,$(CALLERS), \
@@ -34,7 +34,7 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 										   mkdir -p summary && \
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
 										   $(maf-args) \
-										   --output summary/mutation_summary.maf")
+										   --output $$(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	R --version >> version/mutation_summary.txt)
