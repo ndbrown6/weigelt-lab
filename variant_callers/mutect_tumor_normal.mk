@@ -95,7 +95,7 @@ mutect/$1_$2/$1_$2_ft.maf : mutect/$1_$2/$1_$2_ft.vcf
 												       $$(VCF2MAF) \
 												       --input-vcf $$(<) \
 												       --output-maf $$(@) \
-												       --tmp-dir $$(TMPDIR) \
+												       --tmp-dir $$(TMPDIR)/mutect \
 												       --tumor-id $1 \
 												       --normal-id $2 \
 												       --vep-path $$(VCF2MAF_ENV)/bin \
@@ -106,7 +106,7 @@ mutect/$1_$2/$1_$2_ft.maf : mutect/$1_$2/$1_$2_ft.vcf
 												       --species homo_sapiens \
 												       --ncbi-build GRCh37 \
 												       --maf-center MSKCC && \
-												       rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
+												       rm -rf $$(TMPDIR)/mutect/$1_$2_ft.vep.vcf")
 														   
 mutect/$1_$2/$1_$2_ft_ann.maf : mutect/$1_$2/$1_$2_ft.maf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/mutect -N $1_$2/ann-maf,"set -o pipefail && \

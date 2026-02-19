@@ -71,7 +71,7 @@ platypus/$1_$2/$1_$2_ft.maf : platypus/$1_$2/$1_$2_ft.vcf
 													 $$(VCF2MAF) \
 													 --input-vcf $$(<) \
 													 --output-maf $$(@) \
-													 --tmp-dir $$(TMPDIR) \
+													 --tmp-dir $$(TMPDIR)/platypus \
 													 --tumor-id $1 \
 													 --normal-id $2 \
 													 --vep-path $$(VCF2MAF_ENV)/bin \
@@ -82,7 +82,7 @@ platypus/$1_$2/$1_$2_ft.maf : platypus/$1_$2/$1_$2_ft.vcf
 													 --species homo_sapiens \
 													 --ncbi-build GRCh37 \
 													 --maf-center MSKCC && \
-													 rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
+													 rm -rf $$(TMPDIR)/platypus/$1_$2_ft.vep.vcf")
 														   
 platypus/$1_$2/$1_$2_ft_ann.maf : platypus/$1_$2/$1_$2_ft.maf platypus/$1_$2/$1_$2_ft.uvcf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/platypus -N $1_$2/ann-maf,"set -o pipefail && \

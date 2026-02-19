@@ -78,7 +78,7 @@ scalpel/$1_$2/$1_$2_ft.maf : scalpel/$1_$2/$1_$2_ft.vcf
 													$$(VCF2MAF) \
 													--input-vcf $$(<) \
 													--output-maf $$(@) \
-													--tmp-dir $$(TMPDIR) \
+													--tmp-dir $$(TMPDIR)/scalpel \
 													--tumor-id $1 \
 													--normal-id $2 \
 													--vcf-tumor-id TUMOR \
@@ -91,7 +91,7 @@ scalpel/$1_$2/$1_$2_ft.maf : scalpel/$1_$2/$1_$2_ft.vcf
 													--species homo_sapiens \
 													--ncbi-build GRCh37 \
 													--maf-center MSKCC && \
-													rm -rf $$(TMPDIR)/$1_$2_ft.vep.vcf")
+													rm -rf $$(TMPDIR)/scalpel/$1_$2_ft.vep.vcf")
 														   
 scalpel/$1_$2/$1_$2_ft_ann.maf : scalpel/$1_$2/$1_$2_ft.maf scalpel/$1_$2/$1_$2_ft.uvcf
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/scalpel -N $1_$2/ann-maf,"set -o pipefail && \

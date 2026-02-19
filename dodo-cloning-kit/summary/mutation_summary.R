@@ -14,6 +14,7 @@ optList = list(make_option(c("--mutect_maf"), type="character", default=NULL, he
                make_option(c("--varscan_maf"), type="character", default=NULL, help="VarScan MAF file"),
                make_option(c("--scalpel_maf"), type="character", default=NULL, help="Scalpel MAF file"),
                make_option(c("--platypus_maf"), type="character", default=NULL, help="Platypus MAF file"),
+               make_option(c("--facets_gene"), type="character", default=NULL, help="Facets Suite gene file"),
                make_option(c("--output"), type="character", help="Output combined MAF file"))
 parser = OptionParser(usage = "%prog", option_list = optList)
 arguments = parse_args(parser, positional_arguments = T)

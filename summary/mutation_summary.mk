@@ -25,15 +25,19 @@ endef
 $(foreach caller,$(CALLERS), \
 	$(eval $(call caller-rule,$(caller))))
 
+facets_suite/summary/aggregated-gene.txt :
+	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk facets
+
 define maf-args
 $(foreach caller,$(CALLERS),--$(caller)_maf $(caller)/mutation_summary.maf)
 endef
 
-summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf)
+summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf) facets_suite/summary/aggregated-gene.txt
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N combine-maf,"set -o pipefail && \
 										   mkdir -p summary && \
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
 										   $(maf-args) \
+										   --facets_gene facets_suite/summary/aggregated-gene.txt \
 										   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
