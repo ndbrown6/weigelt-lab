@@ -34,7 +34,6 @@ mutect_maf = readr::read_tsv(file = opt$mutect_maf, comment = "#", col_names = T
 	     dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
 			   Is_cancer_hotspot = `Is_cancer_hotspot?`)
 
-# Read indel callers
 if (!is.null(opt$strelka_maf)) {
 	maf_list[["strelka"]] = readr::read_tsv(file = opt$strelka_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
@@ -61,7 +60,9 @@ if (!is.null(opt$platypus_maf)) {
 }
 
 if (length(maf_list) == 0) {
-	combined_maf = mutect_maf
+	combined_maf = mutect_maf %>%
+		       dplyr::distinct() %>%
+		       dplyr::mutate(UPS_coordinate = "-")
 } else {
 	combined_indels = maf_list[[1]]
 	if (length(maf_list) > 1) {
