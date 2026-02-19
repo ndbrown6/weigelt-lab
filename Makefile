@@ -164,11 +164,11 @@ arriba_fusion :
 
 TARGETS += annotate_vcf_maf
 annotate_vcf_maf :
-	$(call RUN_MAKE,modules/vcf_tools/annotate_vcf_maf.mk)
+	$(call RUN_MAKE,weigelt-lab/vcf_tools/annotate_vcf_maf.mk)
 	
 TARGETS += annotate_maf_vcf
 annotate_maf_vcf :
-	$(call RUN_MAKE,modules/vcf_tools/annotate_maf_vcf.mk)
+	$(call RUN_MAKE,weigelt-lab/vcf_tools/annotate_maf_vcf.mk)
 	
 #==================================================
 # BAM tools
@@ -176,39 +176,39 @@ annotate_maf_vcf :
 
 TARGETS += idx_metrics
 idx_metrics :
-	$(call RUN_MAKE,modules/bam_tools/idx_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/idx_metrics.mk)
 
 TARGETS += aln_metrics
 aln_metrics :
-	$(call RUN_MAKE,modules/bam_tools/aln_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/aln_metrics.mk)
 
 TARGETS += insert_metrics
 insert_metrics :
-	$(call RUN_MAKE,modules/bam_tools/insert_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/insert_metrics.mk)
 
 TARGETS += oxog_metrics
 oxog_metrics :
-	$(call RUN_MAKE,modules/bam_tools/oxog_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/oxog_metrics.mk)
 
 TARGETS += gc_metrics
 gc_metrics :
-	$(call RUN_MAKE,modules/bam_tools/gc_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/gc_metrics.mk)
 
 TARGETS += hs_metrics
 hs_metrics :
-	$(call RUN_MAKE,modules/bam_tools/hs_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/hs_metrics.mk)
 
 TARGETS += dup_metrics
 dup_metrics :
-	$(call RUN_MAKE,modules/bam_tools/dup_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/dup_metrics.mk)
 	
 TARGETS += wgs_metrics
 wgs_metrics :
-	$(call RUN_MAKE,modules/bam_tools/wgs_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/wgs_metrics.mk)
 	
 TARGETS += rnaseq_metrics
 rnaseq_metrics :
-	$(call RUN_MAKE,modules/bam_tools/rnaseq_metrics.mk)
+	$(call RUN_MAKE,weigelt-lab/bam_tools/rnaseq_metrics.mk)
 
 #==================================================
 # Summary
@@ -216,14 +216,14 @@ rnaseq_metrics :
 
 TARGETS += mutation_summary
 mutation_summary :
-	$(call RUN_MAKE,modules/summary/mutation_summary.mk)
+	$(call RUN_MAKE,weigelt-lab/summary/mutation_summary.mk)
 	
 TARGETS += sv_summary
 sv_summary :
-	$(call RUN_MAKE,modules/summary/sv_summary.mk)
+	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk)
 	
 TARGETS += fusion_summary
 fusion_summary :
-	$(call RUN_MAKE,modules/summary/fusion_summary.mk)
+	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk)
 	
 .PHONY : $(TARGETS)
