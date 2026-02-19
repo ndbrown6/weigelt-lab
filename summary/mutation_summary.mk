@@ -16,13 +16,11 @@ smry : summary/mutation_summary.maf
 
 define caller-rule
 $(1)/mutation_summary.maf :
-    $$(MAKE) -f $$(call get_makefile,$(1)) $(1)/mutation_summary.maf
+	$$(MAKE) -f $$(call get_makefile,$(1)) $(1)/mutation_summary.maf
 
 endef
 $(foreach caller,$(CALLERS), \
 	$(eval $(call caller-rule,$(caller))))
-
-MAF_FILES = 
 
 define maf-args
 $(foreach caller,$(CALLERS),--$(caller)_maf $(caller)/mutation_summary.maf)
@@ -37,4 +35,4 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: smry
