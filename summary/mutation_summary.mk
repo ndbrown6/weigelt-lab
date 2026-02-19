@@ -47,5 +47,5 @@ summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 .PHONY: smry clean
 
 clean:
-	$(foreach caller,$(CALLERS),$(MAKE) -f $(call get_makefile,$(caller)) clean;) && \
+	$(foreach caller,$(CALLERS),$(MAKE) -f $(call get_makefile,$(caller)) clean;)
 	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
