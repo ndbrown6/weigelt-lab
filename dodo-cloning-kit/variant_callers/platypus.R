@@ -101,7 +101,8 @@ if (as.numeric(opt$option) == 1) {
 	      readr::type_convert() %>%
 	      dplyr::mutate(`Is_platypus?` = ifelse(is.na(`Is_platypus?`), "no", `Is_platypus?`)) %>%
 	      dplyr::mutate(`Is_cmo_hotspot?` = ifelse(is.na(`Is_cmo_hotspot?`), "no", `Is_cmo_hotspot?`)) %>%
-	      dplyr::mutate(`Is_cancer_hotspot?` = ifelse(is.na(`Is_cancer_hotspot?`), "no", `Is_cancer_hotspot?`))
+	      dplyr::mutate(`Is_cancer_hotspot?` = ifelse(is.na(`Is_cancer_hotspot?`), "no", `Is_cancer_hotspot?`)) %>%
+	      dplyr::distinct()
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
