@@ -74,8 +74,8 @@ scalpel_tumor_normal :
 	
 TARGETS += platypus_tumor_normal
 platypus_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/variant_callers/platypus_tumor_normal.mk)
-#	$(MAKE) -f weigelt-lab/variant_callers/platypus_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/variant_callers/platypus_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/variant_callers/platypus_tumor_normal.mk clean
 	
 #==================================================
 # Copy number aberrations
