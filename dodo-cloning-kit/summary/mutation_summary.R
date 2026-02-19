@@ -85,7 +85,8 @@ if (!is.null(opt$platypus_maf)) {
 if (length(maf_list) == 0) {
 	combined_maf = mutect_maf %>%
 		       dplyr::distinct() %>%
-		       dplyr::mutate(UPS_coordinate = "-")
+		       dplyr::mutate(UPS_coordinate = "-") %>%
+		       dplyr::left_join(facets_gene, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
 } else {
 	combined_indels = maf_list[[1]]
 	if (length(maf_list) > 1) {
