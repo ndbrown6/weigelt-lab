@@ -59,3 +59,4 @@ clean:
 	rm -rf kallisto/*/*_R1.fastq
 	rm -rf kallisto/*/*_R2.fastq
 	rm -rf kallisto/*/abundance.tsv
+	rm -rf kallisto/*/abundance.h5
