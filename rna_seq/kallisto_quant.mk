@@ -2,7 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/kallisto.$(NOW)
 
-kallisto : $(foreach sample,$(SAMPLES),kallisto/$(sample)/$(sample).1.fastq) \
+kallisto : $(foreach sample,$(SAMPLES),kallisto/$(sample)/$(sample)_R1.fastq) \
+	   $(foreach sample,$(SAMPLES),kallisto/$(sample)/$(sample)_R2.fastq) \
 	   $(foreach sample,$(SAMPLES),kallisto/$(sample)/abundance.tsv) \
 	   kallisto/tpm_bygene.txt
 
@@ -10,19 +11,21 @@ SLEUTH_ANNOT ?= $(HOME)/share/lib/resource_files/Hugo_ENST_ensembl75_fixed.txt
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-define bam-to-fastq
-kallisto/$1/$1.1.fastq : bam/$1.bam
-	$$(call RUN,-c -n 4 -s 4G -m 9G -p $(PROJECT_DIR)/kallisto -N $1/bam2fastq,"set -o pipefail && \
-										    mkdir -p kallisto/$1 && \
-										    $$(SAMTOOLS) sort -T kallisto/$1/$1 -O bam -n -@ 4 -m 6G $$(<) | \
-										    bedtools bamtofastq -i - -fq kallisto/$1/$1.1.fastq -fq2 kallisto/$1/$1.2.fastq")
+define merge-fastq
+kallisto/$1/$1_R1.fastq : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R1,"set -o pipefail && \
+											    zcat $$(^) > $$(@)")
+    
+kallisto/$1/$1_R2.fastq : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -w 2:00:00 -p $(PROJECT_DIR)/star -N $1/merge_R2,"set -o pipefail && \
+											    zcat $$(^) > $$(@)")
 
 endef
 $(foreach sample,$(SAMPLES),\
-		$(eval $(call bam-to-fastq,$(sample))))
+        $(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
 
 define fastq-to-kallisto
-kallisto/$1/abundance.tsv : kallisto/$1/$1.1.fastq
+kallisto/$1/abundance.tsv : kallisto/$1/$1_R1.fastq kallisto/$1/$1_R2.fastq
 	$$(call RUN,-c -n 12 -s 2G -m 3G -v $(KALLISTO_ENV) -p $(PROJECT_DIR)/kallisto -N $1/quant,"set -o pipefail && \
 												    kallisto quant \
 												    -i $$(KALLISTO_INDEX) \
@@ -31,8 +34,8 @@ kallisto/$1/abundance.tsv : kallisto/$1/$1.1.fastq
 												    -b 100 \
 												    -t 12 \
 												    --fusion \
-												    kallisto/$1/$1.1.fastq \
-												    kallisto/$1/$1.2.fastq")
+												    $$(<) \
+												    $$(<<)")
 
 endef
 $(foreach sample,$(SAMPLES),\
@@ -53,6 +56,6 @@ kallisto/tpm_bygene.txt : $(foreach sample,$(SAMPLES),kallisto/$(sample)/abundan
 .PHONY: kallisto clean
 
 clean:
-	rm -rf kallisto/*/*.1.fastq
-	rm -rf kallisto/*/*.2.fastq
+	rm -rf kallisto/*/*_R1.fastq
+	rm -rf kallisto/*/*_R2.fastq
 	rm -rf kallisto/*/abundance.tsv
