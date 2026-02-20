@@ -25,6 +25,23 @@ endef
 RUN_MAKE = $(if $(findstring false,$(USE_CLUSTER))$(findstring n,$(MAKEFLAGS)),+$(MAKE) -f $1,$(call RUN_QMAKE,$1,$(NUM_JOBS)))
 
 #==================================================
+# Summary
+#==================================================
+
+TARGETS += mutation_summary
+mutation_summary :
+	$(call RUN_MAKE,weigelt-lab/summary/mutation_summary.mk) && \
+	$(MAKE) -f weigelt-lab/summary/mutation_summary.mk clean
+	
+TARGETS += sv_summary
+sv_summary :
+	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk)
+	
+TARGETS += fusion_summary
+fusion_summary :
+	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk)
+
+#==================================================
 # FASTQ aligners
 #==================================================
 
@@ -210,21 +227,4 @@ TARGETS += rnaseq_metrics
 rnaseq_metrics :
 	$(call RUN_MAKE,weigelt-lab/bam_tools/rnaseq_metrics.mk)
 
-#==================================================
-# Summary
-#==================================================
-
-TARGETS += mutation_summary
-mutation_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/mutation_summary.mk) && \
-	$(MAKE) -f weigelt-lab/summary/mutation_summary.mk clean
-	
-TARGETS += sv_summary
-sv_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk)
-	
-TARGETS += fusion_summary
-fusion_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk)
-	
 .PHONY : $(TARGETS)
