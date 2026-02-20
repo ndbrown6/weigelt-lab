@@ -10,9 +10,9 @@ vcf : scalpel/chunk_bed/taskcomplete.txt \
       $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.uvcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.maf)
-#      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft_ann.maf) \
-#      scalpel/mutation_summary.maf
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),scalpel/$(pair)/$(pair)_ft_ann.maf) \
+      scalpel/mutation_summary.maf
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
