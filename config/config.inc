@@ -19,7 +19,7 @@ SCALPEL_ENV ?= $(HOME)/share/env/scalpel-0.5.3
 PLATYPUS_ENV = $(HOME)/share/env/platypus-variant-0.8.1
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
-
+KALLISTO_ENV ?= $(HOME)/share/env/kallisto-0.46.2
 
 # aliases
 PYTHON ?= python
