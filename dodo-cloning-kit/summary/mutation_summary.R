@@ -43,19 +43,19 @@ mutect_maf = readr::read_tsv(file = opt$mutect_maf, comment = "#", col_names = T
 	     dplyr::rename(Is_cmo_hotspot = `Is_cmo_hotspot?`,
 			   Is_cancer_hotspot = `Is_cancer_hotspot?`)
 
-facets_gene = readr::read_tsv(file = opt$facets_gene, col_names = TRUE, col_types = cols(.default = col_character())) %>%
-	      dplyr::mutate(Tumor_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[1] } ))) %>%
-	      dplyr::mutate(Matched_Norm_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[2] } ))) %>%
-	      dplyr::select(Tumor_Sample_Barcode,
-			    Matched_Norm_Sample_Barcode,
-			    Hugo_Symbol = gene,
-			    total_SNPs = gene_snps,
-			    het_SNPs = gene_het_snps,
-			    CN_state = cn_state,
-			    qt = tcn,
-			    q1 = lcn) %>%
-	      readr::type_convert() %>%
-	      dplyr::mutate(q2 = qt - q1)
+facets_maf = readr::read_tsv(file = opt$facets_gene, col_names = TRUE, col_types = cols(.default = col_character())) %>%
+	     dplyr::mutate(Tumor_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[1] } ))) %>%
+	     dplyr::mutate(Matched_Norm_Sample_Barcode = unlist(lapply(sample, function(x) { (strsplit(x, "_", fixed = TRUE)[[1]])[2] } ))) %>%
+	     dplyr::select(Tumor_Sample_Barcode,
+			   Matched_Norm_Sample_Barcode,
+			   Hugo_Symbol = gene,
+			   total_snps = gene_snps,
+			   het_snps = gene_het_snps,
+			   cn_state = cn_state,
+			   qt = tcn,
+			   q1 = lcn) %>%
+	     readr::type_convert() %>%
+	     dplyr::mutate(q2 = qt - q1)
 	      
 if (!is.null(opt$strelka_maf)) {
 	maf_list[["strelka"]] = readr::read_tsv(file = opt$strelka_maf, comment = "#", col_names = TRUE, col_types = cols(.default = col_character())) %>%
@@ -86,7 +86,7 @@ if (length(maf_list) == 0) {
 	combined_maf = mutect_maf %>%
 		       dplyr::distinct() %>%
 		       dplyr::mutate(UPS_coordinate = "-") %>%
-		       dplyr::left_join(facets_gene, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
+		       dplyr::left_join(facets_maf, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
 } else {
 	combined_indels = maf_list[[1]]
 	if (length(maf_list) > 1) {
@@ -117,7 +117,7 @@ if (length(maf_list) == 0) {
 
 	combined_maf = dplyr::bind_rows(mutect_maf, combined_indels) %>%
 		       dplyr::distinct() %>%
-		       dplyr::left_join(facets_gene, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
+		       dplyr::left_join(facets_amf, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
 
 	if (!is.null(opt$mutect_maf)) {
 		combined_maf = combined_maf %>%
