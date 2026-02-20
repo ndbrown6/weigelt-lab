@@ -113,4 +113,5 @@ platypus/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/
 
 clean :
 	rm -f platypus/*/*--*.log && \
-	rm -f platypus/*/*--*.vcf
+	rm -f platypus/*/*--*.vcf && \
+	rm -f platypus/*/*_fx.vcf
