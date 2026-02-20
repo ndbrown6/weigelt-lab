@@ -6,11 +6,11 @@ PLATYPUS_CHUNKS := $(shell seq 1 22) X Y
 
 vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(pair)/$(pair)--$(n).vcf)) \
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair).vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf) \
-      platypus/mutation_summary.maf
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf)
+#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf) \
+#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf) \
+#      platypus/mutation_summary.maf
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -52,7 +52,8 @@ platypus/$1_$2/$1_$2_ft.vcf : platypus/$1_$2/$1_$2.vcf $(TARGETS_FILE)
 											  --option 2 \
 											  --input $$(<<) \
 											  --file_in $$(<) \
-											  --file_out $$(@)")
+											  --file_out platypus/$1_$2/$1_$2_fx.vcf && \
+											  bash weigelt-lab/dodo-cloning-kit/variant_callers/platypus.sh platypus/$1_$2/$1_$2_fx.vcf $$(@)")
 											 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
