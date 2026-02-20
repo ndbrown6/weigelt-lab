@@ -85,8 +85,8 @@ if (as.numeric(opt$option) == 1) {
 			       dplyr::mutate(`Is_cancer_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "HGVSp_Short")) %>%
 	      readr::type_convert() %>%
-	      dplyr::filter(t_alt_count>0) #%>%
-#	      dplyr::filter(n_alt_count<=1)
+	      dplyr::filter(t_alt_count>0) %>%
+	      dplyr::filter((100*n_alt_count/n_depth)<=5)
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)
