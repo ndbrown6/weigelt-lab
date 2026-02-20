@@ -99,7 +99,7 @@ strelka/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(
 
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(STRELKA_ENV/)opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py --version > version/strelka_tumor_normal.txt; \
+	$(STRELKA_ENV)/opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py --version > version/strelka_tumor_normal.txt; \
 	R --version >> version/strelka_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
