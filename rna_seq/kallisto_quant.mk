@@ -60,3 +60,5 @@ clean:
 	rm -f kallisto/*/*_R2.fastq
 	rm -f kallisto/*/abundance.tsv
 	rm -f kallisto/*/abundance.h5
+	rm -f kallisto/*/fusion.txt
+	rm -f kallisto/*/run_info.json
