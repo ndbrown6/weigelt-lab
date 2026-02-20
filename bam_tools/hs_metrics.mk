@@ -25,7 +25,7 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call picard-metrics,$(sample))))
 	
 summary/hs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).hs_metrics.txt)
-	$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/summary -N summary/hs,"set -o pipefail && \
+	$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/summary -N metrics/hs,"set -o pipefail && \
 										 $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 6 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \

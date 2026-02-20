@@ -23,7 +23,7 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call picard-metrics,$(sample))))
 	
 summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt)
-	$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/summary -N summary/oxog,"set -o pipefail && \
+	$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/summary -N metrics/oxog,"set -o pipefail && \
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/bam_metrics.R --option 4 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \

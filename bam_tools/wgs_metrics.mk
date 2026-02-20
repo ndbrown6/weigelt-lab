@@ -20,7 +20,7 @@ $(foreach sample,$(SAMPLES),\
     $(eval $(call picard-metrics,$(sample))))
 
 summary/wgs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/wgs,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N metrics/wgs,"set -o pipefail && \
 										  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 6 --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
