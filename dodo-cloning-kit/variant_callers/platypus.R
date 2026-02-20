@@ -47,7 +47,6 @@ if (as.numeric(opt$option) == 1) {
 
 }  else if (as.numeric(opt$option) == 2) {
 	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
-	      dplyr::filter(FILTER=="PASS") %>%
 	      dplyr::mutate(Chromosome = `#CHROM`,
 			    Start_Position = as.numeric(`POS`),
 			    End_Position = as.numeric(`POS`)+1) %>%
@@ -85,7 +84,9 @@ if (as.numeric(opt$option) == 1) {
 					       col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			       dplyr::mutate(`Is_cancer_hotspot?` = "yes"),
 			       by = c("Hugo_Symbol", "HGVSp_Short")) %>%
-	      readr::type_convert()
+	      readr::type_convert() %>%
+	      dplyr::filter(t_alt_count>0) #%>%
+#	      dplyr::filter(n_alt_count<=1)
 	
 	cat("#version 2.4\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = maf, path = opt$file_out, col_names = TRUE, append = TRUE)

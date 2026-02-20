@@ -8,9 +8,9 @@ vcf : $(foreach pair,$(SAMPLE_PAIRS),$(foreach n,$(PLATYPUS_CHUNKS),platypus/$(p
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair).vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.vcf) \
       $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.uvcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf)
-#      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf) \
-#      platypus/mutation_summary.maf
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft.maf) \
+      $(foreach pair,$(SAMPLE_PAIRS),platypus/$(pair)/$(pair)_ft_ann.maf) \
+      platypus/mutation_summary.maf
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
