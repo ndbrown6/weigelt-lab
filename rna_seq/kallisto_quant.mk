@@ -56,7 +56,7 @@ kallisto/tpm_bygene.txt : $(foreach sample,$(SAMPLES),kallisto/$(sample)/abundan
 .PHONY: kallisto clean
 
 clean:
-	rm -rf kallisto/*/*_R1.fastq
-	rm -rf kallisto/*/*_R2.fastq
-	rm -rf kallisto/*/abundance.tsv
-	rm -rf kallisto/*/abundance.h5
+	rm -f kallisto/*/*_R1.fastq
+	rm -f kallisto/*/*_R2.fastq
+	rm -f kallisto/*/abundance.tsv
+	rm -f kallisto/*/abundance.h5
