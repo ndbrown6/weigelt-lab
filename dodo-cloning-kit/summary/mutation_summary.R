@@ -117,7 +117,7 @@ if (length(maf_list) == 0) {
 
 	combined_maf = dplyr::bind_rows(mutect_maf, combined_indels) %>%
 		       dplyr::distinct() %>%
-		       dplyr::left_join(facets_amf, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
+		       dplyr::left_join(facets_maf, by = c("Tumor_Sample_Barcode", "Matched_Norm_Sample_Barcode", "Hugo_Symbol"))
 
 	if (!is.null(opt$mutect_maf)) {
 		combined_maf = combined_maf %>%
