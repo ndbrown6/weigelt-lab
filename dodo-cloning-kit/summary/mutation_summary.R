@@ -164,5 +164,4 @@ if (length(maf_list) == 0) {
 	}
 }
 
-cat("#version 2.4\n", file = opt$output, append = FALSE)
-readr::write_tsv(x = combined_maf, path = opt$output, col_names = TRUE, append = TRUE)
+readr::write_tsv(x = combined_maf, path = opt$output, col_names = TRUE, append = FALSE)

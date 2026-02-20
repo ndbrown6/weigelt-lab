@@ -2,7 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/mutation_summary.$(NOW)
 
-smry : summary/mutation_summary.maf
+smry : summary/mutation_summary.txt
 
 REQUIRED_CALLERS = mutect
 OPTIONAL_CALLERS = strelka varscan scalpel platypus
@@ -32,7 +32,7 @@ define maf-args
 $(foreach caller,$(CALLERS),--$(caller)_maf $(caller)/mutation_summary.maf)
 endef
 
-summary/mutation_summary.maf : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf) facets_suite/summary/aggregated-gene.txt
+summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf) facets_suite/summary/aggregated-gene.txt
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N combine-maf,"set -o pipefail && \
 										   mkdir -p summary && \
 										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
