@@ -83,7 +83,7 @@ scalpel/$1_$2/$1_$2_ft.maf : scalpel/$1_$2/$1_$2_ft.vcf
 													--normal-id $2 \
 													--vcf-tumor-id $1 \
 													--vcf-normal-id $2 \
-													--retain-fmt \"AD,DP\" \
+													#--retain-fmt \"AD,DP\" \
 													--vep-path $$(VCF2MAF_ENV)/bin \
 													--vep-data $$(HOME)/share/lib/resource_files/VEP/GRCh37/ \
 													--vep-forks 12 \
