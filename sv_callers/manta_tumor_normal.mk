@@ -2,7 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/manta_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
+      $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/$(pair).vcf)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -17,6 +18,14 @@ manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
 												    --config=$(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py.ini \
 												    --runDir $$(@D)")
 
+manta/$1_$2/$1_$2.vcf : manta/$1_$2/runWorkflow.py
+	$$(call RUN,-c -n 10 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/run -v $(MANTA_ENV) -w 48:00:00,"set -o pipefail && \
+													   manta/$1_$2/runWorkflow.py \
+													   -m local \
+													   -j 10 \
+													   -g 4 && \
+													   gzip -dc manta/$1_$2/results/variants/somaticSV.vcf.gz > $$(@)")
+						  
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
 	$(eval $(call manta-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
