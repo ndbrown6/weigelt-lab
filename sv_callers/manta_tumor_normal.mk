@@ -22,7 +22,8 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	$(eval $(call manta-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
-	python --version &> version/manta_tumor_normal.txt)
+	python --version &> version/manta_tumor_normal.txt; \
+	$(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py --version >> version/manta_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY:
