@@ -164,4 +164,7 @@ if (length(maf_list) == 0) {
 	}
 }
 
+combined_maf = combined_maf %>%
+	       dplyr::select(1:vcf_pos, contains("?"), UPS_coordinate, Is_cmo_hotspot, Is_cancer_hotspot, total_snps, het_snps, cn_state, qt, q1, q2)
+
 readr::write_tsv(x = combined_maf, path = opt$output, col_names = TRUE, append = FALSE)
