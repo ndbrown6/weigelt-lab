@@ -2,8 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/manta_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
-      $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/$(pair).vcf)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -35,8 +34,4 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	python --version &> version/manta_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
-
-clean :
-	rm -f strelka/chunk_bed/*
-    
+.PHONY:

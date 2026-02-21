@@ -128,8 +128,8 @@ salmon_quant :
 
 TARGETS += manta_tumor_normal
 manta_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/sv_callers/manta_tumor_normal.mk) && \
-	$(MAKE) -f weigelt-lab/sv_callers/manta_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/sv_callers/manta_tumor_normal.mk)
+#	$(MAKE) -f weigelt-lab/sv_callers/manta_tumor_normal.mk clean
 	
 TARGETS += svaba_tumor_normal
 svaba_tumor_normal :
