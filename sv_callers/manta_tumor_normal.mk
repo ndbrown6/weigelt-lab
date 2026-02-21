@@ -8,13 +8,13 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define manta-tumor-normal
 manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
-	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/configure -v $(MANTA_ENV), "set -o pipefail && \
-												     rm -rf $$(@D) && \
-												     $$(CONFIGURE_MANTA) \
-												     --tumorBam=$$(<) \
-												     --normalBam=$$(<<) \
-												     --referenceFasta=$$(REF_FASTA)
-												     --config=
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/configure -v $(MANTA_ENV),"set -o pipefail && \
+												    rm -rf $$(@D) && \
+												    $$(CONFIGURE_MANTA) \
+												    --tumorBam=$$(<) \
+												    --normalBam=$$(<<) \
+												    --referenceFasta=$$(REF_FASTA)
+												    --config= \
 												     --runDir $$(@D)")
 
 manta/$1_$2.manta_timestamp : manta/$1_$2/runWorkflow.py
