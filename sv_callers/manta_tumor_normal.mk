@@ -1,5 +1,4 @@
 include weigelt-lab/Makefile.inc
-include weigelt-lab/config/manta.inc
 
 LOGDIR ?= log/manta_tumor_normal.$(NOW)
 
@@ -9,14 +8,15 @@ vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
 PROJECT_DIR := $(notdir $(CURDIR))
 
 define manta-tumor-normal
-manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam bam/$1.bam.bai bam/$2.bam.bai
+manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/configure -v $(MANTA_ENV), "set -o pipefail && \
 												     rm -rf $$(@D) && \
-												     $$(CONFIG_MANTA) \
-												     --tumorBam $$(<) \
-												     --normalBam $$(<<) \
-												     $$(CONFIG_MANTA_OPTS) 
-												     --runDir $$(@D) 
+												     $$(CONFIGURE_MANTA) \
+												     --tumorBam=$$(<) \
+												     --normalBam=$$(<<) \
+												     --referenceFasta=$$(REF_FASTA)
+												     --config=
+												     --runDir $$(@D)"
 
 manta/$1_$2.manta_timestamp : manta/$1_$2/runWorkflow.py
 	$$(call RUN,-n 8 -s 2G -m 4G -w 72:00:00,"set -o pipefail && \
@@ -32,7 +32,11 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	$(eval $(call manta-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 
 ..DUMMY := $(shell mkdir -p version; \
-	     python --version &> version/manta_tumor_normal.txt)
+	python --version &> version/manta_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: manta
+.PHONY: clean
+
+clean :
+	rm -f strelka/chunk_bed/*
+    

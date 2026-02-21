@@ -20,6 +20,7 @@ PLATYPUS_ENV = $(HOME)/share/env/platypus-variant-0.8.1
 FACETS_SUITE_ENV ?= $(HOME)/share/env/r-facets-suite-2.0.8
 COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 KALLISTO_ENV ?= $(HOME)/share/env/kallisto-0.46.2
+MANTA_ENV ?= $(HOME)/share/env/manta-0.29.6
 
 # aliases
 PYTHON ?= python
@@ -38,6 +39,7 @@ VCF2MAF ?= vcf2maf.pl
 MAF2VCF ?= maf2vcf.pl
 MAF2MAF ?= maf2maf.pl
 CONFIGURE_STRELKA ?= $(STRELKA_ENV)/opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py
+CONFIGURE_MANTA ?= $(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py
 
 # picard command lines
 PICARD_MEM = 8G
