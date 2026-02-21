@@ -15,7 +15,7 @@ manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
 												     --normalBam=$$(<<) \
 												     --referenceFasta=$$(REF_FASTA)
 												     --config=
-												     --runDir $$(@D)"
+												     --runDir $$(@D)")
 
 manta/$1_$2.manta_timestamp : manta/$1_$2/runWorkflow.py
 	$$(call RUN,-n 8 -s 2G -m 4G -w 72:00:00,"set -o pipefail && \
