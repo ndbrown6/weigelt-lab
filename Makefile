@@ -160,6 +160,11 @@ gridss_tumor_only :
 # RNA fusion callers
 #==================================================
 
+TARGETS += arriba_fusion
+arriba_fusion :
+	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk) && \
+	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
+	
 TARGETS += star_fusion
 star_fusion :
 	$(call RUN_MAKE,modules/sv_callers/star_fusion.mk) && \
@@ -170,11 +175,6 @@ fusion_catcher :
 	$(call RUN_MAKE,modules/sv_callers/fusion_catcher.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/fusion_catcher.mk clean
 	
-TARGETS += arriba_fusion
-arriba_fusion :
-	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk) && \
-	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
-
 #==================================================
 # VCF tools
 #==================================================
