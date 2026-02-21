@@ -14,7 +14,7 @@ manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
 												    --tumorBam=$$(<) \
 												    --normalBam=$$(<<) \
 												    --referenceFasta=$$(REF_FASTA) \
-												    --config= \
+												    --config=$(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py.ini \
 												    --runDir $$(@D)")
 
 endef
