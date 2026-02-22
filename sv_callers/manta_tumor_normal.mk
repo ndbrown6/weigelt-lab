@@ -7,7 +7,7 @@ vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
 
 MANTA_CORES ?= 10
 MANTA_MEM_CORE ?= 4G
-MANTA_WALL_TIME ?= 48:00:00
+MANTA_WALL_TIME ?= 24:00:00
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
