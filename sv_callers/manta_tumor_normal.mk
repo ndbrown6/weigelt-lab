@@ -43,8 +43,8 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 .PHONY: clean
 
 clean :
-	rm -rf manta/*/results
-	rm -rf manta/*/workspace
-	rm -f manta/*/workflow.*.txt
-	rm -f manta/*/runWorkflow.py
+	rm -rf manta/*/results && \
+	rm -rf manta/*/workspace && \
+	rm -f manta/*/workflow.*.txt && \
+	rm -f manta/*/runWorkflow.py && \
 	rm -f manta/*/runWorkflow.py.config.pickle
