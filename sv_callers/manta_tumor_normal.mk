@@ -3,6 +3,7 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/manta_tumor_normal.$(NOW)
 
 vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
+      $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/results/variants/somaticSV.vcf.gz) \
       $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/$(pair).vcf)
 
 MANTA_CORES ?= 10
@@ -22,14 +23,17 @@ manta/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam
 												    --config=$(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py.ini \
 												    --runDir $$(@D)")
 
-manta/$1_$2/$1_$2.vcf : manta/$1_$2/runWorkflow.py
+manta/$1_$2/results/variants/somaticSV.vcf.gz : manta/$1_$2/runWorkflow.py
 	$$(call RUN,-c -n $(MANTA_CORES) -s 2G -m $(MANTA_MEM_CORE) -p $(PROJECT_DIR)/manta -N $1_$2/run -v $(MANTA_ENV) -w $(MANTA_WALL_TIME),"set -o pipefail && \
 																		manta/$1_$2/runWorkflow.py \
 																		-m local \
 																		-j 10 \
-																		-g 4 && \
-																		gzip -dc manta/$1_$2/results/variants/somaticSV.vcf.gz > $$(@)")
-						  
+																		-g 4")
+																		
+manta/$1_$2/$1_$2.vcf : manta/$1_$2/results/variants/somaticSV.vcf.gz
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/gzip -v $(MANTA_ENV),"set -o pipefail && \
+											       gzip -dc $$(<) > $$(@)"
+
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
 	$(eval $(call manta-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
