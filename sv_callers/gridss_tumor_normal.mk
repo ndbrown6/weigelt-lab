@@ -40,7 +40,7 @@ gridss/$1_$2/$1_$2.gridss_sv_ft.vcf.bgz : gridss/$1_$2/$1_$2.gridss_sv.vcf
 
 gridss/$1_$2/$1_$2.vcf : gridss/$1_$2/$1_$2.gridss_sv_ft.vcf.bgz
 	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/gridss -N $1_$2/unzip -v $(GRIDSS_ENV),"set -o pipefail && \
-												   gzip -dc $$(<) > $$(@)")
+												   zcat $$(<) > $$(@)")
 	
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\

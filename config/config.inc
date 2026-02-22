@@ -22,6 +22,7 @@ COPYNUMBER_ENV ?= $(HOME)/share/env/r-copynumber-1.38.0
 KALLISTO_ENV ?= $(HOME)/share/env/kallisto-0.46.2
 MANTA_ENV ?= $(HOME)/share/env/manta-0.29.6
 SVABA_ENV ?= $(HOME)/share/env/svaba-1.1.0
+GRIDSS_ENV ?= $(HOME)/share/env/gridss-2.13.2
 
 # aliases
 PYTHON ?= python
