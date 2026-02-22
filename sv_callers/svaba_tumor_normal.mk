@@ -31,7 +31,7 @@ svaba/$1_$2/$1_$2.svaba.somatic.sv.vcf : bam/$1.bam bam/$2.bam
 
 svaba/$1_$2/$1_$2.vcf : svaba/$1_$2/$1_$2.svaba.somatic.sv.vcf
 	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/svaba -N $1_$2/copy -v $(SVABA_ENV),"set -o pipefail && \
-											       cat $$(<) > $$(@)"
+											       cat $$(<) > $$(@)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
