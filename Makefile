@@ -133,8 +133,8 @@ manta_tumor_normal :
 	
 TARGETS += svaba_tumor_normal
 svaba_tumor_normal :
-	$(call RUN_MAKE,weigelt-lab/sv_callers/svaba_tumor_normal.mk)
-#	$(MAKE) -f weigelt-lab/sv_callers/svaba_tumor_normal.mk clean
+	$(call RUN_MAKE,weigelt-lab/sv_callers/svaba_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/sv_callers/svaba_tumor_normal.mk clean
 	
 TARGETS += gridss_tumor_normal
 gridss_tumor_normal :
