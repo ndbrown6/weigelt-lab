@@ -21,7 +21,7 @@ if (as.numeric(opt$option) == 1) {
 	      readr::type_convert() %>%
 	      dplyr::filter(FILTER == "PASS")
 	
-	readr::write_tsv(x = vcf, path = as.character(opt$file_out), append = TRUE, col_names = TRUE)
+	readr::write_tsv(x = vcf, path = as.character(opt$file_out), append = TRUE, col_names = FALSE)
 	
 } else if (as.numeric(opt$option) == 2) {
 	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
@@ -30,5 +30,5 @@ if (as.numeric(opt$option) == 1) {
 	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = c(1:22, "X", "Y"), ordered = TRUE)) %>%
 	      dplyr::arrange(`#CHROM`, POS)
 	
-	readr::write_tsv(x = vcf, path = as.character(opt$file_out), append = TRUE, col_names = TRUE)
+	readr::write_tsv(x = vcf, path = as.character(opt$file_out), append = TRUE, col_names = FALSE)
 }
