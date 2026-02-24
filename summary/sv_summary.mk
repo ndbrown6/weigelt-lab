@@ -2,10 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/sv_summary.$(NOW)
 
-smry : $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft_srt.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft_srt.txt)
+smry : $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_jasmine.vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_survivor.vcf) \
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -22,58 +20,51 @@ PROJECT_DIR := $(notdir $(CURDIR))
 JASMINE_CORES ?= 4
 JASMINE_MEM_CORE ?= 8G
 
-define jasmine-merge-sv
-jasmine/$1_$2/$1_$2_mrg.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
-	$$(call RUN,-c -n $(JASMINE_CORES) -s 4G -m $(JASMINE_MEM_CORE) -p $(PROJECT_DIR)/jasmine -N $1_$2/merge -v $(JASMINE_ENV),"set -o pipefail && \
-																    mkdir -p jasmine/$1_$2 && \
-																    rm -f jasmine/$1_$2/vcf_list.txt && \
-																    $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> jasmine/$1_$2/vcf_list.txt &&) \
-																    jasmine \
-																    file_list=jasmine/$1_$2/vcf_list.txt \
-																    out_file=jasmine/$1_$2/$1_$2_mrg.vcf \
-																    genome_file=$$(REF_FASTA) \
-																    --normalize_type \
-																    --pre_normalize \
-																    --ignore_strand \
-																    --ignore_type \
-																    max_dist=3000 \
-																    min_seq_id=0.2 \
-																    min_overlap=0.2 \
-																    spec_reads=1 \
-																    k_jaccard=5 \
-																    threads=$(JASMINE_CORES)")
-																			    
-jasmine/$1_$2/$1_$2_mrg_ft.vcf : jasmine/$1_$2/$1_$2_mrg.vcf
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1_$2/filter,"set -o pipefail && \
-										   grep \"^#\" $$(<) > $$(@) && \
-										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/sv_summary.R \
-										   --option 1 \
-										   --file_in $$(<) \
-										   --file_out $$(@)")
-										 
-jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf : jasmine/$1_$2/$1_$2_mrg_ft.vcf
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1_$2/sort,"set -o pipefail && \
-										 grep \"^#\" $$(<) > $$(@) && \
-										 $(RSCRIPT) $(SCRIPTS_DIR)/summary/sv_summary.R \
-										 --option 2 \
-										 --file_in $$(<) \
-										 --file_out $$(@)")
-										 
-jasmine/$1_$2/$1_$2_mrg_ft_srt.txt : jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1/$2/annotate -v $(ANNOTATESV_ENV),"set -o pipefail && \
-													  $$(ANNOTATE_SV) \
-													  -SVinputFile $$(<) \
-													  -outputFile jasmine/$1_$2/$1_$2_mrg_ft_srt \
-													  -genomeBuild GRCh37 && \
-													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.tsv $$(@) && \
-													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.unannotated.tsv jasmine/$1_$2/$1_$2_mrg_ft_srt.unannotated.txt")
+SURVIVOR_CORES ?= 1
+SURVIVOR_MEM_CORE ?= 8G
 
+define merge-sv-vcf
+annot_sv/$1_$2/$1_$2_jasmine.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
+	$$(call RUN,-c -n $(JASMINE_CORES) -s 4G -m $(JASMINE_MEM_CORE) -p $(PROJECT_DIR)/annot_sv -N $1_$2/jasmine -v $(JASMINE_ENV),"set -o pipefail && \
+																       mkdir -p annot_sv/$1_$2 && \
+																       rm -f annot_sv/$1_$2/vcf_list_js.txt && \
+																       $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annot_sv/$1_$2/vcf_list_js.txt &&) \
+																       jasmine \
+																       file_list=annot_sv/$1_$2/vcf_list_js.txt \
+																       out_file=annot_sv/$1_$2/$1_$2_jasmine.vcf \
+																       genome_file=$$(REF_FASTA) \
+																       --normalize_type \
+																       --pre_normalize \
+																       --ignore_strand \
+																       --ignore_type \
+																       max_dist=3000 \
+																       min_seq_id=0.2 \
+																       min_overlap=0.2 \
+																       spec_reads=1 \
+																       k_jaccard=5 \
+																       threads=$(JASMINE_CORES)")
+																    
+annot_sv/$1_$2/$1_$2_survivor.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
+	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR)/annot_sv -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
+																	   mkdir -p annot_sv/$1_$2 && \
+																	   rm -f annot_sv/$1_$2/vcf_list_sv.txt && \
+																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annot_sv/$1_$2/vcf_list_sv.txt &&) \
+																	   SURVIVOR merge \
+																	   $$(<) \
+																	   3000 \
+																	   2 \
+																	   0 \
+																	   0 \
+																	   0 \
+																	   10 \
+																	   $$(@)")
+																			    
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
-	$(eval $(call jasmine-merge-sv,$(tumor.$(pair)),$(normal.$(pair)))))
+	$(eval $(call merge-sv-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
 
 
 ..DUMMY := $(shell mkdir -p version; \
@@ -83,4 +74,4 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: smry clean
 
 clean :
-	rm jasmine/*/vcf_list.txt
+	rm jasmine/*/vcf_list_*.txt

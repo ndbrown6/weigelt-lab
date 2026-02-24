@@ -35,7 +35,8 @@ mutation_summary :
 	
 TARGETS += sv_summary
 sv_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk)
+	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk) && \
+	$(MAKE) -f weigelt-lab/summary/sv_summary.mk clean
 	
 TARGETS += fusion_summary
 fusion_summary :
