@@ -35,7 +35,7 @@ jasmine/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(
 																			    --ignore_strand \
 																			    --ignore_type \
 																			    --allow_intrasample \
-																			    --clique_merging
+																			    --clique_merging \
 																			    max_dist=3000 \
 																			    min_seq_id=0.2 \
 																			    min_overlap=0.2 \
