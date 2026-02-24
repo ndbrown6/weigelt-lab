@@ -24,6 +24,7 @@ MANTA_ENV ?= $(HOME)/share/env/manta-0.29.6
 SVABA_ENV ?= $(HOME)/share/env/svaba-1.1.0
 GRIDSS_ENV ?= $(HOME)/share/env/gridss-2.13.2
 JASMINE_ENV ?= $(HOME)/share/env/jasminesv-1.1.5
+ANNOTATESV_ENV ?= $(HOME)/share/env/annot_sv-3.1.3
 
 # aliases
 PYTHON ?= python
@@ -43,6 +44,7 @@ MAF2VCF ?= maf2vcf.pl
 MAF2MAF ?= maf2maf.pl
 CONFIGURE_STRELKA ?= $(STRELKA_ENV)/opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py
 CONFIGURE_MANTA ?= $(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py
+ANNOTATE_SV ?= $(ANNOTATESV_ENV)/opt/AnnotSV/bin/AnnotSV
 
 # picard command lines
 PICARD_MEM = 8G

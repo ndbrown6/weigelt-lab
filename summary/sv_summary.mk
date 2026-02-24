@@ -3,7 +3,8 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/sv_summary.$(NOW)
 
 smry : $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_srt.vcf)
+       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_srt.vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_srt.txt)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -43,8 +44,16 @@ jasmine/$1_$2/$1_$2_mrg.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path
 																			    threads=$(JASMINE_CORES)")
 																			    
 jasmine/$1_$2/$1_$2_mrg_srt.vcf : jasmine/$1_$2/$1_$2_mrg.vcf
-	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/jasmine -N $1_$2/sort,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/jasmine -N $1/$2/sort,"set -o pipefail && \
 										 bcftools sort $$(<) -o $$(@)")
+										 
+jasmine/$1_$2/$1_$2_mrg_srt.txt : jasmine/$1_$2/$1_$2_mrg_srt.vcf
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1/$2/annotate -v $(ANNOTATESV_ENV),"set -o pipefail && \
+													  mkdir -p annotate_sv/$1_$2 && \
+													  $$(ANNOTATE_SV) \
+													  -SVinputFile $$(<) \
+													  -outputFile $$(@) \
+													  -genomeBuild GRCh37")
 
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
