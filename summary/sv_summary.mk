@@ -1,0 +1,54 @@
+include weigelt-lab/Makefile.inc
+
+LOGDIR = log/sv_summary.$(NOW)
+
+smry : $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair).vcf)
+
+REQUIRED_CALLERS ?= manta
+OPTIONAL_CALLERS ?= svaba gridss
+CALLERS ?= $(REQUIRED_CALLERS) $(OPTIONAL_CALLERS)
+CALLER_MAKEFILES = manta:weigelt-lab/sv_callers/manta_tumor_normal.mk \
+		   svaba:weigelt-lab/sv_callers/svaba_tumor_normal.mk \
+		   gridss:weigelt-lab/sv_callers/gridss_tumor_normal.mk
+
+get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
+get_vcf_path = $(1)/$(2)_$(3)/$(2)_$(3).vcf
+
+PROJECT_DIR := $(notdir $(CURDIR))
+
+JASMINE_CORES ?= 4
+JASMINE_MEM_CORE ?= 8G
+JASMINE_WALL_TIME ?= 12:00:00
+
+define jasmine-merge-sv
+jasmine/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
+	$$(call RUN,-c -n $(JASMINE_CORES) -s 4G -m $(JASMINE_MEM_CORE) -p $(PROJECT_DIR)/jasmine -N $1_$2/merge -v $(JASMINE_ENV) -w $(JASMINE_WALL_TIME),"set -o pipefail && \
+																			    mkdir -p jasmine/$1_$2 && \
+																			    rm -f jasmine/$1_$2/vcf_list.txt && \
+																			    $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> jasmine/$1_$2/vcf_list.txt &&) \
+																			    jasmine \
+																			    file_list=jasmine/$1_$2/vcf_list.txt \
+																			    out_file=jasmine/$1_$2/$1_$2.vcf \
+																			    genome_file=$$(REF_FASTA) \
+																			    --normalize_type \
+																			    --output_genotypes \
+																			    --ignore_strand \
+																			    max_dist=1000 \
+																			    min_seq_id=0.5 \
+																			    spec_reads=3")
+
+$$(foreach caller,$$(CALLERS), \
+	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
+
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call jasmine-merge-sv,$(tumor.$(pair)),$(normal.$(pair)))))
+
+
+..DUMMY := $(shell mkdir -p version; \
+	$(JASMINE_ENV)/bin/jasmine --version &> version/sv_summary.txt)
+.SECONDARY:
+.DELETE_ON_ERROR:
+.PHONY: smry clean
+
+clean :
