@@ -15,7 +15,7 @@ CALLER_MAKEFILES = manta:weigelt-lab/sv_callers/manta_tumor_normal.mk \
 
 get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 get_vcf_path = $(1)/$(2)_$(3)/$(2)_$(3).vcf
-SORT_CMD = set -o pipefail && echo '##FILTER=<ID=PON,Description=\"Filtered by panel of normals\">' | bcftools annotate -h /dev/stdin $$(<) | bcftools sort -o $$(@)
+SORT_CMD = $(set -o pipefail && echo '##FILTER=<ID=PON,Description=\"Filtered by panel of normals\">' | bcftools annotate -h /dev/stdin $$(<) | bcftools sort -o $$(@))
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
