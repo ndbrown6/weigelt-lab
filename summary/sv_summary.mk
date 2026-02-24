@@ -43,8 +43,10 @@ jasmine/$1_$2/$1_$2_mrg.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path
 																    threads=$(JASMINE_CORES)")
 																			    
 jasmine/$1_$2/$1_$2_mrg_srt.vcf : jasmine/$1_$2/$1_$2_mrg.vcf
-	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/jasmine -N $1/$2/sort,"set -o pipefail && \
-										 bcftools sort $$(<) -o $$(@)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/jasmine -N $1_$2/sort,"set -o pipefail && \
+										 echo '##FILTER=<ID=PON,Description=\"Filtered by panel of normals\">' | \
+										 bcftools annotate -h /dev/stdin $$(<) | \
+										 bcftools sort -o $$(@)")
 										 
 jasmine/$1_$2/$1_$2_mrg_srt.txt : jasmine/$1_$2/$1_$2_mrg_srt.vcf
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1/$2/annotate -v $(ANNOTATESV_ENV),"set -o pipefail && \
