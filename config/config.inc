@@ -24,6 +24,7 @@ MANTA_ENV ?= $(HOME)/share/env/manta-0.29.6
 SVABA_ENV ?= $(HOME)/share/env/svaba-1.1.0
 GRIDSS_ENV ?= $(HOME)/share/env/gridss-2.13.2
 JASMINE_ENV ?= $(HOME)/share/env/jasminesv-1.1.5
+SURVIVOR_ENV ?= $(HOME)/share/env/survivor-1.0.7
 ANNOTATESV_ENV ?= $(HOME)/share/env/annot_sv-3.1.3
 
 # aliases

@@ -50,7 +50,7 @@ annot_sv/$1_$2/$1_$2_survivor.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vc
 																	   rm -f annot_sv/$1_$2/vcf_list_sv.txt && \
 																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annot_sv/$1_$2/vcf_list_sv.txt &&) \
 																	   SURVIVOR merge \
-																	   $$(<) \
+																	   annot_sv/$1_$2/vcf_list_sv.txt \
 																	   3000 \
 																	   2 \
 																	   0 \
@@ -74,4 +74,4 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: smry clean
 
 clean :
-	rm jasmine/*/vcf_list_*.txt
+	rm annot_sv/*/vcf_list_*.txt
