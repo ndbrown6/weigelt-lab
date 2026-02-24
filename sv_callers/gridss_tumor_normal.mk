@@ -54,5 +54,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: clean
 
 clean :
-	rm -f gridss/*/*/*.bam && \
-	rm -f gridss/*/*/*.bai
+	rm -f gridss/*/*.log && \
+	rm -f gridss/*/*.so && \
+	rm -rf gridss/*/*.gridss.working && \
+	rm -rf gridss/*/${USER}
