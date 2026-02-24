@@ -31,7 +31,6 @@ jasmine/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(
 																			    out_file=jasmine/$1_$2/$1_$2.vcf \
 																			    genome_file=$$(REF_FASTA) \
 																			    --normalize_type \
-																			    --output_genotypes \
 																			    --ignore_strand \
 																			    max_dist=1000 \
 																			    min_seq_id=0.5 \
