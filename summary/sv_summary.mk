@@ -63,8 +63,9 @@ jasmine/$1_$2/$1_$2_mrg_ft_srt.txt : jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1/$2/annotate -v $(ANNOTATESV_ENV),"set -o pipefail && \
 													  $$(ANNOTATE_SV) \
 													  -SVinputFile $$(<) \
-													  -outputFile $$(@) \
-													  -genomeBuild GRCh37")
+													  -outputFile jasmine/$1_$2/$1_$2_mrg_ft_srt \
+													  -genomeBuild GRCh37 && \
+													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.tsv $$(@)")
 
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
