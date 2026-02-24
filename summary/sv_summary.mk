@@ -65,7 +65,8 @@ jasmine/$1_$2/$1_$2_mrg_ft_srt.txt : jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf
 													  -SVinputFile $$(<) \
 													  -outputFile jasmine/$1_$2/$1_$2_mrg_ft_srt \
 													  -genomeBuild GRCh37 && \
-													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.tsv $$(@)")
+													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.tsv $$(@) && \
+													  mv jasmine/$1_$2/$1_$2_mrg_ft_srt.unannotated.tsv jasmine/$1_$2/$1_$2_mrg_ft_srt.unannotated.txt")
 
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
