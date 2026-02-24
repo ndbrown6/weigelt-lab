@@ -3,8 +3,9 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/sv_summary.$(NOW)
 
 smry : $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_srt.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_srt.txt)
+       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft.vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft_srt.vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),jasmine/$(pair)/$(pair)_mrg_ft_srt.txt)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -58,7 +59,7 @@ jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf : jasmine/$1_$2/$1_$2_mrg_ft.vcf
 										 --file_in $$(<) \
 										 --file_out $$(@)")
 										 
-jasmine/$1_$2/$1_$2_mrg_srt.txt : jasmine/$1_$2/$1_$2_mrg_srt.vcf
+jasmine/$1_$2/$1_$2_mrg_ft_srt.txt : jasmine/$1_$2/$1_$2_mrg_ft_srt.vcf
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/jasmine -N $1/$2/annotate -v $(ANNOTATESV_ENV),"set -o pipefail && \
 													  $$(ANNOTATE_SV) \
 													  -SVinputFile $$(<) \
