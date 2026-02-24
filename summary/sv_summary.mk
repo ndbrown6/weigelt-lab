@@ -59,8 +59,8 @@ annot_sv/$1_$2/$1_$2_survivor.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vc
 																	   10 \
 																	   $$(@)")
 																			    
-#$$(foreach caller,$$(CALLERS), \
-#	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
+$$(foreach caller,$$(CALLERS), \
+	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
