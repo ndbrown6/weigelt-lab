@@ -2,8 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/sv_summary.$(NOW)
 
-smry : $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).txt)
+smry : $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).txt)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -27,13 +27,13 @@ STRAND = 0
 MIN_SIZE = 30
 
 define merge-sv-vcf
-survivor/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
+annotate_sv/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
 	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR)/survivor -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
-																	   mkdir -p survivor/$1_$2 && \
-																	   rm -f survivor/$1_$2/vcf_list.txt && \
-																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> survivor/$1_$2/vcf_list.txt &&) \
+																	   mkdir -p annotate_sv/$1_$2 && \
+																	   rm -f annotate_sv/$1_$2/vcf_list.txt && \
+																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annotate_sv/$1_$2/vcf_list.txt &&) \
 																	   SURVIVOR merge \
-																	   survivor/$1_$2/vcf_list.txt \
+																	   annotate_sv/$1_$2/vcf_list.txt \
 																	   $(MAX_DIST) \
 																	   $(NUM_CALLERS) \
 																	   $(TYPE) \
@@ -42,7 +42,7 @@ survivor/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$
 																	   $(MIN_SIZE) \
 																	   $$(@)")
 																	   
-survivor/$1_$2/$1_$2.txt : survivor/$1_$2/$1_$2.vcf
+annotate_sv/$1_$2/$1_$2.txt : annotate_sv/$1_$2/$1_$2.vcf
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/survivor -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
 													  $$(ANNOTATE_SV) \
 													  -SVinputFile $$(<) \
