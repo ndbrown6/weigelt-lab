@@ -55,10 +55,9 @@ if (as.numeric(opt$option) == 1) {
 	data = list()
 	for (i in 1:length(sample_names)) {
 		data[[i]] = readr::read_tsv(file = paste0("delly/", sample_names[i], "/", sample_names[i], ".txt"),
-					    col_names = TRUE,
-					    col_types = cols(.default = col_character()))
+					    col_names = TRUE, col_types = cols(.default = col_character()))
 	}
-	data = do.call(rbind, data) %>%
+	data = dplyr::bind_rows(data) %>%
 	       readr::type_convert()
 	
 	readr::write_tsv(x = data, path = as.character(opt$output), append = FALSE, col_names = TRUE)
