@@ -66,3 +66,6 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 .PHONY: clean
 
 clean :
+	rm -f delly/*/*.tsv && \
+	rm -f delly/*/*.bcf && \
+	rm -f delly/*/*.bcf.csi
