@@ -75,4 +75,4 @@ summary/sv_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pa
 .PHONY: smry clean
 
 clean :
-	rm survivor/*/vcf_list.txt
+	rm annotate_sv/*/vcf_list.txt
