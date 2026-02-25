@@ -142,21 +142,6 @@ gridss_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/sv_callers/gridss_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/gridss_tumor_normal.mk clean
 	
-TARGETS += manta_tumor_only
-manta_tumor_only :
-	$(call RUN_MAKE,weigelt-lab/sv_callers/manta_tumor_only.mk)
-#	$(MAKE) -f weigelt-lab/sv_callers/manta_tumor_only.mk clean
-	
-TARGETS += svaba_tumor_only
-svaba_tumor_only :
-	$(call RUN_MAKE,weigelt-lab/sv_callers/svaba_tumor_only.mk)
-#	$(MAKE) -f weigelt-lab/sv_callers/svaba_tumor_only.mk clean
-	
-TARGETS += gridss_tumor_only
-gridss_tumor_only :
-	$(call RUN_MAKE,weigelt-lab/sv_callers/gridss_tumor_only.mk)
-#	$(MAKE) -f weigelt-lab/sv_callers/gridss_tumor_only.mk clean
-	
 #==================================================
 # RNA fusion callers
 #==================================================
