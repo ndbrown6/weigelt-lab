@@ -33,7 +33,7 @@ BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-INPUT_TYPE ?= bam
+INPUT_TYPE ?= fastq
 
 ifeq ($(INPUT_TYPE),bam)
 define prepare-fastq
