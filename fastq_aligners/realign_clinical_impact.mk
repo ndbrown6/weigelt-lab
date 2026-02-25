@@ -1,7 +1,7 @@
 include weigelt-lab/Makefile.inc
 include weigelt-lab/config/gatk.inc
 
-LOGDIR ?= log/align_impact_fastq.$(NOW)
+LOGDIR ?= log/realign_clinical_impact.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 	 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
@@ -241,13 +241,13 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
-	     head -3 version/tmp.txt | tail -2 > version/align_impact_fastq.txt; \
+	     head -3 version/tmp.txt | tail -2 > version/realign_clinical_impact.txt; \
 	     rm version/tmp.txt; \
-	     $(SAMTOOLS) --version >> version/align_impact_fastq.txt; \
-	     echo "gatk3" >> version/align_impact_fastq.txt; \
-	     $(GATK) --version >> version/align_impact_fastq.txt; \
-	     echo "picard" >> version/align_impact_fastq.txt; \
-	     $(PICARD) MarkIlluminaAdapters --version &>> version/align_impact_fastq.txt)
+	     $(SAMTOOLS) --version >> version/realign_clinical_impact.txt; \
+	     echo "gatk3" >> version/realign_clinical_impact.txt; \
+	     $(GATK) --version >> version/realign_clinical_impact.txt; \
+	     echo "picard" >> version/realign_clinical_impact.txt; \
+	     $(PICARD) MarkIlluminaAdapters --version &>> version/realign_clinical_impact.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
