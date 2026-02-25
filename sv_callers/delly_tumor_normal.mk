@@ -3,7 +3,8 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/delly_tumor_normal.$(NOW)
 
 vcf : $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).txt)
+      $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).txt) \
+      summary/sv_summary.txt
 
 DELLY_CORES ?= 8
 DELLY_MEM_CORE ?= 2G
@@ -58,6 +59,13 @@ endef
 $(foreach pair,$(SAMPLE_PAIRS),\
         $(eval $(call delly-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 
+summary/sv_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).txt)
+	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N aggregate,"set -o pipefail && \
+										 mkdir -p summary && \
+										 $(RSCRIPT) $(SCRIPTS_DIR)/summary/sv_summary.R \
+										 --option 2 \
+										 --sample_name '$(SAMPLE_PAIRS)' \
+										 --output $(@)")
 
 .DUMMY := $(shell mkdir -p version; \
     $(DELLY_ENV)/bin/delly &> version/delly_tumor_normal.txt)

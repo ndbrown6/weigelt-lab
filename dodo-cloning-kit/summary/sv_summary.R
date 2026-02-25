@@ -49,4 +49,18 @@ if (as.numeric(opt$option) == 1) {
 	       ))
 	
 	readr::write_tsv(x = data, path = as.character(opt$output), append = FALSE, col_names = TRUE)
+
+} else if (as.numeric(opt$option) == 1) {
+	sample_names = unlist(strsplit(x = as.character(opt$sample_name), split = " ", fixed = TRUE))
+	data = list()
+	for (i in 1:length(sample_names)) {
+		data[[i]] = readr::read_tsv(file = paste0("delly/", sample_names[i], "/", sample_names[i], ".txt"),
+					    col_names = TRUE,
+					    col_types = cols(.default = col_character()))
+	}
+	data = do.call(rbind, data) %>%
+	       readr::type_convert()
+	
+	readr::write_tsv(x = data, path = as.character(opt$output), append = FALSE, col_names = TRUE)
+	
 }
