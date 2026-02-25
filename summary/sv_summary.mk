@@ -48,7 +48,7 @@ annotate_sv/$1_$2/$1_$2.txt : annotate_sv/$1_$2/$1_$2.vcf
 													  -SVinputFile $$(<) \
 													  -outputFile ./annotate_sv/$1_$2/$1_$2.tsv \
 													  -genomeBuild GRCh37 && \
-													  mv ./annotate_sv/$1_$2/$1.$2.tsv $$(@) && \
+													  mv ./annotate_sv/$1_$2/$1_$2.tsv $$(@) && \
 													  mv ./annotate_sv/$1_$2/$1_$2.unannotated.tsv ./annotate_sv/$1_$2/$1_$2.unannotated.txt")
 							       
 $$(foreach caller,$$(CALLERS), \
