@@ -50,7 +50,7 @@ delly/$1_$2/$1_$2.txt : delly/$1_$2/$1_$2.vcf
 													-genomeBuild GRCh37 && \
 													mv ./delly/$1_$2/$1_$2.tsv $$(@); \
 												 else \
-												 	echo 'No variants found in VCF, skipping annotation' && \
+												 	echo 'No variants found in VCF skipping annotation' && \
 													touch $$(@); \
 												 fi")
 												 
