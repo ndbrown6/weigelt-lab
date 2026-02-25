@@ -2,7 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/sv_summary.$(NOW)
 
-smry : $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).vcf)
+smry : $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).txt)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
