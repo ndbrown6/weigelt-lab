@@ -142,6 +142,11 @@ gridss_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/sv_callers/gridss_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/gridss_tumor_normal.mk clean
 	
+TARGETS += delly_tumor_normal
+delly_tumor_normal :
+	$(call RUN_MAKE,weigelt-lab/sv_callers/delly_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/sv_callers/delly_tumor_normal.mk clean
+	
 #==================================================
 # RNA fusion callers
 #==================================================
