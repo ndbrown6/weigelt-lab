@@ -51,6 +51,11 @@ align_impact_fastq :
 	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_impact_fastq.mk) && \
 	$(MAKE) -f weigelt-lab/fastq_aligners/align_impact_fastq.mk clean
 	
+TARGETS += realign_clinical_impact
+realign_clinical_impact :
+	$(call RUN_MAKE,weigelt-lab/fastq_aligners/realign_clinical_impact.mk) && \
+	$(MAKE) -f weigelt-lab/fastq_aligners/realign_clinical_impact.mk clean
+	
 TARGETS += align_exome_fastq
 align_exome_fastq :
 	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_exome_fastq.mk) && \
