@@ -49,8 +49,7 @@ annotate_sv/$1_$2/$1_$2.txt : annotate_sv/$1_$2/$1_$2.vcf
 												 -SVinputFile $$(<) \
 												 -outputFile ./annotate_sv/$1_$2/$1_$2.tsv \
 												 -genomeBuild GRCh37 && \
-												 mv ./annotate_sv/$1_$2/$1_$2.tsv $$(@) && \
-												 mv ./annotate_sv/$1_$2/$1_$2.unannotated.tsv ./annotate_sv/$1_$2/$1_$2.unannotated.txt")
+												 mv ./annotate_sv/$1_$2/$1_$2.tsv $$(@)")
 							       
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
