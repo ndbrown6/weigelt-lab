@@ -50,7 +50,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, path = as.character(opt$output), append = FALSE, col_names = TRUE)
 
-} else if (as.numeric(opt$option) == 1) {
+} else if (as.numeric(opt$option) == 2) {
 	sample_names = unlist(strsplit(x = as.character(opt$sample_name), split = " ", fixed = TRUE))
 	data = list()
 	for (i in 1:length(sample_names)) {
