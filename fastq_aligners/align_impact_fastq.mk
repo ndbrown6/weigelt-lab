@@ -36,32 +36,32 @@ PROJECT_DIR := $(notdir $(CURDIR))
 INPUT_TYPE ?= bam
 
 ifeq ($(INPUT_TYPE),bam)
-	define prepare-fastq
-	bwamem/$1/taskcomplete.txt :
-		$$(call RUN,-n 4 -s 4G -m 6G -p $(PROJECT_DIR)/bwamem -N $1/bam2fastq,"set -o pipefail && \
-										       mkdir -p bwamem/$1 && \
-										       $$(SAMTOOLS) sort -T bwamem/$1/$1 -O bam -n -@ 4 -m 4G /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam | \
-										       bedtools bamtofastq -i - -fq >(gzip > bwamem/$1/$1_R1.fastq.gz) -fq2 >(gzip > bwamem/$1/$1_R2.fastq.gz) && \
-										       touch $$(@)")
-	endef
-	$(foreach sample,$(SAMPLES),\
-		$(eval $(call prepare-fastq,$(sample))))
+define prepare-fastq
+bwamem/$1/taskcomplete.txt :
+	$$(call RUN,-n 4 -s 4G -m 6G -p $(PROJECT_DIR)/bwamem -N $1/bam2fastq,"set -o pipefail && \
+									       mkdir -p bwamem/$1 && \
+									       $$(SAMTOOLS) sort -T bwamem/$1/$1 -O bam -n -@ 4 -m 4G /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam | \
+									       bedtools bamtofastq -i - -fq >(gzip > bwamem/$1/$1_R1.fastq.gz) -fq2 >(gzip > bwamem/$1/$1_R2.fastq.gz) && \
+									       touch $$(@)")
+endef
+$(foreach sample,$(SAMPLES),\
+	$(eval $(call prepare-fastq,$(sample))))
 else
-	define prepare-fastq
-	bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
-		$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/merge_R1,"set -o pipefail && \
-											   zcat $$(^) | gzip -c > $$(@)")
+define prepare-fastq
+bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/merge_R1,"set -o pipefail && \
+										   zcat $$(^) | gzip -c > $$(@)")
 
-	bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
-		$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/merge_R2,"set -o pipefail && \
-											   zcat $$(^) | gzip -c > $$(@)")
+bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/merge_R2,"set -o pipefail && \
+										   zcat $$(^) | gzip -c > $$(@)")
 
-	bwamem/$1/taskcomplete.txt : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
-		$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
-											touch $$(@)")
-	endef
-	$(foreach sample,$(SAMPLES),\
-		$(eval $(call prepare-fastq,$(sample),$(split.$(sample)))))
+bwamem/$1/taskcomplete.txt : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
+	$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
+										touch $$(@)")
+endef
+$(foreach sample,$(SAMPLES),\
+	$(eval $(call prepare-fastq,$(sample),$(split.$(sample)))))
 endif
 
 define fastq-2-bam
