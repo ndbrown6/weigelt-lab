@@ -3,7 +3,7 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/sv_summary.$(NOW)
 
 smry : $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_jasmine.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_survivor.vcf) \
+       $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_survivor.vcf)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
