@@ -28,7 +28,7 @@ MIN_SIZE = 30
 
 define merge-sv-vcf
 annotate_sv/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
-	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR)/survivor -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR) -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
 																	   mkdir -p annotate_sv/$1_$2 && \
 																	   rm -f annotate_sv/$1_$2/vcf_list.txt && \
 																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annotate_sv/$1_$2/vcf_list.txt &&) \
@@ -43,7 +43,7 @@ annotate_sv/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path
 																	   $$(@)")
 																	   
 annotate_sv/$1_$2/$1_$2.txt : annotate_sv/$1_$2/$1_$2.vcf
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/survivor -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
 													  $$(ANNOTATE_SV) \
 													  -SVinputFile $$(<) \
 													  -outputFile ./annotate_sv/$1_$2/$1_$2.tsv \
