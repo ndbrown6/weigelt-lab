@@ -37,7 +37,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 define bam-to-fastq
 bwamem/$1/taskcomplete.txt :
 	$$(call RUN,-n 4 -s 4G -m 6G,"set -o pipefail && \
-				      mkdir -p fastq/$1 && \
+				      mkdir -p bwamem/$1 && \
 				      $$(SAMTOOLS) sort -T fastq/$1/$1 -O bam -n -@ 4 -m 4G /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam | \
 				      bedtools bamtofastq -i - -fq >(gzip > bwamem/$1/$1_R1.fastq.gz) -fq2 >(bwamem/$1/$1_R2.fastq.gz) && \
 				      touch $$(@)")
