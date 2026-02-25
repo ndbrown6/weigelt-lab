@@ -41,18 +41,18 @@ delly/$1_$2/$1_$2.vcf : delly/$1_$2/$1_$2_ft.bcf
 										   bcftools view -O v $$(<) > $$(@)")
 
 delly/$1_$2/$1_$2.txt : delly/$1_$2/$1_$2.vcf
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
-												 rm -f delly/$1_$2/$1_$2.tsv && \
-												 if grep -v '^\#' $$(<) | grep -q .; then \
-												 	$$(ANNOTATE_SV) \
-													-SVinputFile $$(<) \
-													-outputFile ./delly/$1_$2/$1_$2.tsv \
-													-genomeBuild GRCh37 && \
-													mv ./delly/$1_$2/$1_$2.tsv $$(@); \
-												 else \
-												 	echo 'No variants found in VCF skipping annotation' && \
-													touch $$(@); \
-												 fi")
+	$$(call RUN,-n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
+											      rm -f delly/$1_$2/$1_$2.tsv && \
+											      if grep -v '^\#' $$(<) | grep -q .; then \
+											      	$$(ANNOTATE_SV) \
+												-SVinputFile $$(<) \
+												-outputFile ./delly/$1_$2/$1_$2.tsv \
+												-genomeBuild GRCh37 && \
+												mv ./delly/$1_$2/$1_$2.tsv $$(@); \
+											      else \
+											      	echo 'No variants found in VCF skipping annotation' && \
+												touch $$(@); \
+											      fi")
 												 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
