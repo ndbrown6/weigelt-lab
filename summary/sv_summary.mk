@@ -3,7 +3,8 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/sv_summary.$(NOW)
 
 smry : $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).txt)
+       $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).txt) \
+       summary/sv_summary.txt
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -57,7 +58,15 @@ $$(foreach caller,$$(CALLERS), \
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call merge-sv-vcf,$(tumor.$(pair)),$(normal.$(pair)))))
-
+	
+summary/sv_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),annotate_sv/$(pair)/$(pair).txt)
+	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N combine-txt,"set -o pipefail && \
+										   mkdir -p summary && \
+										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/sv_summary.R \
+										   --option 1 \
+										   --sv_callers '$(CALLERS)' \
+										   --sample_name '$(SAMPLE_PAIRS)' \
+										   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(SURVIVOR_ENV)/bin/SURVIVOR --version &> version/sv_summary.txt)
