@@ -11,7 +11,7 @@ DELLY_EXCLUDE ?= $(DELLY_ENV)/opt/delly/excludeTemplates/human.hg19.excl.tsv
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-define delly-somatic
+define delly-tumor-normal
 delly/$1_$2/samples.tsv :
 	$$(call RUN,-c -n 1 -s 1G -m 2G -p $(PROJECT_DIR)/delly -N $1_$2/samples,"set -o pipefail && \
 										  mkdir -p delly/$1_$2 && \
@@ -41,11 +41,11 @@ delly/$1_$2/$1_$2.vcf : delly/$1_$2/$1_$2_ft.bcf
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
-        $(eval $(call delly-somatic,$(tumor.$(pair)),$(normal.$(pair)))))
+        $(eval $(call delly-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 
 
 .DUMMY := $(shell mkdir -p version; \
-    $(DELLY_ENV)/bin/delly &> version/delly_somatic.txt)
+    $(DELLY_ENV)/bin/delly &> version/delly_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
