@@ -56,6 +56,10 @@ if (as.numeric(opt$option) == 1) {
 	for (i in 1:length(sample_names)) {
 		data[[i]] = readr::read_tsv(file = paste0("delly/", sample_names[i], "/", sample_names[i], ".txt"),
 					    col_names = TRUE, col_types = cols(.default = col_character()))
+		if (nrow(data[[i]]) != 0) {
+			colnames(data[[i]])[15] = "Tumor_Sample"
+			colnames(data[[i]])[16] = "Matched_Normal_Sample"
+		}
 	}
 	data = dplyr::bind_rows(data) %>%
 	       readr::type_convert()
