@@ -44,6 +44,8 @@ ifeq ($(INPUT_TYPE),bam)
 										       bedtools bamtofastq -i - -fq >(gzip > bwamem/$1/$1_R1.fastq.gz) -fq2 >(gzip > bwamem/$1/$1_R2.fastq.gz) && \
 										       touch $$(@)")
 	endef
+	$(foreach sample,$(SAMPLES),\
+		$(eval $(call prepare-fastq,$(sample))))
 else
 	define prepare-fastq
 	bwamem/$1/$1_R1.fastq.gz : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
@@ -58,13 +60,8 @@ else
 		$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
 											touch $$(@)")
 	endef
-endif
-ifeq ($(INPUT_TYPE),bam)
-$(foreach sample,$(SAMPLES),\
-	$(eval $(call prepare-fastq,$(sample))))
-else
-$(foreach sample,$(SAMPLES),\
-	$(eval $(call prepare-fastq,$(sample),$(split.$(sample)))))
+	$(foreach sample,$(SAMPLES),\
+		$(eval $(call prepare-fastq,$(sample),$(split.$(sample)))))
 endif
 
 define fastq-2-bam
