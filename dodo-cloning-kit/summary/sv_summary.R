@@ -24,7 +24,8 @@ if (as.numeric(opt$option) == 1) {
 		data[[i]] = readr::read_tsv(file = paste0("annotate_sv/", sample_names[i], "/", sample_names[i], ".txt"),
 					    col_names = TRUE,
 					    col_types = cols(.default = col_character())) %>%
-			    readr::type_convert()
+			    readr::type_convert() %>%
+			    dplyr::mutate(Samples_ID = sample_names[i])
 		
 		sv_callers = unlist(strsplit(x = as.character(opt$sv_callers), split = " ", fixed = TRUE))
 		colnames(data[[i]])[15] = "Manta"
@@ -40,7 +41,12 @@ if (as.numeric(opt$option) == 1) {
 			colnames(data[[i]])[17] = "GRIDSS"
 		}
 	}
-	data = do.call(rbind, data)
+	data = do.call(rbind, data) %>%
+	       dplyr::mutate(SV_type = case_when(
+		       grepl("DUP", Manta) ~ "DUP",
+		       grepl("DEL", Manta) ~ "DEL",
+		       TRUE ~ SV_type
+	       ))
 	
 	readr::write_tsv(x = data, path = as.character(opt$output), append = FALSE, col_names = TRUE)
 }
