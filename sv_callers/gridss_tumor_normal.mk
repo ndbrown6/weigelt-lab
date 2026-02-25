@@ -5,7 +5,7 @@ LOGDIR = log/gridss_tumor_normal.$(NOW)
 vcf : $(foreach pair,$(SAMPLE_PAIRS),gridss/$(pair)/$(pair).vcf)
       
 GRIDSS_CORES ?= 8
-GRIDSS_MEM_CORE ?= 6G
+GRIDSS_MEM_CORE ?= 4G
 GRIDSS_WALL_TIME ?= 48:00:00
 GRIDSS_BLACKLIST ?= $(HOME)/share/lib/resource_files/gridss/example/ENCFF001TDO.bed
 GRIDSS_PON_DIR ?= $(HOME)/share/lib/resource_files/gridss/pon/
@@ -14,7 +14,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define gridss-tumor-normal
 gridss/$1_$2/$1_$2.gridss_sv.vcf : bam/$1.bam bam/$2.bam
-	$$(call RUN,-c -n $(GRIDSS_CORES) -s 4G -m $(GRIDSS_MEM_CORE) -p $(PROJECT_DIR)/gridss -N $1_$2/run -v $(GRIDSS_ENV) -w $(GRIDSS_WALL_TIME),"set -o pipefail && \
+	$$(call RUN,-c -n $(GRIDSS_CORES) -s 2G -m $(GRIDSS_MEM_CORE) -p $(PROJECT_DIR)/gridss -N $1_$2/run -v $(GRIDSS_ENV) -w $(GRIDSS_WALL_TIME),"set -o pipefail && \
 																		     mkdir -p gridss/$1_$2 && \
 																		     cd gridss/$1_$2 && \
 																		     gridss \
@@ -26,7 +26,7 @@ gridss/$1_$2/$1_$2.gridss_sv.vcf : bam/$1.bam bam/$2.bam
 																		     ../../bam/$1.bam")
 												    
 gridss/$1_$2/$1_$2.gridss_sv_ft.vcf.bgz : gridss/$1_$2/$1_$2.gridss_sv.vcf
-	$$(call RUN,-c -n 1 -s 12G -m 18G -p $(PROJECT_DIR)/gridss -N $1_$2/filter -v $(GRIDSS_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/gridss -N $1_$2/filter -v $(GRIDSS_ENV),"set -o pipefail && \
 												     cd gridss/$1_$2 && \
 												     gridss_somatic_filter \
 												     --pondir $$(GRIDSS_PON_DIR) \
@@ -37,7 +37,7 @@ gridss/$1_$2/$1_$2.gridss_sv_ft.vcf.bgz : gridss/$1_$2/$1_$2.gridss_sv.vcf
 												     -t 2")
 
 gridss/$1_$2/$1_$2.vcf : gridss/$1_$2/$1_$2.gridss_sv_ft.vcf.bgz
-	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/gridss -N $1_$2/unzip -v $(GRIDSS_ENV),"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 1G -m 2G -p $(PROJECT_DIR)/gridss -N $1_$2/unzip -v $(GRIDSS_ENV),"set -o pipefail && \
 												   zcat $$(<) > $$(@)")
 	
 endef

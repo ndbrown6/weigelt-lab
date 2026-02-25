@@ -8,7 +8,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define annotate-vcf-maf
 maf/$1.maf : vcf/$1.vcf
-	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/maf -N $1/vcf2maf,"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 1G -m 2G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/maf -N $1/vcf2maf,"set -o pipefail && \
 												$$(VCF2MAF) \
 												--input-vcf $$(<) \
 												--output-maf $$(@) \

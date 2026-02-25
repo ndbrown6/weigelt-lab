@@ -38,7 +38,7 @@ bwamem : $(foreach sample,$(SAMPLES),bwamem/$(sample)/$(sample)_R1.fastq.gz) \
 	 summary/duplicate_metrics.txt
 
 SPLIT_THREADS = 8
-SPLIT_MEM_THREAD = 1G
+SPLIT_MEM_THREAD = 2G
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -112,14 +112,14 @@ bwamem/$1/$1--$2_cl.fastq.gz : bwamem/$1/$1--$2_aln.bam
 											  CLIPPING_MIN_LENGTH=25")
                                            
 bwamem/$1/$1--$2_cl_aln.bam : bwamem/$1/$1--$2_cl.fastq.gz
-	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 2G -m $(BWAMEM_MEM_PER_THREAD) -p $(PROJECT_DIR)/bwamem -N $1--$2/bwa_align,"set -o pipefail && \
+	$$(call RUN,-c -n $(BWAMEM_THREADS) -s 1G -m $(BWAMEM_MEM_PER_THREAD) -p $(PROJECT_DIR)/bwamem -N $1--$2/bwa_align,"set -o pipefail && \
 															    $$(BWA) mem -p -M \
 															    -R \"@RG\tID:$1\tLB:$1\tPL:illumina\tSM:$1\" \
 															    -t $$(BWAMEM_THREADS) $$(REF_FASTA) $$(<) | \
 															    $$(SAMTOOLS) view -bhS - > $$(@)")
 
 bwamem/$1/$1--$2_cl_aln_srt.bam : bwamem/$1/$1--$2_cl_aln.bam
-	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 2G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/bwamem -N $1--$2/sort_index,"set -o pipefail && \
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/bwamem -N $1--$2/sort_index,"set -o pipefail && \
 															     $$(SAMTOOLS) sort -@ $$(SAMTOOLS_THREADS) $$(<) -o $$(@) && \
 															     $$(SAMTOOLS) index $$(@) && \
 															     cp bwamem/$1/$1--$2_cl_aln_srt.bam.bai bwamem/$1/$1--$2_cl_aln_srt.bai")
@@ -163,7 +163,7 @@ bwamem/$1/$1--$2_cl_aln_srt_IR_FX.grp : bwamem/$1/$1--$2_cl_aln_srt_IR_FX.bam
 																    -o $$(@)")
 
 bwamem/$1/$1--$2_cl_aln_srt_IR_FX_BR.bam : bwamem/$1/$1--$2_cl_aln_srt_IR_FX.bam bwamem/$1/$1--$2_cl_aln_srt_IR_FX.grp
-	$$(call RUN,-c -n $(GATK_THREADS) -s 1G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1--$2/apply_bqsr,"set -o pipefail && \
+	$$(call RUN,-c -n $(GATK_THREADS) -s 2G -m $(GATK_MEM_THREAD) -v $(GATK_ENV) -p $(PROJECT_DIR)/bwamem -N $1--$2/apply_bqsr,"set -o pipefail && \
 																    $$(call GATK_CMD,8G) \
 																    -T PrintReads \
 																    -R $$(REF_FASTA) \

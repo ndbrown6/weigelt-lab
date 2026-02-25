@@ -68,7 +68,7 @@ platypus/$1_$2/$1_$2_ft.uvcf : platypus/$1_$2/$1_$2_ft.vcf
 													   -hd=true")
 
 platypus/$1_$2/$1_$2_ft.maf : platypus/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/platypus -N $1_$2/vcf2maf ,"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 1G -m 2G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/platypus -N $1_$2/vcf2maf ,"set -o pipefail && \
 													 $$(VCF2MAF) \
 													 --input-vcf $$(<) \
 													 --output-maf $$(@) \

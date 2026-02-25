@@ -2,11 +2,12 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/delly_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).vcf)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).vcf) \
+      $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).txt)
 
 DELLY_CORES ?= 8
-DELLY_MEM_CORE ?= 8G
-DELLY_WALL_TIME ?= 12:00:00
+DELLY_MEM_CORE ?= 2G
+DELLY_WALL_TIME ?= 2:00:00
 DELLY_EXCLUDE ?= $(DELLY_ENV)/opt/delly/excludeTemplates/human.hg19.excl.tsv
 
 PROJECT_DIR := $(notdir $(CURDIR))
@@ -19,7 +20,7 @@ delly/$1_$2/samples.tsv :
 										  echo -e '$2\tcontrol' >> $$(@)")
 
 delly/$1_$2/$1_$2.bcf : bam/$1.bam bam/$2.bam
-	$$(call RUN,-c -n $(DELLY_CORES) -s 4G -m $(DELLY_MEM_CORE) -p $(PROJECT_DIR)/delly -N $1_$2/call -v $(DELLY_ENV) -w $(DELLY_WALL_TIME),"set -o pipefail && \
+	$$(call RUN,-c -n $(DELLY_CORES) -s 1G -m $(DELLY_MEM_CORE) -p $(PROJECT_DIR)/delly -N $1_$2/call -v $(DELLY_ENV) -w $(DELLY_WALL_TIME),"set -o pipefail && \
 																		 delly call \
 																		 -x $$(DELLY_EXCLUDE) \
 																		 -o $$(@) \
@@ -39,6 +40,15 @@ delly/$1_$2/$1_$2.vcf : delly/$1_$2/$1_$2_ft.bcf
 	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/delly -N $1_$2/bcftools,"set -o pipefail && \
 										   bcftools view -O v $$(<) > $$(@)")
 
+delly/$1_$2/$1_$2.txt : delly/$1_$2/$1_$2.vcf
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR) -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
+												 rm -f delly/$1_$2/$1_$2.tsv && \
+												 $$(ANNOTATE_SV) \
+												 -SVinputFile $$(<) \
+												 -outputFile ./delly/$1_$2/$1_$2.tsv \
+												 -genomeBuild GRCh37 && \
+												 mv ./delly/$1_$2/$1_$2.tsv $$(@)")
+												 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
         $(eval $(call delly-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))

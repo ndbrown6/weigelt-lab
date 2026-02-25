@@ -32,7 +32,7 @@ strelka/$1_$2/runWorkflow.py : bam/$1.bam bam/$2.bam strelka/chunk_bed/target.be
 													--runDir=$$(@D)")
 
 strelka/$1_$2/$1_$2.vcf : strelka/$1_$2/runWorkflow.py
-	$$(call RUN,-c -n 10 -s 2G -m 4G -p $(PROJECT_DIR)/strelka -N $1_$2/run -v $(STRELKA_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 10 -s 1G -m 2G -p $(PROJECT_DIR)/strelka -N $1_$2/run -v $(STRELKA_ENV),"set -o pipefail && \
 												     strelka/$1_$2/runWorkflow.py \
 												     -m local \
 												     -j 10 \
@@ -59,7 +59,7 @@ strelka/$1_$2/$1_$2_ft.uvcf : strelka/$1_$2/$1_$2_ft.vcf
 													  -hd=true")
 
 strelka/$1_$2/$1_$2_ft.maf : strelka/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 12 -s 2G -m 4G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/strelka -N $1_$2/vcf2maf ,"set -o pipefail && \
+	$$(call RUN,-c -n 12 -s 1G -m 2G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/strelka -N $1_$2/vcf2maf ,"set -o pipefail && \
 													$$(VCF2MAF) \
 													--input-vcf $$(<) \
 													--output-maf $$(@) \
