@@ -2,9 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/manta_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/runWorkflow.py) \
-      $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/results/variants/somaticSV.vcf.gz) \
-      $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/$(pair).vcf)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),manta/$(pair)/$(pair).vcf)
 
 MANTA_CORES ?= 10
 MANTA_MEM_CORE ?= 4G

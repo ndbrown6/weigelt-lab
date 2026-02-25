@@ -2,8 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/svaba_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),svaba/$(pair)/$(pair).svaba.somatic.sv.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),svaba/$(pair)/$(pair).vcf)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),svaba/$(pair)/$(pair).vcf)
 
 SVABA_CORES ?= 8
 SVABA_MEM_CORE ?= 8G

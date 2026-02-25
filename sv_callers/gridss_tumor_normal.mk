@@ -2,9 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/gridss_tumor_normal.$(NOW)
 
-vcf : $(foreach pair,$(SAMPLE_PAIRS),gridss/$(pair)/$(pair).gridss_sv.vcf) \
-      $(foreach pair,$(SAMPLE_PAIRS),gridss/$(pair)/$(pair).gridss_sv_ft.vcf.bgz) \
-      $(foreach pair,$(SAMPLE_PAIRS),gridss/$(pair)/$(pair).vcf)
+vcf : $(foreach pair,$(SAMPLE_PAIRS),gridss/$(pair)/$(pair).vcf)
       
 GRIDSS_CORES ?= 8
 GRIDSS_MEM_CORE ?= 6G

@@ -2,8 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/sv_summary.$(NOW)
 
-smry : $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_jasmine.vcf) \
-       $(foreach pair,$(SAMPLE_PAIRS),annot_sv/$(pair)/$(pair)_survivor.vcf)
+smry : $(foreach pair,$(SAMPLE_PAIRS),survivor/$(pair)/$(pair).vcf)
 
 REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
@@ -17,48 +16,40 @@ get_vcf_path = $(1)/$(2)_$(3)/$(2)_$(3).vcf
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-JASMINE_CORES ?= 4
-JASMINE_MEM_CORE ?= 8G
-
 SURVIVOR_CORES ?= 1
 SURVIVOR_MEM_CORE ?= 8G
 
+MAX_DIST = 500
+NUM_CALLERS = 2
+TYPE = 0
+STRAND = 0
+MIN_SIZE = 30
+
 define merge-sv-vcf
-annot_sv/$1_$2/$1_$2_jasmine.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
-	$$(call RUN,-c -n $(JASMINE_CORES) -s 4G -m $(JASMINE_MEM_CORE) -p $(PROJECT_DIR)/annot_sv -N $1_$2/jasmine -v $(JASMINE_ENV),"set -o pipefail && \
-																       mkdir -p annot_sv/$1_$2 && \
-																       rm -f annot_sv/$1_$2/vcf_list_js.txt && \
-																       $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annot_sv/$1_$2/vcf_list_js.txt &&) \
-																       jasmine \
-																       file_list=annot_sv/$1_$2/vcf_list_js.txt \
-																       out_file=annot_sv/$1_$2/$1_$2_jasmine.vcf \
-																       genome_file=$$(REF_FASTA) \
-																       --normalize_type \
-																       --pre_normalize \
-																       --ignore_strand \
-																       --ignore_type \
-																       max_dist=3000 \
-																       min_seq_id=0.2 \
-																       min_overlap=0.2 \
-																       spec_reads=1 \
-																       k_jaccard=5 \
-																       threads=$(JASMINE_CORES)")
-																    
-annot_sv/$1_$2/$1_$2_survivor.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
-	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR)/annot_sv -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
-																	   mkdir -p annot_sv/$1_$2 && \
-																	   rm -f annot_sv/$1_$2/vcf_list_sv.txt && \
-																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> annot_sv/$1_$2/vcf_list_sv.txt &&) \
+survivor/$1_$2/$1_$2.vcf : $$(foreach caller,$$(CALLERS),$$(call get_vcf_path,$$(caller),$1,$2))
+	$$(call RUN,-c -n $(SURVIVOR_CORES) -s 4G -m $(SURVIVOR_MEM_CORE) -p $(PROJECT_DIR)/survivor -N $1_$2/survivor -v $(SURVIVOR_ENV),"set -o pipefail && \
+																	   mkdir -p survivor/$1_$2 && \
+																	   rm -f survivor/$1_$2/vcf_list.txt && \
+																	   $$(foreach caller,$$(CALLERS),echo '$$(call get_vcf_path,$$(caller),$1,$2)' >> survivor/$1_$2/vcf_list.txt &&) \
 																	   SURVIVOR merge \
-																	   annot_sv/$1_$2/vcf_list_sv.txt \
-																	   3000 \
-																	   2 \
+																	   survivor/$1_$2/vcf_list.txt \
+																	   $(MAX_DIST) \
+																	   $(NUM_CALLERS) \
+																	   $(TYPE) \
+																	   $(STRAND) \
 																	   0 \
-																	   0 \
-																	   0 \
-																	   10 \
+																	   $(MIN_SIZE) \
 																	   $$(@)")
-																			    
+																	   
+survivor/$1_$2/$1_$2.txt : survivor/$1_$2/$1_$2.vcf
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/survivor -N $1_$2/AnnotSV -v $(ANNOTATESV_ENV),"set -o pipefail && \
+													  $$(ANNOTATE_SV) \
+													  -SVinputFile $$(<) \
+													  -outputFile ./annotate_sv/$1_$2/$1_$2.tsv \
+													  -genomeBuild GRCh37 && \
+													  mv ./annotate_sv/$1_$2/$1.$2.tsv $$(@) && \
+													  mv ./annotate_sv/$1_$2/$1_$2.unannotated.tsv ./annotate_sv/$1_$2/$1_$2.unannotated.txt")
+							       
 $$(foreach caller,$$(CALLERS), \
 	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
 
@@ -68,10 +59,10 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(JASMINE_ENV)/bin/jasmine --version &> version/sv_summary.txt)
+	$(SURVIVOR_ENV)/bin/SURVIVOR --version &> version/sv_summary.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: smry clean
 
 clean :
-	rm annot_sv/*/vcf_list_*.txt
+	rm survivor/*/vcf_list.txt
