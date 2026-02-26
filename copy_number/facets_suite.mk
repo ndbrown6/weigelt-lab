@@ -34,8 +34,8 @@ facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf
 													      snp-pileup-wrapper.R --verbose \
 													      -sp $(FACETS_SUITE_ENV)/bin/snp-pileup \
 													      --vcf-file $$(<) \
-													      --tumor-bam /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$1.bam \
-													      --normal-bam /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$2.bam \
+													      --tumor-bam /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam \
+													      --normal-bam /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$2.bam \
 													      --output-prefix facets_suite/$1_$2/$1_$2 \
 													      --pseudo-snps 50 \
 													      --max-depth $$(FACETS_MAX_DEPTH)")
