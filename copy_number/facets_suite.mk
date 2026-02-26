@@ -20,13 +20,33 @@ NORMAL_DEPTH ?= 25
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
+BAM_SOURCE ?= irb
+
 facets_suite/targets_dbsnp.vcf : $(TARGETS_FILE)
 	$(call RUN,-c -n 1 -s 6G -m 8G -p $(PROJECT_DIR) -N dbsnp_intersect,"set -o pipefail && \
 									     $(BEDTOOLS) intersect -header -u -a $(DBSNP_137) -b $(<) > $(@)")
-    
+
+ifeq ($(BAM_SOURCE),impact)
+define snp-pileup
+facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf
+	$$(call RUN,-c -s 2G -m 4G -v $(FACETS_SUITE_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/snp_pileup,"set -o pipefail && \
+													      mkdir -p facets_suite/$1_$2 && \
+													      snp-pileup-wrapper.R --verbose \
+													      -sp $(FACETS_SUITE_ENV)/bin/snp-pileup \
+													      --vcf-file $$(<) \
+													      --tumor-bam /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$1.bam \
+													      --normal-bam /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$2.bam \
+													      --output-prefix facets_suite/$1_$2/$1_$2 \
+													      --pseudo-snps 50 \
+													      --max-depth $$(FACETS_MAX_DEPTH)")
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call snp-pileup,$(tumor.$(pair)),$(normal.$(pair)))))
+else
 define snp-pileup
 facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -s 2G -m 4G -v $(FACETS_SUITE_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/snp_pileup,"set -o pipefail && \
+													      mkdir -p facets_suite/$1_$2 && \
 													      snp-pileup-wrapper.R --verbose \
 													      -sp $(FACETS_SUITE_ENV)/bin/snp-pileup \
 													      --vcf-file $$(<) \
@@ -35,10 +55,10 @@ facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf bam/$1.b
 													      --output-prefix facets_suite/$1_$2/$1_$2 \
 													      --pseudo-snps 50 \
 													      --max-depth $$(FACETS_MAX_DEPTH)")
-    
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call snp-pileup,$(tumor.$(pair)),$(normal.$(pair)))))
+endif
 
 define run-facets
 facets_suite/$1_$2/taskcomplete : facets_suite/$1_$2/$1_$2.snp_pileup.gz
