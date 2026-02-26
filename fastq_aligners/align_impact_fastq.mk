@@ -33,9 +33,9 @@ BAITS_LIST := $(BAITS_FILE:.bed=.list)
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-INPUT_TYPE ?= fastq
+FASTQ_SOURCE ?= local
 
-ifeq ($(INPUT_TYPE),bam)
+ifeq ($(FASTQ_SOURCE),irb)
 define prepare-fastq
 bwamem/$1/taskcomplete.txt :
 	$$(call RUN,-n 4 -s 4G -m 6G -p $(PROJECT_DIR)/bwamem -N $1/bam2fastq,"set -o pipefail && \

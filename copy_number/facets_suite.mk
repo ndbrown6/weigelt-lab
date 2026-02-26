@@ -20,13 +20,13 @@ NORMAL_DEPTH ?= 25
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-BAM_SOURCE ?= irb
+BAM_SOURCE ?= local
 
 facets_suite/targets_dbsnp.vcf : $(TARGETS_FILE)
 	$(call RUN,-c -n 1 -s 6G -m 8G -p $(PROJECT_DIR) -N dbsnp_intersect,"set -o pipefail && \
 									     $(BEDTOOLS) intersect -header -u -a $(DBSNP_137) -b $(<) > $(@)")
 
-ifeq ($(BAM_SOURCE),impact)
+ifeq ($(BAM_SOURCE),irb)
 define snp-pileup
 facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf
 	$$(call RUN,-c -s 2G -m 4G -v $(FACETS_SUITE_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/snp_pileup,"set -o pipefail && \
