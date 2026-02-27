@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Project Dashboard</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell',sans-serif;background:#DAE0E6;color:#1c1c1c;line-height:1.5}.header{background:#fff;border-bottom:1px solid #ccc;padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 4px rgba(0,0,0,0.1)}.header-content{padding:12px 20px;display:flex;align-items:center;gap:16px}.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px;color:#1c1c1c}.logo-icon{width:32px;height:32px;background:#FF4500;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px}.header-title{flex:1}.header-subtitle{font-size:12px;color:#7c7c7c;font-weight:400}.main-container{display:flex;height:calc(100vh - 57px)}.sidebar{width:280px;background:#fff;border-right:1px solid #ccc;overflow-y:auto;flex-shrink:0}.sidebar-section{padding:16px;border-bottom:1px solid #edeff1}.sidebar-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#7c7c7c;margin-bottom:12px;letter-spacing:0.5px}.sidebar-item{padding:8px 12px;margin-bottom:4px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:12px;font-size:14px;color:#1c1c1c;transition:background 0.2s;text-decoration:none}.sidebar-item:hover{background:#f6f7f8}.sidebar-item.active{background:#e9f5ff;color:#0079d3;font-weight:500}.sidebar-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#5f6368}.sidebar-item:hover .sidebar-icon,.sidebar-item.active .sidebar-icon{color:#0079d3}.sidebar-count{margin-left:auto;font-size:12px;color:#7c7c7c;background:#f6f7f8;padding:2px 8px;border-radius:10px}.config-label{font-size:11px;color:#7c7c7c;margin-bottom:3px;margin-top:8px}.config-label:first-child{margin-top:0}.config-input{width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;font-family:'IBM Plex Mono','Courier New',monospace;color:#1c1c1c;background:#f6f7f8}.config-input:focus{outline:none;border-color:#0079d3;background:#fff}.config-group-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#0079d3;margin-top:14px;margin-bottom:6px;letter-spacing:0.4px}.content-wrapper{flex:1;overflow-y:auto}.content{max-width:1200px;margin:0 auto;padding:24px}.card{background:#fff;border:1px solid #ccc;border-radius:4px;margin-bottom:16px;overflow:hidden}.card-header{background:#fff;padding:12px 16px;border-bottom:1px solid #edeff1;font-weight:500;font-size:14px;color:#1c1c1c;display:flex;justify-content:space-between;align-items:center}.card-body{padding:16px}.upload-area{border:2px dashed #ccc;border-radius:4px;padding:32px;text-align:center;background:#f6f7f8;transition:all 0.2s}.upload-area.dragover{background:#e9f5ff;border-color:#0079d3}input[type="file"]{display:none}.btn{padding:8px 16px;font-size:14px;font-weight:700;border:none;border-radius:9999px;cursor:pointer;transition:all 0.2s;font-family:inherit;text-transform:none}.btn-primary{background:#0079d3;color:#fff}.btn-primary:hover{background:#0060a8}.btn-primary:disabled{background:#dadada;color:#959595;cursor:not-allowed}.btn-secondary{background:#fff;color:#0079d3;border:1px solid #0079d3}.btn-secondary:hover{background:#f6f7f8}.btn-outline{background:transparent;color:#0079d3;border:1px solid #0079d3}.btn-outline:hover{background:#0079d3;color:#fff}.btn-small{padding:6px 12px;font-size:12px}.file-label{display:inline-block;padding:10px 20px;background:#0079d3;color:white;border-radius:9999px;cursor:pointer;font-weight:700;font-size:14px;transition:all 0.2s}.file-label:hover{background:#0060a8}.button-group{display:flex;gap:8px;align-items:center}.view-toggle{display:flex;gap:4px;background:#f6f7f8;padding:4px;border-radius:4px}.view-toggle-btn{padding:6px 12px;font-size:12px;background:transparent;border:none;border-radius:4px;cursor:pointer;transition:all 0.2s;font-weight:600}.view-toggle-btn.active{background:#0079d3;color:white}.view-section{display:none}.view-section.visible{display:block}.yaml-editor{width:100%;min-height:400px;padding:16px;border:1px solid #ccc;border-radius:4px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:13px;resize:vertical;background:#f6f7f8;line-height:1.6}.yaml-editor:focus{outline:none;border-color:#0079d3;background:#fff}.table-view,.yaml-view,.tree-view{display:none}.table-view.active,.yaml-view.active,.tree-view.active{display:block}.samples-table{width:100%;border-collapse:collapse;margin-top:16px}.samples-table th,.samples-table td{padding:12px;text-align:left;border:1px solid #e0e0e0}.samples-table th{background:#f6f7f8;font-weight:600;font-size:13px;color:#5f6368}.samples-table td{font-size:14px}.samples-table input{width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:13px}.samples-table input:focus{outline:none;border-color:#0079d3}.table-actions{margin-top:12px;display:flex;gap:8px}.remove-row-btn{padding:4px 8px;font-size:12px;background:#ea0027;color:white;border:none;border-radius:4px;cursor:pointer}.remove-row-btn:hover{background:#c5221f}.tree-container{font-family:'IBM Plex Mono','Courier New',monospace;font-size:13px;padding:16px;background:#f6f7f8;border:1px solid #ccc;border-radius:4px;max-height:600px;overflow-y:auto}.tree-node{margin-left:0;padding:4px 0}.tree-parent{font-weight:600;color:#0079d3;cursor:pointer;padding:6px 8px;border-radius:4px;transition:background 0.2s;display:flex;align-items:center;gap:8px}.tree-parent:hover{background:#e9f5ff}.tree-parent i{font-size:10px;transition:transform 0.2s}.tree-parent.collapsed i.fa-chevron-down{transform:rotate(-90deg)}.tree-children{margin-left:24px;border-left:2px solid #e0e0e0;padding-left:12px;margin-top:4px}.tree-child{padding:4px 8px;color:#5f6368;font-size:12px;line-height:1.8}.tree-child-key{color:#1c1c1c;font-weight:500}.tree-child-value{color:#0079d3;margin-left:8px}.tree-child-array{color:#ea0027}.targets-section{display:none}.targets-section.visible{display:block}.category{margin-bottom:10px;border:1px solid #ccc;border-radius:4px;overflow:hidden;background:#fff;scroll-margin-top:80px}.category-header{background:#f6f7f8;color:#1c1c1c;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:0.5px}.category-header:hover{background:#edeff1}.vote-count{color:#0079d3;font-weight:700;margin-left:8px}.toggle-icon{transition:transform 0.2s;font-size:14px;color:#7c7c7c}.category-header.collapsed .toggle-icon{transform:rotate(-90deg)}.category-content{background:#fff}.category-content.hidden{display:none}.target-item{background:#fff;padding:12px 16px;border-top:1px solid #edeff1;cursor:pointer;display:flex;align-items:center;transition:background 0.2s}.target-item:hover{background:#f6f7f8}.target-item.selected{background:#e9f5ff}.target-item input[type="checkbox"]{margin-right:12px;width:16px;height:16px;cursor:pointer;accent-color:#0079d3}.target-info{flex:1}.target-name{font-weight:500;color:#1c1c1c;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.target-path{color:#7c7c7c;font-size:11px;font-family:'IBM Plex Mono',monospace}.status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:#e6f4ea;color:#188038}.status-badge i{font-size:10px}.actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}.actions .btn{flex:1;min-width:100px}.output-section{display:none}.output-section.visible{display:block}.script-output{background:#1c1c1c;color:#d7dadc;padding:16px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;overflow-x:auto;white-space:pre-wrap;margin-top:12px}.message{padding:12px 16px;border-radius:4px;margin-top:12px;font-size:14px;display:none}.success-message{background:#e9f5ff;border:1px solid #0079d3;color:#0079d3}.error-message{background:#ffe9e9;border:1px solid #ea0027;color:#ea0027}.warning-message{background:#fff4e5;border:1px solid #ff9800;color:#e65100}.info-banner{background:#e9f5ff;border:1px solid #0079d3;border-radius:4px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:#1c1c1c}.stat-item{display:flex;justify-content:space-between;padding:8px 12px;margin-bottom:4px;border-radius:4px;font-size:14px;background:#f6f7f8}.stat-label{color:#7c7c7c}.stat-value{font-weight:700;color:#0079d3}.help-text{font-size:12px;color:#7c7c7c;line-height:1.6}.text-muted{color:#7c7c7c;font-size:12px}.debug-info{background:#f0f0f0;border:1px solid #ccc;border-radius:4px;padding:12px;margin-top:12px;font-family:'Courier New',monospace;font-size:11px;max-height:200px;overflow-y:auto}@media(max-width:960px){.main-container{flex-direction:column}.sidebar{width:100%;height:auto;max-height:300px}.content-wrapper{height:auto}}</style></head><body><div class="header"><div class="header-content"><div class="logo"><div class="logo-icon"><i class="fa-solid fa-wrench"></i></div><div><div>Project Dashboard</div></div></div><div class="header-title"><div class="header-subtitle">Parse and execute Makefile targets</div></div></div></div><div class="main-container"><div class="sidebar"><div class="sidebar-section"><div class="sidebar-title">About</div><p class="help-text">This tool helps you select and run multiple Makefile targets. Select a project directory containing weigelt-lab/Makefile and configuration files.</p></div><div class="sidebar-section"><div class="sidebar-title">Statistics</div><div class="stat-item"><span class="stat-label">Total targets</span><span class="stat-value" id="sidebarTotalTargets">0</span></div><div class="stat-item"><span class="stat-label">Categories</span><span class="stat-value" id="sidebarTotalCategories">0</span></div><div class="stat-item"><span class="stat-label">Completed</span><span class="stat-value" id="sidebarCompletedTargets">0</span></div><div class="stat-item"><span class="stat-label">Selected</span><span class="stat-value" id="sidebarSelectedTargets">0</span></div></div><div class="sidebar-section" id="viewsNav" style="display:none"><div class="sidebar-title">Views</div><a class="sidebar-item active" onclick="switchView('makefile')" id="nav-makefile"><span class="sidebar-icon"><i class="fa-solid fa-wrench"></i></span><span>Makefile Targets</span></a><a class="sidebar-item" onclick="switchView('project-config')" id="nav-project-config" style="display:none"><span class="sidebar-icon"><i class="fa-solid fa-cog"></i></span><span>project_config.yaml</span></a><a class="sidebar-item" onclick="switchView('samples')" id="nav-samples" style="display:none"><span class="sidebar-icon"><i class="fa-solid fa-vial"></i></span><span>samples.yaml</span></a><a class="sidebar-item" onclick="switchView('fastq')" id="nav-fastq" style="display:none"><span class="sidebar-icon"><i class="fa-solid fa-file-lines"></i></span><span>sample.fastq.yaml</span></a></div><div class="sidebar-section" id="categoriesNav" style="display:none"><div class="sidebar-title">Categories</div></div><div class="sidebar-section" id="scriptConfigSection"><div class="sidebar-title">Script Configuration</div><div class="config-group-title">Environment</div><div class="config-label">Working Directory</div><input class="config-input" type="text" id="configWorkDir" value="."><div class="config-label">Screen Session Name</div><input class="config-input" type="text" id="configScreenName" value="makefile_session"><div class="config-group-title">SLURM Options</div><div class="config-label">Job Name</div><input class="config-input" type="text" id="configJobName" value="makefile_run"><div class="config-label">Nodes</div><input class="config-input" type="text" id="configNodes" value="1"><div class="config-label">Tasks per Node</div><input class="config-input" type="text" id="configNtasks" value="4"><div class="config-label">Memory</div><input class="config-input" type="text" id="configMem" value="16G"><div class="config-label">Wall Time</div><input class="config-input" type="text" id="configWalltime" value="24:00:00"></div><div class="sidebar-section"><div class="sidebar-title">How to use</div><ol class="help-text" style="margin-left:16px;line-height:1.8"><li>Select project directory</li><li>View/edit configuration files</li><li>Configure script options</li><li>Select desired targets</li><li>Generate shell script</li><li>Run in your terminal</li></ol></div><div class="sidebar-section"><div class="sidebar-title">Tips</div><p class="help-text">💡 The generated script launches targets inside a detached screen session running an interactive Slurm job. Reload reprocesses current directory.</p></div></div><div class="content-wrapper"><div class="content"><div class="card"><div class="card-body"><div class="upload-area" id="uploadSection"><div class="file-input-wrapper"><input type="file" id="directoryInput" webkitdirectory directory multiple onchange="handleDirectorySelect(event)"><div class="button-group" style="justify-content:center"><label for="directoryInput" class="file-label">Choose Directory</label><button class="btn btn-secondary btn-small" onclick="reloadDirectory()" id="reloadBtn" style="display:none"><i class="fa-solid fa-rotate"></i> Reload</button></div><p class="text-muted" style="margin-top:12px">Select a project directory containing weigelt-lab/Makefile</p></div><div class="error-message message" id="errorMessage"></div><div class="warning-message message" id="warningMessage"></div><div class="debug-info" id="debugInfo" style="display:none"></div></div></div></div><div class="view-section visible" id="view-makefile"><div class="targets-section" id="targetsSection"><div class="info-banner"><strong>✓ Success</strong> — Your Makefile has been parsed successfully</div><div class="card"><div class="card-header">Available Targets</div><div class="card-body" style="padding:0"><div id="categoriesContainer"></div></div></div><div class="card"><div class="card-body"><div class="actions"><button class="btn btn-primary" onclick="generateScript()" id="generateBtn" disabled>Generate script</button><button class="btn btn-outline" onclick="selectAll()">Select all</button><button class="btn btn-outline" onclick="clearAll()">Clear all</button></div></div></div><div class="output-section" id="outputSection"><div class="card"><div class="card-header">Generated Shell Script</div><div class="card-body"><div class="script-output" id="scriptOutput"></div><div style="margin-top:16px;display:flex;gap:8px"><button class="btn btn-secondary" onclick="copyScript()"><i class="fa-solid fa-copy"></i> Copy</button><button class="btn btn-secondary" onclick="downloadScript()"><i class="fa-solid fa-download"></i> Download</button></div><div class="success-message message" id="successMessage">✓ Copied to clipboard</div></div></div></div></div></div><div class="view-section" id="view-project-config"><div class="card"><div class="card-header"><span><i class="fa-solid fa-cog"></i> project_config.yaml</span><div class="button-group"><button class="btn btn-outline btn-small" onclick="saveYamlFile('project-config')"><i class="fa-solid fa-save"></i> Save</button></div></div><div class="card-body"><textarea class="yaml-editor" id="projectConfigEditor" placeholder="No project_config.yaml loaded"></textarea><div class="success-message message" id="saveMessage-project-config">✓ File saved</div></div></div></div><div class="view-section" id="view-samples"><div class="card"><div class="card-header"><span><i class="fa-solid fa-vial"></i> samples.yaml</span><div class="button-group"><div class="view-toggle"><button class="view-toggle-btn active" onclick="toggleSamplesView('yaml')" id="samples-view-yaml">YAML</button><button class="view-toggle-btn" onclick="toggleSamplesView('tree')" id="samples-view-tree">Tree</button><button class="view-toggle-btn" onclick="toggleSamplesView('table')" id="samples-view-table">Table</button></div><button class="btn btn-outline btn-small" onclick="saveYamlFile('samples')"><i class="fa-solid fa-save"></i> Save</button></div></div><div class="card-body"><div class="yaml-view active" id="samplesYamlView"><textarea class="yaml-editor" id="samplesEditor" placeholder="No samples.yaml loaded"></textarea></div><div class="tree-view" id="samplesTreeView"><div class="tree-container" id="samplesTreeContainer"></div></div><div class="table-view" id="samplesTableView"><table class="samples-table" id="samplesTable"><thead><tr><th>Sample Name</th><th>Normal Sample</th><th>Tumor Samples</th><th>Actions</th></tr></thead><tbody id="samplesTableBody"></tbody></table><div class="table-actions"><button class="btn btn-outline btn-small" onclick="addSampleRow()"><i class="fa-solid fa-plus"></i> Add Sample</button></div></div><div class="success-message message" id="saveMessage-samples">✓ File saved</div></div></div></div><div class="view-section" id="view-fastq"><div class="card"><div class="card-header"><span><i class="fa-solid fa-file-lines"></i> sample.fastq.yaml</span><div class="button-group"><button class="btn btn-outline btn-small" onclick="saveYamlFile('fastq')"><i class="fa-solid fa-save"></i> Save</button></div></div><div class="card-body"><textarea class="yaml-editor" id="fastqEditor" placeholder="No sample.fastq.yaml loaded"></textarea><div class="success-message message" id="saveMessage-fastq">✓ File saved</div></div></div></div></div></div></div> <script>let selectedTargets=new Set(),parsedTargets=[],categories={},completedTasks=new Set(),loadedFiles={makefile:false,projectConfig:false,samples:false,fastq:false},lastDirectoryInput=null,samplesData={};
+
+function handleDirectorySelect(e){lastDirectoryInput=e.target.files;processDirectoryFiles(lastDirectoryInput);document.getElementById('reloadBtn').style.display='inline-block';}
+function reloadDirectory(){if(lastDirectoryInput)processDirectoryFiles(lastDirectoryInput);}
+
+function processDirectoryFiles(e){
+const t=document.getElementById('errorMessage'),a=document.getElementById('warningMessage'),n=document.getElementById('debugInfo');
+t.style.display='none';a.style.display='none';n.style.display='none';n.innerHTML='';
+if(0===e.length){t.textContent='No directory selected';t.style.display='block';return;}
+loadedFiles={makefile:false,projectConfig:false,samples:false,fastq:false};
+completedTasks.clear();
+let s=null,l=null,o=null,i=null;
+const r=[],d=['Files found:'];
+for(let t of e){
+const e=(t.webkitRelativePath||t.name).replace(/\\/g,'/');
+d.push('- '+e);
+const a=e.toLowerCase(),n=e.split('/').pop();
+if(a.includes('completed_tasks/')&&!n.includes('.')){completedTasks.add(n);d.push('  → Found completed task: '+n);}
+else if(a.includes('weigelt-lab')&&('Makefile'===n||'makefile'===n)&&!n.includes('.mk')){d.push('  → Matched as Makefile!');r.push(t.text().then(e=>{s=e;loadedFiles.makefile=true;}));}
+else if('project_config.yaml'===n){d.push('  → Matched as project_config.yaml!');r.push(t.text().then(e=>{l=e;loadedFiles.projectConfig=true;}));}
+else if('samples.yaml'===n){d.push('  → Matched as samples.yaml!');r.push(t.text().then(e=>{o=e;loadedFiles.samples=true;}));}
+else if('sample.fastq.yaml'===n){d.push('  → Matched as sample.fastq.yaml!');r.push(t.text().then(e=>{i=e;loadedFiles.fastq=true;}));}
+}
+d.push('\nCompleted tasks found: '+completedTasks.size);
+if(completedTasks.size>0)d.push('Tasks: '+Array.from(completedTasks).join(', '));
+n.textContent=d.join('\n');n.style.display='block';
+Promise.all(r).then(()=>{
+if(!s){t.textContent='Could not find weigelt-lab/Makefile in selected directory';t.style.display='block';return;}
+document.getElementById('viewsNav').style.display='block';
+document.getElementById('nav-project-config').style.display=loadedFiles.projectConfig?'flex':'none';
+document.getElementById('nav-samples').style.display=loadedFiles.samples?'flex':'none';
+document.getElementById('nav-fastq').style.display=loadedFiles.fastq?'flex':'none';
+if(l)document.getElementById('projectConfigEditor').value=l;
+if(o){document.getElementById('samplesEditor').value=o;parseSamplesYaml(o);buildSamplesTree(o);}
+if(i)document.getElementById('fastqEditor').value=i;
+const warn=[];
+if(!loadedFiles.projectConfig)warn.push('project_config.yaml');
+if(!loadedFiles.samples)warn.push('samples.yaml');
+if(!loadedFiles.fastq)warn.push('sample.fastq.yaml');
+if(warn.length>0){a.textContent='Optional files not found: '+warn.join(', ');a.style.display='block';}
+parseLoadedMakefile(s);
+setTimeout(()=>{n.style.display='none';},3000);
+});
+}
+
+function parseSamplesYaml(e){
+samplesData={};
+try{
+const t=e.split('\n');let a=null;
+for(let e of t){
+const t=e.match(/- name:\s*(.+)/);
+if(t){a=t[1].trim();samplesData[a]={normal:'',tumor:[]};}
+if(e.match(/normal:\s*(.+)/)&&a)samplesData[a].normal=RegExp.$1.trim();
+if(e.match(/tumor:\s*\[(.+)\]/)&&a)samplesData[a].tumor=RegExp.$1.split(',').map(e=>e.trim().replace(/[\[\]]/g,''));
+}
+displaySamplesTable();
+}catch(e){console.error('Error parsing samples YAML:',e);}
+}
+
+function buildSamplesTree(e){
+const t=document.getElementById('samplesTreeContainer');t.innerHTML='';
+try{
+const a=e.split('\n');let n=null;
+for(let e of a){
+const a=e.trim();if(!a)continue;
+const s=a.match(/^-\s*name:\s*(.+)$/);
+if(s){
+const e=s[1].trim(),a=document.createElement('div');a.className='tree-node';
+const l=document.createElement('div');l.className='tree-parent';l.innerHTML='<i class="fa-solid fa-chevron-down"></i><i class="fa-solid fa-folder"></i>'+e;
+const o=document.createElement('div');o.className='tree-children';
+l.onclick=function(){this.classList.toggle('collapsed');o.style.display=(o.style.display==='none'||o.style.display==='')?'block':'none';};
+a.appendChild(l);a.appendChild(o);t.appendChild(a);n=o;continue;
+}
+if(n){
+const e=a.match(/^normal:\s*(.+)$/),t=a.match(/^tumor:\s*\[(.+)\]$/);
+if(e){const t=document.createElement('div');t.className='tree-child';t.innerHTML='<span class="tree-child-key">normal:</span><span class="tree-child-value">'+e[1].trim()+'</span>';n.appendChild(t);}
+else if(t){const e=t[1].trim(),a=document.createElement('div');a.className='tree-child';a.innerHTML='<span class="tree-child-key">tumor: </span><span class="tree-child-array">'+e+'</span>';n.appendChild(a);}
+}
+}
+}catch(e){console.error('Error building samples tree:',e);t.innerHTML='<div style="color:#ea0027;padding:16px">Error parsing YAML for tree view</div>';}
+}
+
+function displaySamplesTable(){
+const e=document.getElementById('samplesTableBody');e.innerHTML='';
+for(const[t,a]of Object.entries(samplesData)){
+const n=e.insertRow();
+n.innerHTML='<td><input type="text" value="'+t+'" onchange="updateSampleData(this,\''+t+'\',\'name\')"></td><td><input type="text" value="'+a.normal+'" onchange="updateSampleData(this,\''+t+'\',\'normal\')"></td><td><input type="text" value="'+a.tumor.join(', ')+'" onchange="updateSampleData(this,\''+t+'\',\'tumor\')"></td><td><button class="remove-row-btn" onclick="removeSampleRow(\''+t+'\')"><i class="fa-solid fa-trash"></i></button></td>';
+}
+}
+
+function updateSampleData(e,t,a){
+const n=e.value;
+if('name'===a){if(n!==t){samplesData[n]=samplesData[t];delete samplesData[t];}}
+else if('normal'===a)samplesData[t].normal=n;
+else if('tumor'===a)samplesData[t].tumor=n.split(',').map(e=>e.trim()).filter(e=>e);
+syncSamplesYaml();
+}
+
+function addSampleRow(){const e='Sample-'+(Object.keys(samplesData).length+1);samplesData[e]={normal:'',tumor:[]};displaySamplesTable();syncSamplesYaml();}
+function removeSampleRow(e){if(confirm('Remove sample "'+e+'"?')){delete samplesData[e];displaySamplesTable();syncSamplesYaml();}}
+
+function syncSamplesYaml(){
+let e='';
+for(const[t,a]of Object.entries(samplesData)){
+e+='- name: '+t+'\n';
+if(a.normal)e+='  normal: '+a.normal+'\n';
+if(a.tumor&&a.tumor.length>0)e+='  tumor: ['+a.tumor.join(', ')+']\n';
+}
+document.getElementById('samplesEditor').value=e;buildSamplesTree(e);
+}
+
+function toggleSamplesView(e){
+if('yaml'===e){document.getElementById('samplesYamlView').classList.add('active');document.getElementById('samplesTreeView').classList.remove('active');document.getElementById('samplesTableView').classList.remove('active');document.getElementById('samples-view-yaml').classList.add('active');document.getElementById('samples-view-tree').classList.remove('active');document.getElementById('samples-view-table').classList.remove('active');}
+else if('tree'===e){document.getElementById('samplesTreeView').classList.add('active');document.getElementById('samplesYamlView').classList.remove('active');document.getElementById('samplesTableView').classList.remove('active');document.getElementById('samples-view-tree').classList.add('active');document.getElementById('samples-view-yaml').classList.remove('active');document.getElementById('samples-view-table').classList.remove('active');buildSamplesTree(document.getElementById('samplesEditor').value||'');}
+else if('table'===e){document.getElementById('samplesTableView').classList.add('active');document.getElementById('samplesYamlView').classList.remove('active');document.getElementById('samplesTreeView').classList.remove('active');document.getElementById('samples-view-table').classList.add('active');document.getElementById('samples-view-yaml').classList.remove('active');document.getElementById('samples-view-tree').classList.remove('active');parseSamplesYaml(document.getElementById('samplesEditor').value||'');}
+}
+
+function saveYamlFile(e){
+let t,a;
+switch(e){
+case'project-config':t=document.getElementById('projectConfigEditor').value;a='project_config.yaml';break;
+case'samples':if(document.getElementById('samplesTableView').classList.contains('active'))syncSamplesYaml();t=document.getElementById('samplesEditor').value;a='samples.yaml';break;
+case'fastq':t=document.getElementById('fastqEditor').value;a='sample.fastq.yaml';break;
+}
+if(!t||''===t.trim()){alert('No content to save');return;}
+const n=new Blob([t],{type:'text/yaml'}),s=URL.createObjectURL(n),l=document.createElement('a');l.href=s;l.download=a;document.body.appendChild(l);l.click();document.body.removeChild(l);URL.revokeObjectURL(s);
+const o=document.getElementById('saveMessage-'+e);o.style.display='block';setTimeout(()=>{o.style.display='none';},2000);
+}
+
+function parseLoadedMakefile(e){
+parsedTargets=[];categories={};
+let t={name:'Other',icon:'fa-folder'};
+const a=e.split('\n');
+for(let e=0;e<a.length;e++){
+const n=a[e].trim();
+if(n.startsWith('#')&&n.includes('=====')&&e+1<a.length){
+const s=a[e+1].trim();
+if(s.startsWith('#')&&!s.includes('=====')){const e=s.replace(/^#+\s*/,'').trim();if(e)t=detectCategory(e);}
+}
+const s=n.match(/^TARGETS\s*\+=\s*(\S+)/);
+if(s){
+const n=s[1];let l='';
+for(let t=e+1;t<Math.min(e+10,a.length);t++){const e=a[t].match(/RUN_MAKE,([^)]+)/);if(e){l=e[1].trim();break;}}
+parsedTargets.push({name:n,category:t,path:l,completed:completedTasks.has(n)});
+const o=t.name;if(!categories[o])categories[o]={info:t,targets:[]};
+categories[o].targets.push({name:n,path:l,completed:completedTasks.has(n)});
+}
+}
+if(0===parsedTargets.length)alert('No targets found in Makefile. Make sure it follows the expected format.');
+else displayTargets();
+}
+
+function detectCategory(e){
+const t=e.toLowerCase();
+const a={
+'summary':{name:'Summary',icon:'fa-clipboard-list'},
+'fastq aligners':{name:'FASTQ Aligners',icon:'fa-dna'},
+'variant callers':{name:'Variant Callers',icon:'fa-magnifying-glass'},
+'copy number aberrations':{name:'Copy Number Aberrations',icon:'fa-chart-column'},
+'rna expression':{name:'RNA Expression',icon:'fa-chart-column'},
+'dna structural variant callers':{name:'DNA Structural Variant Callers',icon:'fa-code-merge'},
+'rna fusion callers':{name:'RNA Fusion Callers',icon:'fa-code-merge'},
+'vcf tools':{name:'VCF Tools',icon:'fa-file-code'},
+'bam tools':{name:'BAM Tools',icon:'fa-box-archive'}
+};
+if(a[t])return a[t];
+for(const[e,n]of Object.entries(a))if(t.includes(e))return n;
+return{name:e.charAt(0).toUpperCase()+e.slice(1),icon:'fa-folder'};
+}
+
+function getCategoryId(e){return'category-'+e.name.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();}
+
+function displayTargets(){
+const e=document.getElementById('categoriesContainer'),t=document.getElementById('categoriesNav');
+e.innerHTML='';t.innerHTML='<div class="sidebar-title">Categories</div>';t.style.display='block';
+const a=parsedTargets.filter(e=>e.completed).length;
+document.getElementById('sidebarTotalTargets').textContent=parsedTargets.length;
+document.getElementById('sidebarTotalCategories').textContent=Object.keys(categories).length;
+document.getElementById('sidebarCompletedTargets').textContent=a;
+for(const[a,n]of Object.entries(categories)){
+const s=n.info,l=n.targets,o=getCategoryId(s);
+const i=document.createElement('a');i.className='sidebar-item';i.href='#'+o;
+i.innerHTML='<span class="sidebar-icon"><i class="fa-solid '+s.icon+'"></i></span><span>'+s.name+'</span><span class="sidebar-count">'+l.length+'</span>';
+i.onclick=function(e){e.preventDefault();switchView('makefile');setTimeout(()=>{document.getElementById(o).scrollIntoView({behavior:'smooth',block:'start'});},100);};
+t.appendChild(i);
+const r=document.createElement('div');r.className='category';r.id=o;
+const d=document.createElement('div');d.className='category-header';d.innerHTML='<span>'+s.name+'<span class="vote-count">'+l.length+'</span></span><span class="toggle-icon">▼</span>';d.onclick=function(){toggleCategory(this);};
+const c=document.createElement('div');c.className='category-content';
+l.forEach(e=>{
+const t=document.createElement('div');t.className='target-item';t.onclick=function(){toggleTarget(this,e.name);};
+const a=e.completed?'<span class="status-badge"><i class="fa-solid fa-check"></i> Completed</span>':'';
+t.innerHTML='<input type="checkbox" id="'+e.name+'"><div class="target-info"><div class="target-name">'+e.name+a+'</div><div class="target-path">'+(e.path||'No path specified')+'</div></div>';
+c.appendChild(t);
+});
+r.appendChild(d);r.appendChild(c);e.appendChild(r);
+}
+document.getElementById('targetsSection').classList.add('visible');switchView('makefile');
+}
+
+function switchView(e){
+document.querySelectorAll('.view-section').forEach(e=>{e.classList.remove('visible');});
+document.getElementById('view-'+e).classList.add('visible');
+document.querySelectorAll('#viewsNav .sidebar-item').forEach(e=>{e.classList.remove('active');});
+document.getElementById('nav-'+e).classList.add('active');
+}
+
+function toggleCategory(e){e.classList.toggle('collapsed');e.nextElementSibling.classList.toggle('hidden');}
+
+function toggleTarget(e,t){
+const a=document.getElementById(t);a.checked=!a.checked;
+if(a.checked){selectedTargets.add(t);e.classList.add('selected');}
+else{selectedTargets.delete(t);e.classList.remove('selected');}
+updateUI();
+}
+
+function updateUI(){document.getElementById('sidebarSelectedTargets').textContent=selectedTargets.size;document.getElementById('generateBtn').disabled=0===selectedTargets.size;}
+
+function selectAll(){document.querySelectorAll('input[type="checkbox"]').forEach(e=>{e.checked=true;selectedTargets.add(e.id);e.closest('.target-item').classList.add('selected');});updateUI();}
+
+function clearAll(){document.querySelectorAll('input[type="checkbox"]').forEach(e=>{e.checked=false;e.closest('.target-item').classList.remove('selected');});selectedTargets.clear();updateUI();document.getElementById('outputSection').classList.remove('visible');}
+
+function generateScript(){
+const targets=Array.from(selectedTargets);
+const workDir=document.getElementById('configWorkDir').value||'.';
+const screenName=document.getElementById('configScreenName').value||'makefile_session';
+const jobName=document.getElementById('configJobName').value||'makefile_run';
+const nodes=document.getElementById('configNodes').value||'1';
+const ntasks=document.getElementById('configNtasks').value||'4';
+const mem=document.getElementById('configMem').value||'16G';
+const walltime=document.getElementById('configWalltime').value||'24:00:00';
+
+const makeLines=targets.map(t=>'make '+t).join(' && \\\n    ');
+
+let script='#!/bin/bash\n';
+script+='# Generated Makefile execution script\n';
+script+='# Created: '+new Date().toLocaleString()+'\n';
+script+='# Targets: '+targets.length+'\n\n';
+script+='screen -dmS "'+screenName+'" \\\n';
+script+='  srun \\\n';
+script+='    --nodes='+nodes+' \\\n';
+script+='    --ntasks-per-node='+ntasks+' \\\n';
+script+='    --mem='+mem+' \\\n';
+script+='    --time='+walltime+' \\\n';
+script+='    --job-name='+jobName+' \\\n';
+script+='    bash -c "cd '+workDir+' && \\\n';
+script+='    '+makeLines+'"\n\n';
+script+='echo "Started in screen session: '+screenName+'"\n';
+script+='echo "Attach with: screen -r '+screenName+'"\n';
+
+document.getElementById('scriptOutput').textContent=script;
+document.getElementById('outputSection').classList.add('visible');
+document.getElementById('outputSection').scrollIntoView({behavior:'smooth'});
+}
+
+function copyScript(){navigator.clipboard.writeText(document.getElementById('scriptOutput').textContent).then(()=>{const e=document.getElementById('successMessage');e.style.display='block';setTimeout(()=>{e.style.display='none';},2000);});}
+
+function downloadScript(){
+const e=document.getElementById('scriptOutput').textContent;
+const t=new Date().toISOString().replace(/[:.]/g,'-');
+const a=new Blob([e],{type:'text/plain'}),n=URL.createObjectURL(a),s=document.createElement('a');
+s.href=n;s.download='run_targets_'+t+'.sh';document.body.appendChild(s);s.click();document.body.removeChild(s);URL.revokeObjectURL(n);
+const l=document.getElementById('successMessage');l.textContent='✓ Downloaded as run_targets_'+t+'.sh';l.style.display='block';
+setTimeout(()=>{l.style.display='none';l.textContent='✓ Copied to clipboard';},2000);
+}</script> </body></html>
