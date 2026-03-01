@@ -12,11 +12,11 @@ input[type="file"]{display:none}
 
 /* Header */
 .header{background:#fff;border-bottom:1px solid #ccc;position:sticky;top:0;z-index:200;box-shadow:0 2px 4px rgba(0,0,0,.1)}
-.header-content{padding:8px 20px;display:flex;align-items:center;gap:12px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;color:#1c1c1c;text-decoration:none;flex-shrink:0}
+.header-content{padding:10px 20px;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px;color:#1c1c1c;text-decoration:none;flex-shrink:0}
 .logo-icon{width:32px;height:32px;background:#FF4500;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0}
-.header-sub{font-size:11px;color:#7c7c7c;font-weight:400}
-.header-spacer{flex:1}
+.header-sub{font-size:12px;color:#7c7c7c;font-weight:400}
+.header-title{flex:1}
 .dir-label{font-size:11px;color:#7c7c7c;font-family:'IBM Plex Mono','Courier New',monospace;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Layout */
@@ -157,9 +157,24 @@ input[type="file"]{display:none}
 .tooltip{position:fixed;background:rgba(28,28,28,.92);color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;pointer-events:none;z-index:999;display:none;white-space:nowrap}
 
 /* Colormap preview strip */
-.cmap-strip{height:5px;border-radius:2px;margin-top:4px;width:100%}
+.cmap-strip{height:12px;border-radius:3px;margin-top:6px;width:100%;border:1px solid #edeff1}
 
-/* Stat row */
+/* Sample subtitle badges */
+.sub-badge{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:9px;font-size:10px;font-weight:700;font-family:'IBM Plex Mono','Courier New',monospace}
+.sub-badge.purity{background:#fff0eb;color:#c83700}
+.sub-badge.ploidy{background:#e9f5ff;color:#0060a8}
+.sub-badge.source-default{background:#f6f7f8;color:#5f6368}
+.sub-badge.source-pinned{background:#e6f4ea;color:#188038}
+.sub-badge.source-flagged{background:#fff4e5;color:#e65100}
+.sample-item{padding:7px 12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#1c1c1c;transition:background .15s;font-family:'IBM Plex Mono','Courier New',monospace}
+.sample-item:hover{background:#f6f7f8}
+.sample-item.active{background:#e9f5ff;color:#0079d3;font-weight:600}
+.sn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.s-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:9px;flex-shrink:0;margin-left:6px}
+.s-badge.done{background:#e6f4ea;color:#188038}
+.s-badge.flagged{background:#fff4e5;color:#e65100}
+.s-badge.pending{background:#f6f7f8;color:#7c7c7c}
+.s-badge.default-val{background:#e9f5ff;color:#0079d3}
 .stat-row{display:flex;justify-content:space-between;padding:4px 7px;border-radius:3px;font-size:11px;background:#f6f7f8;margin-bottom:3px}
 .stat-label{color:#7c7c7c}.stat-value{font-weight:700;color:#1c1c1c;font-family:'IBM Plex Mono',monospace}
 </style>
@@ -173,11 +188,15 @@ input[type="file"]{display:none}
   <div class="header-content">
     <a class="logo" href="#">
       <div class="logo-icon"><i class="fa fa-dna"></i></div>
-      <span>FACETS Dashboard</span>
-      <span style="font-size:13px;font-weight:400;color:#7c7c7c;margin-left:2px">— Goodness of Fit Explorer</span>
+      <div>FACETS Dashboard</div>
     </a>
-    <div class="header-spacer"></div>
-    <span class="dir-label" id="dirLabel">No directory loaded</span>
+    <div class="header-title">
+      <div class="header-sub">Goodness of Fit Explorer</div>
+    </div>
+    <div class="header-spacer" style="display:none"></div>
+    <button class="btn btn-outline btn-sm" id="reloadBtn" onclick="reloadDirectory()" style="display:none">
+      <i class="fa fa-rotate"></i> Reload
+    </button>
     <label for="dirInput" class="btn btn-primary btn-sm" style="cursor:pointer">
       <i class="fa fa-folder-open"></i> Choose Directory
     </label>
@@ -199,14 +218,14 @@ input[type="file"]{display:none}
     </div>
     <div class="sb-sec-body" id="body-color">
       <select class="select-input" id="cmapSelect" onchange="onColormapChange()">
-        <option value="rdbu">ASCAT / RdBu (default)</option>
-        <option value="rdbu_r">ASCAT / RdBu (inverted)</option>
+        <option value="rdbu">ASCAT / RdBu</option>
+        <option value="rdbu_r" selected>ASCAT / RdBu (inverted)</option>
         <option value="viridis">Viridis</option>
         <option value="viridis_r">Viridis (inverted)</option>
         <option value="hot">Hot</option>
         <option value="hot_r">Hot (inverted)</option>
       </select>
-      <canvas id="cmapPreview" class="cmap-strip" width="260" height="5" style="margin-top:5px"></canvas>
+      <canvas id="cmapPreview" class="cmap-strip" width="260" height="12"></canvas>
     </div>
   </div>
 
@@ -292,7 +311,9 @@ input[type="file"]{display:none}
         <div class="card-header" style="flex-shrink:0">
           <div>
             <div id="sampleTitle" style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700">No sample loaded</div>
-            <div id="sampleSubtitle" style="font-size:11px;color:#7c7c7c;font-weight:400;margin-top:1px">Choose a directory to begin</div>
+            <div id="sampleSubtitle" style="display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap">
+              <span style="font-size:11px;color:#7c7c7c">Choose a directory to begin</span>
+            </div>
           </div>
           <div style="display:flex;gap:5px;align-items:center">
             <button class="nav-btn" onclick="navigateSample(-1)"><i class="fa fa-chevron-left"></i></button>
@@ -302,9 +323,12 @@ input[type="file"]{display:none}
         </div>
         <div class="card-body" style="flex:1;overflow-y:auto">
           <div class="loading-bar" id="loadingBar" style="display:none"><div class="loading-fill" id="loadingFill"></div></div>
-          <div id="emptyHeatmap" class="empty-state">
-            <i class="fa fa-chart-simple"></i>
-            <p>Choose a directory containing sample subdirectories with<br><code style="font-size:10px">XXX_YYY/XXX_YYY_sunrise_matrix.txt</code></p>
+          <div id="emptyHeatmap" style="display:flex;align-items:center;justify-content:center;height:100%">
+            <div style="border:2px dashed #ccc;border-radius:6px;padding:40px 32px;text-align:center;background:#f6f7f8;max-width:400px;transition:all .2s">
+              <i class="fa fa-chart-simple" style="font-size:36px;color:#dadada;display:block;margin-bottom:12px"></i>
+              <div style="font-size:13px;font-weight:600;color:#1c1c1c;margin-bottom:6px">No directory loaded</div>
+              <div style="font-size:11px;color:#7c7c7c;line-height:1.6">Select a <code style="font-size:10px;background:#edeff1;padding:1px 4px;border-radius:3px">facets_suite</code> directory containing sample subdirectories with<br><code style="font-size:10px;background:#edeff1;padding:1px 4px;border-radius:3px">XXX_YYY_sunrise_matrix.txt</code></div>
+            </div>
           </div>
           <div id="heatmapArea" style="display:none">
             <div class="heatmap-outer">
@@ -323,17 +347,18 @@ input[type="file"]{display:none}
                 </div>
                 <div class="x-ticks" id="xTicks" style="width:480px"></div>
                 <div class="x-label" style="width:480px">Ploidy</div>
+                <!-- GOF Legend — aligned under canvas -->
+                <div class="legend-wrap" style="width:480px;margin-top:32px">
+                  <canvas id="legendCanvas" class="legend-canvas" width="480" height="12"></canvas>
+                  <div class="legend-ends">
+                    <span id="legendMin">—</span>
+                    <span style="color:#7c7c7c;font-size:9px">Goodness of Fit</span>
+                    <span id="legendMax">—</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <!-- GOF Legend -->
-            <div class="legend-wrap" style="max-width:520px;margin-top:32px">
-              <canvas id="legendCanvas" class="legend-canvas" width="480" height="12"></canvas>
-              <div class="legend-ends">
-                <span id="legendMin">—</span>
-                <span style="color:#7c7c7c;font-size:9px">Goodness of Fit</span>
-                <span id="legendMax">—</span>
-              </div>
-            </div>
+            <!-- end heatmap-outer -->
           </div>
         </div>
       </div>
@@ -349,7 +374,7 @@ input[type="file"]{display:none}
       <div class="card" style="height:100%;display:flex;flex-direction:column;margin-top:0">
         <div class="card-header" style="flex-shrink:0">
           <span id="pngTitle" style="font-family:'IBM Plex Mono',monospace;font-size:12px">CNCF Plot</span>
-          <span style="font-size:10px;color:#7c7c7c">Drag divider above to resize · scroll to pan</span>
+          <span title="Drag the divider above to resize panels · scroll to pan the image" style="color:#ccc;cursor:default;font-size:13px">&#9432;</span>
         </div>
         <div style="flex:1;overflow-y:auto;padding:8px">
           <div class="png-empty" id="pngEmpty"><i class="fa fa-image" style="font-size:24px;display:block;margin-bottom:8px;color:#dadada"></i>CNCF plot will appear here</div>
@@ -395,6 +420,7 @@ function lerp(t, stops) {
 // State
 // ═══════════════════════════════════════════════════
 let allFiles = {};         // webkitRelativePath → File
+let lastRootDir = null;    // for reload
 let samples = [];          // [{name, matrixPath, pngPath, purity, ploidy, source, flagged}]
 let filteredSamples = [];
 let currentIdx = -1;
@@ -435,12 +461,16 @@ document.getElementById('dirInput').addEventListener('change', function(e) {
   if (!files.length) return;
   allFiles = {};
   files.forEach(f => { allFiles[f.webkitRelativePath] = f; });
-  const rootDir = files[0].webkitRelativePath.split('/')[0];
-  document.getElementById('dirLabel').textContent = rootDir;
-  loadDirectory(rootDir);
-  // Reset file input so the same directory can be re-chosen
+  lastRootDir = files[0].webkitRelativePath.split('/')[0];
+  const _dl = document.getElementById('dirLabel'); if (_dl) _dl.textContent = lastRootDir;
+  document.getElementById('reloadBtn').style.display = 'inline-flex';
+  loadDirectory(lastRootDir);
   e.target.value = '';
 });
+
+function reloadDirectory() {
+  if (lastRootDir) loadDirectory(lastRootDir);
+}
 
 async function loadDirectory(rootDir) {
   // Find summary file
@@ -505,7 +535,6 @@ async function loadDirectory(rootDir) {
   });
 
   filteredSamples = [...samples];
-  (document.getElementById('sampleCountBadge')||{}).textContent = `(${samples.length})`;
   renderSampleList();
   updateSolutionsOutput();
   if (samples.length > 0) loadSample(0);
@@ -532,7 +561,7 @@ function parseSummaryTSV(text) {
 // Sample list
 // ═══════════════════════════════════════════════════
 function filterSamples() {
-  const q = document.getElementById('sampleSearch').value.toLowerCase();
+  const q = (document.getElementById('sampleSearch')||{value:''}).value.toLowerCase();
   filteredSamples = q ? samples.filter(s => s.name.toLowerCase().includes(q)) : [...samples];
   renderSampleList();
 }
@@ -612,13 +641,18 @@ async function loadSample(idx) {
 
     const dispP = sol.purity !== null ? sol.purity : sol.defaultPurity;
     const dispPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
-    document.getElementById('sampleSubtitle').textContent =
-      dispP !== null ? `Purity: ${fmtPct(dispP)} | Ploidy: ${fmtPl(dispPl)} | ${sol.source}` : 'No solution yet';
+    const srcCls = sol.flagged ? 'source-flagged' : (sol.purity !== null ? 'source-pinned' : 'source-default');
+    const srcTxt = sol.flagged ? 'flagged' : sol.source;
+    document.getElementById('sampleSubtitle').innerHTML = dispP !== null
+      ? `<span class="sub-badge purity"><i class="fa fa-circle" style="font-size:6px"></i>${fmtPct(dispP)}</span>
+         <span class="sub-badge ploidy"><i class="fa fa-circle" style="font-size:6px"></i>${fmtPl(dispPl)}</span>
+         <span class="sub-badge ${srcCls}">${srcTxt}</span>`
+      : '<span style="font-size:11px;color:#7c7c7c">No solution yet</span>';
   } else {
-    document.getElementById('emptyHeatmap').style.display = 'block';
+    document.getElementById('emptyHeatmap').style.display = 'flex';
     document.getElementById('heatmapArea').style.display = 'none';
     currentMatrix = null;
-    document.getElementById('sampleSubtitle').textContent = s.matrixPath ? 'Matrix file not found' : 'No matrix file';
+    document.getElementById('sampleSubtitle').innerHTML = `<span style="font-size:11px;color:#7c7c7c">${s.matrixPath ? 'Matrix file not found' : 'No matrix file'}</span>`;
   }
 
   // Load CNCF PNG
@@ -631,7 +665,7 @@ function updateSolutionPanel(sol) {
   if (dp !== null && dp !== undefined) {
     document.getElementById('defVals').textContent = `${fmtPct(dp)}  /  ${fmtPl(dpl)}`;
   } else {
-    document.getElementById('defVals').textContent = sol.isNA ? 'NA (normal-only)' : '—';
+    document.getElementById('defVals').textContent = sol.isNA ? 'NA (normal contamination?)' : '—';
   }
   // Pinned row
   if (sol.purity !== null && sol.purity !== undefined) {
@@ -931,7 +965,10 @@ function pinSolution() {
   sol.purity = purity; sol.ploidy = ploidy; sol.source = 'pinned';
   solutions[s.name] = sol;
   updateSolutionPanel(sol);
-  document.getElementById('sampleSubtitle').textContent = `Purity: ${fmtPct(purity)} | Ploidy: ${fmtPl(ploidy)} | pinned`;
+  document.getElementById('sampleSubtitle').innerHTML =
+    `<span class="sub-badge purity"><i class="fa fa-circle" style="font-size:6px"></i>${fmtPct(purity)}</span>
+     <span class="sub-badge ploidy"><i class="fa fa-circle" style="font-size:6px"></i>${fmtPl(ploidy)}</span>
+     <span class="sub-badge source-pinned">pinned</span>`;
   renderSampleList();
   updateSolutionsOutput();
   drawOverlay();
