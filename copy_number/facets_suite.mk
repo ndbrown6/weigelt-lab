@@ -82,11 +82,11 @@ facets_suite/$1_$2/taskcomplete : facets_suite/$1_$2/$1_$2.snp_pileup.gz
 													      echo 'finished!' > $$(@)")
 													      
 facets_suite/$1_$2/$1_$2_sunrise_matrix.txt : facets_suite/$1_$2/taskcomplete
-	$$(call RUN,-c -s 4G -m 6G -v $(FACETS_SUITE_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/sunrise,"set -o pipefail && \
-													   $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
-													   --option 1 \
-													   --file_in facets_suite/$1_$2/$1_$2_purity.cncf.txt \
-													   --file_out $$(@)")
+	$$(call RUN,-c -s 4G -m 6G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/sunrise,"set -o pipefail && \
+													  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
+													  --option 1 \
+													  --file_in facets_suite/$1_$2/$1_$2_purity.cncf.txt \
+													  --file_out $$(@)")
     
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
