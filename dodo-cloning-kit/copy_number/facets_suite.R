@@ -37,7 +37,7 @@ if (as.numeric(opt$option) == 1) {
 	}
 	sunrise %>%
 	dplyr::as_tibble() %>%
-	readr::write_tsv(path = path = as.character(opt$file_out), append = FALSE, col_names = FALSE)
+	readr::write_tsv(path = as.character(opt$file_out), append = FALSE, col_names = FALSE)
 	
 } else if (as.numeric(opt$option) == 2) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
