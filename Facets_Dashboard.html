@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FACETS Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif;background:#DAE0E6;color:#1c1c1c;line-height:1.5;font-size:14px}
+input[type="file"]{display:none}
+
+/* Header */
+.header{background:#fff;border-bottom:1px solid #ccc;position:sticky;top:0;z-index:200;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+.header-content{padding:8px 20px;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;color:#1c1c1c;text-decoration:none;flex-shrink:0}
+.logo-icon{width:32px;height:32px;background:#FF4500;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0}
+.header-sub{font-size:11px;color:#7c7c7c;font-weight:400}
+.header-spacer{flex:1}
+.dir-label{font-size:11px;color:#7c7c7c;font-family:'IBM Plex Mono','Courier New',monospace;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Layout */
+.main-container{display:flex;height:calc(100vh - 50px)}
+
+/* Sidebar */
+.sidebar{width:360px;min-width:240px;max-width:600px;background:#fff;border-right:1px solid #ccc;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sidebar-resizer{position:absolute;top:0;right:-3px;width:6px;height:100%;cursor:col-resize;z-index:50;background:transparent;transition:background .15s}
+.sidebar-resizer:hover,.sidebar-resizer.dragging{background:rgba(0,121,211,.3)}
+.sb-scroll{flex:1;overflow-y:auto;min-height:0}
+.sb-section{border-bottom:1px solid #edeff1}
+.sb-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#7c7c7c;letter-spacing:.5px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;transition:background .12s}
+.sb-sec-title:hover{background:#f6f7f8;color:#1c1c1c}
+.sb-sec-body{padding:8px 12px 12px;border-top:1px solid #f0f0f0}
+.sb-sec-body.collapsed{display:none}
+.sb-chevron{font-size:9px;color:#aaa;transition:transform .2s;flex-shrink:0;margin-left:4px}
+.sb-chevron.collapsed{transform:rotate(-90deg)}
+.sidebar-title{font-size:10px;font-weight:700;text-transform:uppercase;color:#7c7c7c;letter-spacing:.5px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.sol-output-area{overflow-y:auto}
+
+
+/* Buttons */
+.btn{padding:6px 14px;font-size:13px;font-weight:700;border:none;border-radius:9999px;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:#0079d3;color:#fff}.btn-primary:hover{background:#0060a8}
+.btn-outline{background:transparent;border:1.5px solid #0079d3;color:#0079d3}.btn-outline:hover{background:#0079d3;color:#fff}
+.btn-sm{padding:4px 11px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+.btn-danger{background:transparent;border:1.5px solid #e65100;color:#e65100}.btn-danger:hover{background:#e65100;color:#fff}
+.btn-success{background:transparent;border:1.5px solid #188038;color:#188038}.btn-success:hover{background:#188038;color:#fff}
+.btn-grey{background:transparent;border:1.5px solid #ccc;color:#5f6368}.btn-grey:hover{border-color:#0079d3;color:#0079d3}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Inputs */
+.search-box{width:100%;padding:6px 9px;border:1px solid #ccc;border-radius:4px;font-size:12px;font-family:inherit;outline:none;background:#f6f7f8}
+.search-box:focus{border-color:#0079d3;background:#fff}
+.select-input{width:100%;padding:5px 7px;border:1px solid #ccc;border-radius:4px;font-size:11px;font-family:inherit;outline:none;background:#f6f7f8;cursor:pointer}
+.select-input:focus{border-color:#0079d3}
+
+/* Nav row */
+.nav-row{display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.nav-btn{width:24px;height:24px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#5f6368;transition:all .2s;flex-shrink:0}
+.nav-btn:hover{border-color:#0079d3;color:#0079d3}
+.nav-counter{font-size:11px;color:#7c7c7c;flex:1;text-align:center}
+
+/* Readout */
+.readout-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.ro-item{display:flex;flex-direction:column;gap:1px}
+.ro-label{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:#7c7c7c}
+.ro-val{font-size:15px;font-weight:700;font-family:'IBM Plex Mono','Courier New',monospace}
+.ro-val.purity{color:#FF4500}.ro-val.ploidy{color:#0079d3}.ro-val.gof{color:#188038}
+
+/* Sol rows */
+.sol-row{display:flex;justify-content:space-between;align-items:center;padding:4px 7px;border-radius:3px;font-size:11px;margin-bottom:3px}
+.sol-row.default-row{background:#e9f5ff}
+.sol-row.pinned-row{background:#e6f4ea}
+.sol-row.na-row{background:#f6f7f8}
+.sol-row-label{color:#7c7c7c;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+.sol-row-vals{font-family:'IBM Plex Mono','Courier New',monospace;font-weight:700;font-size:11px;color:#1c1c1c}
+
+/* Content */
+/* Vertical split pane */
+.content-wrapper{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:10px;gap:0}
+.vsplit{display:flex;flex-direction:column;flex:1;min-height:0;gap:0}
+.vsplit-top{overflow:hidden;min-height:80px;flex-shrink:0}
+.vsplit-bot{flex:1;overflow:hidden;min-height:60px}
+.vsplit-handle{height:8px;background:#DAE0E6;border-top:1px solid #ccc;border-bottom:1px solid #ccc;cursor:ns-resize;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.vsplit-handle:hover,.vsplit-handle.dragging{background:#c8d0d8}
+.vsplit-handle-grip{width:40px;height:3px;border-radius:2px;background:#aaa}
+.card{background:#fff;border:1px solid #ccc;border-radius:4px;overflow:hidden}
+.card-header{padding:9px 12px;border-bottom:1px solid #edeff1;font-weight:600;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:12px}
+
+/* Heatmap */
+.heatmap-outer{display:flex;gap:0;align-items:flex-start}
+.y-axis-area{display:flex;align-items:stretch;gap:3px;flex-shrink:0}
+.y-label{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;color:#7c7c7c;text-align:center;padding:2px;align-self:center}
+.y-ticks{display:flex;flex-direction:column;justify-content:space-between;width:34px;flex-shrink:0}
+.y-tick{font-size:9px;color:#7c7c7c;font-family:'IBM Plex Mono','Courier New',monospace;text-align:right;line-height:1}
+.heatmap-col{display:flex;flex-direction:column}
+.heatmap-wrapper{position:relative;flex-shrink:0}
+.heatmap-canvas{display:block;cursor:crosshair}
+.overlay-canvas{position:absolute;top:0;left:0;pointer-events:none}
+
+/* Right purity slider */
+.r-track{position:absolute;top:0;right:-20px;width:12px;border-radius:6px;background:#edeff1;cursor:ns-resize}
+.r-thumb{position:absolute;right:-26px;width:20px;height:20px;background:#FF4500;border:2px solid #fff;border-radius:50%;cursor:grab;transform:translateY(-50%);box-shadow:0 1px 4px rgba(0,0,0,.3);z-index:10;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff}
+.r-thumb:active{cursor:grabbing}
+
+/* Bottom ploidy slider */
+.b-track{position:absolute;bottom:-20px;left:0;height:12px;border-radius:6px;background:#edeff1;cursor:ew-resize}
+.b-thumb{position:absolute;bottom:-26px;width:20px;height:20px;background:#0079d3;border:2px solid #fff;border-radius:50%;cursor:grab;transform:translateX(-50%);box-shadow:0 1px 4px rgba(0,0,0,.3);z-index:10;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff}
+.b-thumb:active{cursor:grabbing}
+
+.x-ticks{display:flex;justify-content:space-between;margin-top:30px}
+.x-tick{font-size:9px;color:#7c7c7c;font-family:'IBM Plex Mono','Courier New',monospace;text-align:center}
+.x-label{font-size:10px;color:#7c7c7c;text-align:center;margin-top:3px}
+
+/* GOF legend — always rendered inline */
+.legend-wrap{margin-top:10px;display:flex;flex-direction:column;gap:2px}
+.legend-canvas{display:block;border-radius:2px;border:1px solid #edeff1}
+.legend-ends{display:flex;justify-content:space-between;font-size:9px;color:#7c7c7c;font-family:'IBM Plex Mono',monospace}
+
+/* View toggle */
+.view-toggle{display:flex;gap:3px;background:#f6f7f8;padding:3px;border-radius:4px;flex-shrink:0}
+.vt-btn{padding:3px 10px;font-size:11px;background:transparent;border:none;border-radius:3px;cursor:pointer;font-weight:700;transition:all .18s;font-family:inherit;color:#5f6368}
+.vt-btn.active{background:#0079d3;color:#fff}
+
+/* Solutions output in sidebar */
+.sol-output-area{flex:1;overflow-y:auto;min-height:0;padding:8px 10px}
+.sol-table{width:100%;border-collapse:collapse;font-size:11px}
+.sol-table th,.sol-table td{padding:5px 7px;text-align:left;border-bottom:1px solid #edeff1}
+.sol-table th{font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:#5f6368;background:#f6f7f8;position:sticky;top:0}
+.sol-table td{vertical-align:middle}
+.sol-table td.mono{font-family:'IBM Plex Mono','Courier New',monospace}
+.sol-table tr:hover td{background:#f6f7f8}
+.badge{display:inline-block;padding:1px 6px;border-radius:9px;font-size:9px;font-weight:700}
+.badge-ok{background:#e6f4ea;color:#188038}
+.badge-flag{background:#fff4e5;color:#e65100}
+.badge-na{background:#f6f7f8;color:#7c7c7c}
+.badge-default{background:#e9f5ff;color:#0079d3}
+.badge-pinned{background:#e6f4ea;color:#188038}
+
+.yaml-out{background:#1c1c1c;color:#d7dadc;padding:12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;white-space:pre;overflow:auto;line-height:1.6;flex:1}
+
+/* Empty / loading */
+.empty-state{text-align:center;padding:40px 16px;color:#7c7c7c}
+.empty-state i{font-size:36px;margin-bottom:10px;color:#dadada;display:block}
+.empty-state p{font-size:12px}
+.loading-bar{height:3px;background:#edeff1;border-radius:2px;overflow:hidden;margin-bottom:8px}
+.loading-fill{height:100%;background:#0079d3;width:0%;transition:width .25s;border-radius:2px}
+
+/* PNG viewer */
+.png-viewport{overflow-y:auto;border:1px solid #edeff1;border-radius:3px;background:#f6f7f8}
+.png-viewport img{display:block;width:100%;height:auto}
+.png-empty{padding:30px;text-align:center;color:#7c7c7c;font-size:12px}
+
+/* Tooltip */
+.tooltip{position:fixed;background:rgba(28,28,28,.92);color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;pointer-events:none;z-index:999;display:none;white-space:nowrap}
+
+/* Colormap preview strip */
+.cmap-strip{height:5px;border-radius:2px;margin-top:4px;width:100%}
+
+/* Stat row */
+.stat-row{display:flex;justify-content:space-between;padding:4px 7px;border-radius:3px;font-size:11px;background:#f6f7f8;margin-bottom:3px}
+.stat-label{color:#7c7c7c}.stat-value{font-weight:700;color:#1c1c1c;font-family:'IBM Plex Mono',monospace}
+</style>
+</head>
+<body>
+<input type="file" id="dirInput" webkitdirectory directory multiple>
+<div class="tooltip" id="tooltip"></div>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-content">
+    <a class="logo" href="#">
+      <div class="logo-icon"><i class="fa fa-dna"></i></div>
+      <span>FACETS Dashboard</span>
+      <span style="font-size:13px;font-weight:400;color:#7c7c7c;margin-left:2px">— Goodness of Fit Explorer</span>
+    </a>
+    <div class="header-spacer"></div>
+    <span class="dir-label" id="dirLabel">No directory loaded</span>
+    <label for="dirInput" class="btn btn-primary btn-sm" style="cursor:pointer">
+      <i class="fa fa-folder-open"></i> Choose Directory
+    </label>
+  </div>
+</div>
+
+<div class="main-container">
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar" id="sidebar">
+<div class="sidebar-resizer" id="sidebarResizer"></div>
+<div class="sb-scroll">
+
+  <!-- ── (a) COLOR SCHEME ── -->
+  <div class="sb-section" id="sec-color">
+    <div class="sb-sec-title" onclick="toggleSection('color')">
+      Color Scheme
+      <i class="fa fa-chevron-down sb-chevron" id="chev-color"></i>
+    </div>
+    <div class="sb-sec-body" id="body-color">
+      <select class="select-input" id="cmapSelect" onchange="onColormapChange()">
+        <option value="rdbu">ASCAT / RdBu (default)</option>
+        <option value="rdbu_r">ASCAT / RdBu (inverted)</option>
+        <option value="viridis">Viridis</option>
+        <option value="viridis_r">Viridis (inverted)</option>
+        <option value="hot">Hot</option>
+        <option value="hot_r">Hot (inverted)</option>
+      </select>
+      <canvas id="cmapPreview" class="cmap-strip" width="260" height="5" style="margin-top:5px"></canvas>
+    </div>
+  </div>
+
+  <!-- ── (b) CURSOR ── -->
+  <div class="sb-section" id="sec-cursor">
+    <div class="sb-sec-title" onclick="toggleSection('cursor')">
+      Cursor
+      <i class="fa fa-chevron-down sb-chevron" id="chev-cursor"></i>
+    </div>
+    <div class="sb-sec-body" id="body-cursor">
+      <div class="readout-grid">
+        <div class="ro-item"><div class="ro-label">Purity</div><div class="ro-val purity" id="curPurity">—</div></div>
+        <div class="ro-item"><div class="ro-label">Ploidy</div><div class="ro-val ploidy" id="curPloidy">—</div></div>
+        <div class="ro-item"><div class="ro-label">GoF</div><div class="ro-val gof" id="curGof">—</div></div>
+      </div>
+      <div class="sidebar-title" style="margin-top:8px;margin-bottom:4px">Solution</div>
+      <div class="sol-row default-row">
+        <span class="sol-row-label">Default</span>
+        <span class="sol-row-vals" id="defVals">—</span>
+        <span class="badge badge-default">summary</span>
+      </div>
+      <div class="sol-row pinned-row">
+        <span class="sol-row-label">Pinned</span>
+        <span class="sol-row-vals" id="pinVals">—</span>
+        <span class="badge badge-pinned" id="pinBadge">—</span>
+      </div>
+      <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" id="pinBtn" onclick="pinSolution()" disabled>
+          <i class="fa fa-thumbtack"></i> Pin
+        </button>
+        <button class="btn btn-danger btn-sm" id="flagBtn" onclick="toggleFlag()" disabled>
+          <i class="fa fa-flag"></i> Flag
+        </button>
+        <button class="btn btn-grey btn-sm" id="resetBtn" onclick="resetToDefault()" disabled title="Reset to default values">
+          <i class="fa fa-rotate-left"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── (c) ALL SOLUTIONS ── -->
+  <div class="sb-section" id="sec-solutions">
+    <div class="sb-sec-title" onclick="toggleSection('solutions')">
+      <span>All Solutions</span>
+      <div style="display:flex;gap:4px;align-items:center" onclick="event.stopPropagation()">
+        <div class="view-toggle">
+          <button class="vt-btn active" id="vtTable" onclick="switchView('table')">Table</button>
+          <button class="vt-btn" id="vtYaml" onclick="switchView('yaml')">YAML</button>
+        </div>
+        <button class="btn btn-outline btn-xs" onclick="exportYaml()" title="Export sample_attr.yaml"><i class="fa fa-download"></i></button>
+        <button class="btn btn-grey btn-xs" onclick="copyYaml()" id="copyBtn" title="Copy YAML"><i class="fa fa-copy"></i></button>
+        <i class="fa fa-chevron-down sb-chevron" id="chev-solutions" style="pointer-events:none"></i>
+      </div>
+    </div>
+    <div class="sb-sec-body" id="body-solutions" style="padding:0">
+      <div id="viewTable" class="sol-output-area">
+        <table class="sol-table">
+          <thead><tr>
+            <th>Sample</th><th>Purity</th><th>Ploidy</th><th>Source</th><th>Flag</th><th></th>
+          </tr></thead>
+          <tbody id="solTableBody"></tbody>
+        </table>
+        <div id="tableEmpty" style="padding:16px;text-align:center;font-size:11px;color:#7c7c7c">No solutions yet.</div>
+      </div>
+      <div id="viewYaml" class="yaml-out" style="display:none;max-height:300px">
+# Load a directory to begin
+</div>
+    </div>
+  </div>
+
+</div><!-- /sb-scroll -->
+</div><!-- /sidebar -->
+
+<!-- ══ MAIN CONTENT ══ -->
+<div class="content-wrapper">
+
+  <!-- Vertical split: heatmap (top) + PNG (bottom), drag handle between -->
+  <div class="vsplit" id="vsplit">
+
+    <!-- TOP PANE: heatmap -->
+    <div class="vsplit-top" id="vsplitTop">
+      <div class="card" style="height:100%;display:flex;flex-direction:column;margin-bottom:0">
+        <div class="card-header" style="flex-shrink:0">
+          <div>
+            <div id="sampleTitle" style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700">No sample loaded</div>
+            <div id="sampleSubtitle" style="font-size:11px;color:#7c7c7c;font-weight:400;margin-top:1px">Choose a directory to begin</div>
+          </div>
+          <div style="display:flex;gap:5px;align-items:center">
+            <button class="nav-btn" onclick="navigateSample(-1)"><i class="fa fa-chevron-left"></i></button>
+            <div id="navCounter" style="font-size:11px;color:#7c7c7c;min-width:50px;text-align:center">— / —</div>
+            <button class="nav-btn" onclick="navigateSample(1)"><i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="card-body" style="flex:1;overflow-y:auto">
+          <div class="loading-bar" id="loadingBar" style="display:none"><div class="loading-fill" id="loadingFill"></div></div>
+          <div id="emptyHeatmap" class="empty-state">
+            <i class="fa fa-chart-simple"></i>
+            <p>Choose a directory containing sample subdirectories with<br><code style="font-size:10px">XXX_YYY/XXX_YYY_sunrise_matrix.txt</code></p>
+          </div>
+          <div id="heatmapArea" style="display:none">
+            <div class="heatmap-outer">
+              <div class="y-axis-area">
+                <div class="y-label">Purity</div>
+                <div class="y-ticks" id="yTicks"></div>
+              </div>
+              <div class="heatmap-col">
+                <div class="heatmap-wrapper" id="heatmapWrapper">
+                  <canvas id="heatmapCanvas" class="heatmap-canvas" width="480" height="480"></canvas>
+                  <canvas id="overlayCanvas" class="overlay-canvas" width="480" height="480"></canvas>
+                  <div class="r-track" id="rTrack"></div>
+                  <div class="r-thumb" id="rThumb">↕</div>
+                  <div class="b-track" id="bTrack"></div>
+                  <div class="b-thumb" id="bThumb">↔</div>
+                </div>
+                <div class="x-ticks" id="xTicks" style="width:480px"></div>
+                <div class="x-label" style="width:480px">Ploidy</div>
+              </div>
+            </div>
+            <!-- GOF Legend -->
+            <div class="legend-wrap" style="max-width:520px;margin-top:32px">
+              <canvas id="legendCanvas" class="legend-canvas" width="480" height="12"></canvas>
+              <div class="legend-ends">
+                <span id="legendMin">—</span>
+                <span style="color:#7c7c7c;font-size:9px">Goodness of Fit</span>
+                <span id="legendMax">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /vsplit-top -->
+
+    <!-- DRAG HANDLE -->
+    <div class="vsplit-handle" id="vsplitHandle">
+      <div class="vsplit-handle-grip"></div>
+    </div>
+
+    <!-- BOTTOM PANE: CNCF PNG -->
+    <div class="vsplit-bot" id="vsplitBot">
+      <div class="card" style="height:100%;display:flex;flex-direction:column;margin-top:0">
+        <div class="card-header" style="flex-shrink:0">
+          <span id="pngTitle" style="font-family:'IBM Plex Mono',monospace;font-size:12px">CNCF Plot</span>
+          <span style="font-size:10px;color:#7c7c7c">Drag divider above to resize · scroll to pan</span>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:8px">
+          <div class="png-empty" id="pngEmpty"><i class="fa fa-image" style="font-size:24px;display:block;margin-bottom:8px;color:#dadada"></i>CNCF plot will appear here</div>
+          <img id="pngImg" style="display:none;width:100%;height:auto" alt="CNCF plot">
+        </div>
+      </div>
+    </div><!-- /vsplit-bot -->
+
+  </div><!-- /vsplit -->
+</div><!-- /content-wrapper -->
+</div><!-- /main-container -->
+
+<script>
+// ═══════════════════════════════════════════════════
+// Constants
+// ═══════════════════════════════════════════════════
+const PLOIDY_MIN = 1.5, PLOIDY_MAX = 5.5, PLOIDY_COLS = 100;
+const PURITY_MIN = 0.10, PURITY_MAX = 1.00, PURITY_ROWS = 100;
+const CW = 480, CH = 480; // canvas size
+
+// ═══════════════════════════════════════════════════
+// Colormaps  (5 options)
+// row 0 = low value, last row = high value
+// ═══════════════════════════════════════════════════
+const CMAPS = {
+  // RdBu: brewer.pal(10,"RdBu") — dark red→red→salmon→pale pink→pale blue→blue→dark blue
+  rdbu:     [[103,0,31],[178,24,43],[214,96,77],[244,165,130],[253,219,199],[209,229,240],[146,197,222],[67,147,195],[33,102,172],[5,48,97]],
+  rdbu_r:   [[5,48,97],[33,102,172],[67,147,195],[146,197,222],[209,229,240],[253,219,199],[244,165,130],[214,96,77],[178,24,43],[103,0,31]],
+  viridis:  [[68,1,84],[71,44,122],[59,82,139],[44,113,142],[33,145,140],[39,173,129],[92,200,99],[170,220,50],[253,231,37]],
+  viridis_r:[[253,231,37],[170,220,50],[92,200,99],[39,173,129],[33,145,140],[44,113,142],[59,82,139],[71,44,122],[68,1,84]],
+  hot:      [[0,0,0],[128,0,0],[255,0,0],[255,128,0],[255,255,0],[255,255,255]],
+  hot_r:    [[255,255,255],[255,255,0],[255,128,0],[255,0,0],[128,0,0],[0,0,0]]
+};
+
+function lerp(t, stops) {
+  t = Math.max(0, Math.min(1, t));
+  const n = stops.length - 1, fi = t * n, lo = Math.floor(fi), hi = Math.min(lo + 1, n), f = fi - lo;
+  const a = stops[lo], b = stops[hi];
+  return [Math.round(a[0]+(b[0]-a[0])*f), Math.round(a[1]+(b[1]-a[1])*f), Math.round(a[2]+(b[2]-a[2])*f)];
+}
+
+// ═══════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════
+let allFiles = {};         // webkitRelativePath → File
+let samples = [];          // [{name, matrixPath, pngPath, purity, ploidy, source, flagged}]
+let filteredSamples = [];
+let currentIdx = -1;
+let currentMatrix = null;  // 100×100
+let matMin = 0, matMax = 1;
+let crosshairX = CW / 2, crosshairY = CH / 2;
+let currentView = 'table';
+let solutions = {};        // name → {purity, ploidy, defaultPurity, defaultPloidy, flagged, source}
+let pngExpanded = false;
+let currentPngUrl = null;
+
+// ═══════════════════════════════════════════════════
+// Coordinate helpers
+// Matrix: row 0 (top) = purity 10%, row 99 (bottom) = 100%
+//         col 0 (left) = ploidy 1.5, col 99 (right) = 5.5
+// ═══════════════════════════════════════════════════
+function pyToPurity(py) { return PURITY_MAX - (py / CH) * (PURITY_MAX - PURITY_MIN); }
+function pxToPloidy(px) { return PLOIDY_MIN + (px / CW) * (PLOIDY_MAX - PLOIDY_MIN); }
+function purityToPy(p)  { return (PURITY_MAX - p) / (PURITY_MAX - PURITY_MIN) * CH; }
+function ploidyToPx(v)  { return (v - PLOIDY_MIN) / (PLOIDY_MAX - PLOIDY_MIN) * CW; }
+
+function clampPx(px) { return Math.max(0, Math.min(CW, px)); }
+function clampPy(py) { return Math.max(0, Math.min(CH, py)); }
+
+function matValAt(px, py) {
+  if (!currentMatrix) return null;
+  const col = Math.min(99, Math.max(0, Math.round(px / CW * 99)));
+  // canvas Y=0 = top = 100% = matrix row 99; Y=CH = bottom = 10% = matrix row 0
+  const row = Math.min(99, Math.max(0, Math.round((1 - py / CH) * 99)));
+  return currentMatrix[row][col];
+}
+
+// ═══════════════════════════════════════════════════
+// Directory loading
+// ═══════════════════════════════════════════════════
+document.getElementById('dirInput').addEventListener('change', function(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  allFiles = {};
+  files.forEach(f => { allFiles[f.webkitRelativePath] = f; });
+  const rootDir = files[0].webkitRelativePath.split('/')[0];
+  document.getElementById('dirLabel').textContent = rootDir;
+  loadDirectory(rootDir);
+  // Reset file input so the same directory can be re-chosen
+  e.target.value = '';
+});
+
+async function loadDirectory(rootDir) {
+  // Find summary file
+  const sumKey = Object.keys(allFiles).find(k =>
+    k.toLowerCase().includes('/summary/') && k.toLowerCase().includes('aggregated-purity_ploidy') && k.endsWith('.txt')
+  );
+  let summaryData = {};
+  if (sumKey) {
+    const txt = await allFiles[sumKey].text();
+    summaryData = parseSummaryTSV(txt);
+  }
+
+  // Find matrix files
+  const matKeys = Object.keys(allFiles).filter(k => k.endsWith('_sunrise_matrix.txt'));
+
+  // Build sample list
+  const discovered = {};
+  matKeys.forEach(mPath => {
+    const parts = mPath.split('/');
+    if (parts.length < 2) return;
+    const name = parts[parts.length - 2];
+    const pngKey = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+    const sd = summaryData[name] || {};
+    discovered[name] = {
+      name,
+      matrixPath: mPath,
+      pngPath: pngKey || null,
+      defaultPurity: sd.purity !== undefined ? sd.purity : null,
+      defaultPloidy: sd.ploidy !== undefined ? sd.ploidy : null,
+      isNA: sd.isNA || false,
+      flagged: false,
+      source: 'default'
+    };
+  });
+
+  // Also include summary-only samples
+  Object.keys(summaryData).forEach(name => {
+    if (!discovered[name]) {
+      const pngKey = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+      const sd = summaryData[name];
+      discovered[name] = {
+        name, matrixPath: null, pngPath: pngKey || null,
+        defaultPurity: sd.purity, defaultPloidy: sd.ploidy,
+        isNA: sd.isNA || false, flagged: false, source: 'default'
+      };
+    }
+  });
+
+  samples = Object.values(discovered).sort((a, b) => a.name.localeCompare(b.name));
+
+  // Init solutions from defaults
+  solutions = {};
+  samples.forEach(s => {
+    solutions[s.name] = {
+      purity: null, ploidy: null,          // pinned values (null until user pins)
+      defaultPurity: s.defaultPurity,
+      defaultPloidy: s.defaultPloidy,
+      isNA: s.isNA,
+      flagged: false,
+      source: 'default'
+    };
+  });
+
+  filteredSamples = [...samples];
+  (document.getElementById('sampleCountBadge')||{}).textContent = `(${samples.length})`;
+  renderSampleList();
+  updateSolutionsOutput();
+  if (samples.length > 0) loadSample(0);
+}
+
+function parseSummaryTSV(text) {
+  const lines = text.trim().split('\n');
+  const out = {};
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split('\t');
+    if (cols.length < 3) continue;
+    const name = cols[0].trim();
+    const rawP = cols[1].trim(), rawPl = cols[2].trim();
+    out[name] = {
+      purity: rawP === 'NA' ? null : parseFloat(rawP),
+      ploidy: rawPl === 'NA' ? null : parseFloat(rawPl),
+      isNA: rawP === 'NA'
+    };
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════
+// Sample list
+// ═══════════════════════════════════════════════════
+function filterSamples() {
+  const q = document.getElementById('sampleSearch').value.toLowerCase();
+  filteredSamples = q ? samples.filter(s => s.name.toLowerCase().includes(q)) : [...samples];
+  renderSampleList();
+}
+
+function renderSampleList() {
+  const el = document.getElementById('sampleList'); if (!el) return;
+  if (!filteredSamples.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:#7c7c7c">No samples found</div>';
+    return;
+  }
+  el.innerHTML = filteredSamples.map(s => {
+    const sol = solutions[s.name] || {};
+    const isActive = samples[currentIdx] && samples[currentIdx].name === s.name;
+    let badgeCls = 'pending', badgeTxt = 'pending';
+    if (sol.flagged) { badgeCls = 'flagged'; badgeTxt = 'flagged'; }
+    else if (sol.purity !== null) { badgeCls = 'done'; badgeTxt = `${fmtPct(sol.purity)} / ${fmtPl(sol.ploidy)}`; }
+    else if (sol.defaultPurity !== null) { badgeCls = 'default-val'; badgeTxt = `dflt`; }
+    return `<div class="sample-item${isActive ? ' active' : ''}" onclick="selectSample('${escHtml(s.name)}')">
+      <div class="sn">${escHtml(s.name)}</div>
+      <div class="s-badge ${badgeCls}">${badgeTxt}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectSample(name) {
+  const idx = samples.findIndex(s => s.name === name);
+  if (idx >= 0) loadSample(idx);
+}
+
+function navigateSample(dir) {
+  if (!samples.length) return;
+  const next = Math.max(0, Math.min(samples.length - 1, currentIdx + dir));
+  if (next !== currentIdx) loadSample(next);
+}
+
+// ═══════════════════════════════════════════════════
+// Load sample
+// ═══════════════════════════════════════════════════
+async function loadSample(idx) {
+  currentIdx = idx;
+  const s = samples[idx];
+  const sol = solutions[s.name] || {};
+
+  document.getElementById('sampleTitle').textContent = s.name;
+  document.getElementById('navCounter').textContent = `${idx + 1} / ${samples.length}`;
+  document.getElementById('pinBtn').disabled = false;
+  document.getElementById('flagBtn').disabled = false;
+  document.getElementById('resetBtn').disabled = sol.defaultPurity === null;
+
+  updateFlagBtn(sol.flagged);
+  updateSolutionPanel(sol);
+  renderSampleList();
+
+  // Load matrix
+  if (s.matrixPath && allFiles[s.matrixPath]) {
+    document.getElementById('emptyHeatmap').style.display = 'none';
+    document.getElementById('heatmapArea').style.display = 'block';
+    showLoading(true);
+    const txt = await allFiles[s.matrixPath].text();
+    currentMatrix = parseMatrix(txt);
+    computeRange();
+    showLoading(false);
+    renderHeatmap();
+    setupAxes();
+
+    // Set crosshair: prefer pinned, else default, else center
+    if (sol.purity !== null && sol.ploidy !== null) {
+      crosshairX = clampPx(ploidyToPx(sol.ploidy));
+      crosshairY = clampPy(purityToPy(sol.purity));
+    } else if (sol.defaultPurity !== null && sol.defaultPloidy !== null) {
+      crosshairX = clampPx(ploidyToPx(sol.defaultPloidy));
+      crosshairY = clampPy(purityToPy(sol.defaultPurity));
+    } else {
+      crosshairX = CW / 2; crosshairY = CH / 2;
+    }
+    updateSliderThumbs(); drawOverlay(); updateReadout();
+
+    const dispP = sol.purity !== null ? sol.purity : sol.defaultPurity;
+    const dispPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
+    document.getElementById('sampleSubtitle').textContent =
+      dispP !== null ? `Purity: ${fmtPct(dispP)} | Ploidy: ${fmtPl(dispPl)} | ${sol.source}` : 'No solution yet';
+  } else {
+    document.getElementById('emptyHeatmap').style.display = 'block';
+    document.getElementById('heatmapArea').style.display = 'none';
+    currentMatrix = null;
+    document.getElementById('sampleSubtitle').textContent = s.matrixPath ? 'Matrix file not found' : 'No matrix file';
+  }
+
+  // Load CNCF PNG
+  loadPng(s);
+}
+
+function updateSolutionPanel(sol) {
+  // Default row
+  const dp = sol.defaultPurity, dpl = sol.defaultPloidy;
+  if (dp !== null && dp !== undefined) {
+    document.getElementById('defVals').textContent = `${fmtPct(dp)}  /  ${fmtPl(dpl)}`;
+  } else {
+    document.getElementById('defVals').textContent = sol.isNA ? 'NA (normal-only)' : '—';
+  }
+  // Pinned row
+  if (sol.purity !== null && sol.purity !== undefined) {
+    document.getElementById('pinVals').textContent = `${fmtPct(sol.purity)}  /  ${fmtPl(sol.ploidy)}`;
+    document.getElementById('pinBadge').textContent = 'pinned';
+  } else {
+    document.getElementById('pinVals').textContent = '—';
+    document.getElementById('pinBadge').textContent = 'not pinned';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// PNG viewer
+// ═══════════════════════════════════════════════════
+function loadPng(s) {
+  const img = document.getElementById('pngImg');
+  const empty = document.getElementById('pngEmpty');
+  if (currentPngUrl) { URL.revokeObjectURL(currentPngUrl); currentPngUrl = null; }
+
+  if (s.pngPath && allFiles[s.pngPath]) {
+    const url = URL.createObjectURL(allFiles[s.pngPath]);
+    currentPngUrl = url;
+    img.onload = function() {
+      // Set viewport to show top ~1/4 of the image
+      const viewport = document.getElementById('pngViewport');
+      if (!pngExpanded) {
+        const displayW = img.offsetWidth || viewport.clientWidth;
+        const scale = displayW / img.naturalWidth;
+        const quarterH = Math.round(img.naturalHeight * scale / 4);
+        viewport.style.maxHeight = Math.max(quarterH, 100) + 'px';
+      }
+    };
+    img.src = url;
+    img.style.display = 'block';
+    empty.style.display = 'none';
+    document.getElementById('pngTitle').textContent = s.name;
+  } else {
+    img.style.display = 'none';
+    empty.style.display = 'block';
+    document.getElementById('pngTitle').textContent = 'CNCF Plot — not found';
+  }
+}
+
+function togglePngExpand() {
+  pngExpanded = !pngExpanded;
+  const vp = document.getElementById('pngViewport');
+  const btn = document.getElementById('pngExpandBtn');
+  if (pngExpanded) {
+    vp.style.maxHeight = 'none';
+    btn.innerHTML = '<i class="fa fa-compress-alt"></i>';
+  } else {
+    // Re-trigger onload logic
+    const img = document.getElementById('pngImg');
+    if (img.naturalHeight) {
+      const displayW = img.offsetWidth || vp.clientWidth;
+      const scale = displayW / img.naturalWidth;
+      vp.style.maxHeight = Math.max(Math.round(img.naturalHeight * scale / 4), 100) + 'px';
+    } else {
+      vp.style.maxHeight = '140px';
+    }
+    btn.innerHTML = '<i class="fa fa-expand-alt"></i>';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// Matrix
+// ═══════════════════════════════════════════════════
+function parseMatrix(txt) {
+  return txt.trim().split('\n').map(l => l.trim().split(/\s+/).map(Number));
+}
+function computeRange() {
+  matMin = Infinity; matMax = -Infinity;
+  currentMatrix.forEach(row => row.forEach(v => { if (isFinite(v)) { matMin = Math.min(matMin,v); matMax = Math.max(matMax,v); } }));
+}
+
+// ═══════════════════════════════════════════════════
+// Render heatmap
+// ═══════════════════════════════════════════════════
+function renderHeatmap() {
+  const canvas = document.getElementById('heatmapCanvas');
+  const ctx = canvas.getContext('2d');
+  if (!currentMatrix) { ctx.clearRect(0,0,CW,CH); return; }
+
+  const stops = CMAPS[document.getElementById('cmapSelect').value] || CMAPS.rdbu;
+  const range = matMax - matMin || 1;
+  const img = ctx.createImageData(CW, CH);
+  const rows = currentMatrix.length, cols = currentMatrix[0].length;
+  const cw = CW / cols, ch = CH / rows;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const t = (currentMatrix[r][c] - matMin) / range;
+      const [R,G,B] = lerp(t, stops);
+      const px = Math.floor(c * cw);
+      // Flip: row 0 (10% purity) → bottom of canvas, row 99 (100%) → top
+      const py = Math.floor((rows - 1 - r) * ch);
+      const pw = Math.ceil(cw), ph = Math.ceil(ch);
+      for (let dy = 0; dy < ph; dy++) for (let dx = 0; dx < pw; dx++) {
+        const i = ((py+dy)*CW+(px+dx))*4;
+        img.data[i]=R; img.data[i+1]=G; img.data[i+2]=B; img.data[i+3]=255;
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  renderLegend();
+}
+
+function renderLegend() {
+  const canvas = document.getElementById('legendCanvas');
+  const ctx = canvas.getContext('2d');
+  const stops = CMAPS[document.getElementById('cmapSelect').value] || CMAPS.rdbu;
+  const W = canvas.width, H = canvas.height;
+  const img = ctx.createImageData(W, H);
+  for (let x = 0; x < W; x++) {
+    const [R,G,B] = lerp(x/(W-1), stops);
+    for (let y = 0; y < H; y++) { const i=(y*W+x)*4; img.data[i]=R; img.data[i+1]=G; img.data[i+2]=B; img.data[i+3]=255; }
+  }
+  ctx.putImageData(img, 0, 0);
+  document.getElementById('legendMin').textContent = isFinite(matMin) ? matMin.toFixed(3) : '—';
+  document.getElementById('legendMax').textContent = isFinite(matMax) ? matMax.toFixed(3) : '—';
+}
+
+function renderCmapPreview() {
+  const canvas = document.getElementById('cmapPreview');
+  const ctx = canvas.getContext('2d');
+  const stops = CMAPS[document.getElementById('cmapSelect').value] || CMAPS.rdbu;
+  const W = canvas.width, H = canvas.height;
+  const img = ctx.createImageData(W, H);
+  for (let x = 0; x < W; x++) {
+    const [R,G,B] = lerp(x/(W-1), stops);
+    for (let y = 0; y < H; y++) { const i=(y*W+x)*4; img.data[i]=R; img.data[i+1]=G; img.data[i+2]=B; img.data[i+3]=255; }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function onColormapChange() {
+  renderCmapPreview();
+  if (currentMatrix) { renderHeatmap(); drawOverlay(); }
+}
+
+// ═══════════════════════════════════════════════════
+// Overlay / crosshair
+// ═══════════════════════════════════════════════════
+function drawOverlay() {
+  const canvas = document.getElementById('overlayCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, CW, CH);
+  if (!currentMatrix) return;
+
+  const x = Math.round(crosshairX), y = Math.round(crosshairY);
+
+  // Crosshair lines
+  ctx.setLineDash([5,3]);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CW,y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,CH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Cursor dot
+  ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,69,0,.9)'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Pinned solution marker (green dot if different from cursor)
+  const s = samples[currentIdx];
+  if (s) {
+    const sol = solutions[s.name];
+    if (sol && sol.purity !== null && sol.ploidy !== null) {
+      const px = Math.round(ploidyToPx(sol.ploidy)), py = Math.round(purityToPy(sol.purity));
+      if (Math.abs(px-x)>3 || Math.abs(py-y)>3) {
+        ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+        ctx.fillStyle='rgba(24,128,56,.85)'; ctx.fill();
+        ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+      }
+    }
+    // Default marker (blue dot) if no pinned
+    if (s && sol && sol.purity === null && sol.defaultPurity !== null && sol.defaultPloidy !== null) {
+      const dpx = Math.round(ploidyToPx(sol.defaultPloidy)), dpy = Math.round(purityToPy(sol.defaultPurity));
+      ctx.beginPath(); ctx.arc(dpx,dpy,4,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,121,211,.7)'; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// Axes
+// ═══════════════════════════════════════════════════
+function setupAxes() {
+  // Y: purity 10% (top) → 100% (bottom)
+  const yEl = document.getElementById('yTicks');
+  yEl.style.height = CH + 'px';
+  // Top = 100%, Bottom = 10%
+  const yVals = [100,90,80,70,60,50,40,30,20,10];
+  yEl.innerHTML = yVals.map(v => `<div class="y-tick">${v}%</div>`).join('');
+
+  // X: ploidy 1.5 (left) → 5.5 (right)
+  const xEl = document.getElementById('xTicks');
+  const xVals = [1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5];
+  xEl.innerHTML = xVals.map(v => `<div class="x-tick">${v.toFixed(1)}</div>`).join('');
+
+  document.getElementById('rTrack').style.height = CH + 'px';
+  document.getElementById('bTrack').style.width = CW + 'px';
+}
+
+// ═══════════════════════════════════════════════════
+// Readout
+// ═══════════════════════════════════════════════════
+function updateReadout() {
+  document.getElementById('curPurity').textContent = fmtPct(pyToPurity(crosshairY));
+  document.getElementById('curPloidy').textContent = fmtPl(pxToPloidy(crosshairX));
+  const v = matValAt(crosshairX, crosshairY);
+  document.getElementById('curGof').textContent = v !== null ? v.toFixed(4) : '—';
+}
+
+// ═══════════════════════════════════════════════════
+// Slider thumbs
+// ═══════════════════════════════════════════════════
+function updateSliderThumbs() {
+  document.getElementById('rThumb').style.top = clampPy(crosshairY) + 'px';
+  document.getElementById('bThumb').style.left = clampPx(crosshairX) + 'px';
+}
+
+function setCrosshair(px, py) {
+  crosshairX = clampPx(px); crosshairY = clampPy(py);
+  updateSliderThumbs(); drawOverlay(); updateReadout();
+}
+
+// ═══════════════════════════════════════════════════
+// Mouse interactions — canvas
+// ═══════════════════════════════════════════════════
+const hmCanvas = document.getElementById('heatmapCanvas');
+let draggingCanvas=false, draggingR=false, draggingB=false;
+
+hmCanvas.addEventListener('mousedown', e => {
+  if (!currentMatrix) return;
+  draggingCanvas = true;
+  const r = hmCanvas.getBoundingClientRect();
+  setCrosshair((e.clientX-r.left)*CW/r.width, (e.clientY-r.top)*CH/r.height);
+});
+
+hmCanvas.addEventListener('mousemove', e => {
+  if (draggingCanvas || !currentMatrix) return;
+  const r = hmCanvas.getBoundingClientRect();
+  const px=(e.clientX-r.left)*CW/r.width, py=(e.clientY-r.top)*CH/r.height;
+  const tip = document.getElementById('tooltip');
+  tip.style.display='block';
+  tip.style.left=(e.clientX+12)+'px';
+  tip.style.top=(e.clientY-20)+'px';
+  const v = matValAt(px,py);
+  tip.textContent=`Purity: ${fmtPct(pyToPurity(py))}  Ploidy: ${fmtPl(pxToPloidy(px))}  GoF: ${v!==null?v.toFixed(4):'?'}`;
+});
+hmCanvas.addEventListener('mouseleave', () => { document.getElementById('tooltip').style.display='none'; });
+
+document.addEventListener('mousemove', e => {
+  if (draggingCanvas && currentMatrix) {
+    const r = hmCanvas.getBoundingClientRect();
+    setCrosshair((e.clientX-r.left)*CW/r.width, (e.clientY-r.top)*CH/r.height);
+  }
+  if (draggingR && currentMatrix) {
+    const r = document.getElementById('rTrack').getBoundingClientRect();
+    setCrosshair(crosshairX, (e.clientY-r.top)/r.height*CH);
+  }
+  if (draggingB && currentMatrix) {
+    const r = document.getElementById('bTrack').getBoundingClientRect();
+    setCrosshair((e.clientX-r.left)/r.width*CW, crosshairY);
+  }
+});
+document.addEventListener('mouseup', () => { draggingCanvas=draggingR=draggingB=false; });
+
+// Right (purity) slider
+document.getElementById('rThumb').addEventListener('mousedown', e => { draggingR=true; e.preventDefault(); });
+document.getElementById('rTrack').addEventListener('mousedown', e => {
+  if (!currentMatrix) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  setCrosshair(crosshairX, (e.clientY-r.top)/r.height*CH);
+});
+
+// Bottom (ploidy) slider
+document.getElementById('bThumb').addEventListener('mousedown', e => { draggingB=true; e.preventDefault(); });
+document.getElementById('bTrack').addEventListener('mousedown', e => {
+  if (!currentMatrix) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  setCrosshair((e.clientX-r.left)/r.width*CW, crosshairY);
+});
+
+// ═══════════════════════════════════════════════════
+// Pin / Flag / Reset
+// ═══════════════════════════════════════════════════
+function pinSolution() {
+  if (currentIdx < 0 || !currentMatrix) return;
+  const s = samples[currentIdx];
+  const ploidy = parseFloat(pxToPloidy(crosshairX).toFixed(4));
+  const purity = parseFloat(pyToPurity(crosshairY).toFixed(4));
+  const sol = solutions[s.name] || {};
+  sol.purity = purity; sol.ploidy = ploidy; sol.source = 'pinned';
+  solutions[s.name] = sol;
+  updateSolutionPanel(sol);
+  document.getElementById('sampleSubtitle').textContent = `Purity: ${fmtPct(purity)} | Ploidy: ${fmtPl(ploidy)} | pinned`;
+  renderSampleList();
+  updateSolutionsOutput();
+  drawOverlay();
+}
+
+function toggleFlag() {
+  if (currentIdx < 0) return;
+  const s = samples[currentIdx];
+  const sol = solutions[s.name] || {};
+  sol.flagged = !sol.flagged;
+  solutions[s.name] = sol;
+  updateFlagBtn(sol.flagged);
+  renderSampleList();
+  updateSolutionsOutput();
+}
+
+function resetToDefault() {
+  if (currentIdx < 0) return;
+  const s = samples[currentIdx];
+  const sol = solutions[s.name] || {};
+  sol.purity = null; sol.ploidy = null; sol.source = 'default';
+  solutions[s.name] = sol;
+  updateSolutionPanel(sol);
+  // Move crosshair back to default
+  if (sol.defaultPurity !== null && sol.defaultPloidy !== null) {
+    setCrosshair(ploidyToPx(sol.defaultPloidy), purityToPy(sol.defaultPurity));
+  }
+  renderSampleList();
+  updateSolutionsOutput();
+  drawOverlay();
+}
+
+function updateFlagBtn(flagged) {
+  const btn = document.getElementById('flagBtn');
+  btn.innerHTML = flagged ? '<i class="fa fa-flag"></i> Unflag' : '<i class="fa fa-flag"></i> Flag';
+  btn.className = flagged ? 'btn btn-sm' : 'btn btn-danger btn-sm';
+  if (flagged) { btn.style.background='#e65100'; btn.style.color='#fff'; btn.style.border='none'; }
+  else { btn.style.background=''; btn.style.color=''; btn.style.border=''; }
+}
+
+// ═══════════════════════════════════════════════════
+// Solutions output  (YAML format: sample_attr.yaml)
+// ═══════════════════════════════════════════════════
+function updateSolutionsOutput() { renderSolTable(); renderYaml(); }
+
+function renderSolTable() {
+  const tbody = document.getElementById('solTableBody');
+  const names = Object.keys(solutions);
+  document.getElementById('tableEmpty').style.display = names.length ? 'none' : 'block';
+  tbody.innerHTML = names.map((name, i) => {
+    const sol = solutions[name];
+    // Effective values: pinned takes priority, else default
+    const effP = sol.purity !== null ? sol.purity : sol.defaultPurity;
+    const effPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
+    const pStr = effP !== null && effP !== undefined ? fmtPct(effP) : '<span style="color:#999">NA</span>';
+    const plStr = effPl !== null && effPl !== undefined ? fmtPl(effPl) : '<span style="color:#999">NA</span>';
+    const srcBadge = sol.purity !== null ? '<span class="badge badge-pinned">pinned</span>' : '<span class="badge badge-default">default</span>';
+    const flagBadge = sol.flagged ? '<span class="badge badge-flag">flagged</span>' : '';
+    return `<tr>
+      <td class="mono" style="font-size:10px">${escHtml(name)}</td>
+      <td class="mono">${pStr}</td>
+      <td class="mono">${plStr}</td>
+      <td>${srcBadge}</td>
+      <td>${flagBadge}</td>
+      <td><button class="btn btn-xs btn-outline" onclick="selectSample('${escHtml(name)}')">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderYaml() {
+  const names = Object.keys(solutions);
+  // Format: sample_attr.yaml style — ploidy: block then purity: block
+  // purity stored as fraction (not %)
+  let ploidyBlock = 'ploidy:\n';
+  let purityBlock = 'purity:\n';
+  names.forEach(name => {
+    const sol = solutions[name];
+    const effP = sol.purity !== null ? sol.purity : sol.defaultPurity;
+    const effPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
+    const plVal = sol.isNA ? 'NA' : (effPl !== null && effPl !== undefined ? effPl.toFixed(4) : 'NA');
+    const pVal  = sol.isNA ? 'NA' : (effP  !== null && effP  !== undefined ? effP.toFixed(4)  : 'NA');
+    ploidyBlock += `    ${name}: ${plVal}\n`;
+    purityBlock += `    ${name}: ${pVal}\n`;
+  });
+  const out = names.length
+    ? ploidyBlock + purityBlock
+    : 'ploidy:\n    # No samples loaded\npurity:\n    # No samples loaded\n';
+  document.getElementById('viewYaml').textContent = out;
+}
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('viewTable').style.display = v==='table'?'block':'none';
+  document.getElementById('viewYaml').style.display = v==='yaml'?'flex':'none';
+  document.getElementById('vtTable').classList.toggle('active', v==='table');
+  document.getElementById('vtYaml').classList.toggle('active', v==='yaml');
+}
+
+function exportYaml() {
+  const yaml = document.getElementById('viewYaml').textContent;
+  const blob = new Blob([yaml], {type:'text/yaml'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sample_attr.yaml'; a.click();
+}
+
+function copyYaml() {
+  const txt = document.getElementById('viewYaml').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML='<i class="fa fa-check"></i>';
+    setTimeout(()=>{btn.innerHTML=orig;},1400);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// Loading bar
+// ═══════════════════════════════════════════════════
+function showLoading(show) {
+  document.getElementById('loadingBar').style.display = show?'block':'none';
+  if (show) document.getElementById('loadingFill').style.width='60%';
+  else { document.getElementById('loadingFill').style.width='100%'; setTimeout(()=>{document.getElementById('loadingFill').style.width='0%';},300); }
+}
+
+// ═══════════════════════════════════════════════════
+// Helpers
+// ═══════════════════════════════════════════════════
+function fmtPct(v) { return v!==null&&v!==undefined ? (v*100).toFixed(1)+'%' : '—'; }
+function fmtPl(v)  { return v!==null&&v!==undefined ? parseFloat(v).toFixed(3) : '—'; }
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+// ═══════════════════════════════════════════════════
+// Collapsible sidebar sections
+// ═══════════════════════════════════════════════════
+function toggleSection(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const collapsed = body.classList.toggle('collapsed');
+  chev.classList.toggle('collapsed', collapsed);
+}
+
+// ═══════════════════════════════════════════════════
+// Vertical split pane drag
+// ═══════════════════════════════════════════════════
+(function() {
+  const handle = document.getElementById('vsplitHandle');
+  const top = document.getElementById('vsplitTop');
+  const vsplit = document.getElementById('vsplit');
+  let dragging = false, startY = 0, startH = 0;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startY = e.clientY;
+    startH = top.offsetHeight;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const totalH = vsplit.offsetHeight;
+    const newH = Math.max(200, Math.min(totalH - 100, startH + (e.clientY - startY)));
+    top.style.height = newH + 'px';
+    top.style.flex = 'none';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+// ═══════════════════════════════════════════════════
+// Sidebar drag-to-resize
+// ═══════════════════════════════════════════════════
+(function() {
+  const resizer = document.getElementById('sidebarResizer');
+  const sidebar = document.getElementById('sidebar');
+  let isResizing = false, startX = 0, startW = 0;
+  resizer.addEventListener('mousedown', e => {
+    isResizing = true;
+    startX = e.clientX;
+    startW = sidebar.offsetWidth;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isResizing) return;
+    const newW = Math.max(240, Math.min(600, startW + (e.clientX - startX)));
+    sidebar.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!isResizing) return;
+    isResizing = false;
+    resizer.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+
+renderCmapPreview();
+document.getElementById('rTrack').style.height = CH+'px';
+document.getElementById('bTrack').style.width = CW+'px';
+// Ensure YAML view has flex display when active
+document.getElementById('viewYaml').style.flexDirection='column';
+</script>
+</body>
+</html>
