@@ -23,10 +23,5 @@ unless (-e "summary_config.yaml") {
     copy("weigelt-lab/default_yaml/summary_config.yaml", "summary_config.yaml") or die "Unable to create summary_config.yaml: $!";
 }
 
-unless (-e "Project_Dashboard.html") {
-    copy("weigelt-lab/Project_Dashboard.html", "Project_Dashboard.html") or die "Unable to create Project_Dashboard.html: $!";
-}
-
-unless (-e "Facets_Dashboard.html") {
-    copy("weigelt-lab/Facets_Dashboard.html", "Facets_Dashboard.html") or die "Unable to create Facets_Dashboard.html: $!";
-}
+copy("weigelt-lab/Project_Dashboard.html", "Project_Dashboard.html") or die "Unable to create Project_Dashboard.html: $!";
+copy("weigelt-lab/Facets_Dashboard.html", "Facets_Dashboard.html") or die "Unable to create Facets_Dashboard.html: $!";
