@@ -4,7 +4,7 @@ LOGDIR ?= log/facets_suite.$(NOW)
 
 facets : facets_suite/targets_dbsnp.vcf \
 	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair).snp_pileup.gz) \
-	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete) \
+	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_hisense.cncf.txt) \
 	 $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_sunrise_matrix.txt) \
 	 facets_suite/summary/aggregated-gene.txt \
 	 facets_suite/summary/aggregated-log2.txt \
@@ -12,7 +12,7 @@ facets : facets_suite/targets_dbsnp.vcf \
 	 facets_suite/summary/aggregated-purity_ploidy.txt
     
 FACETS_MAX_DEPTH ?= 15000
-FACETS_CVAL ?= 500
+FACETS_CVAL ?= 250
 FACETS_PURITY_CVAL ?= 1000
 FACETS_MIN_NHET ?= 15
 FACETS_PURITY_MIN_NHET ?= 10
@@ -62,7 +62,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 endif
 
 define run-facets
-facets_suite/$1_$2/taskcomplete : facets_suite/$1_$2/$1_$2.snp_pileup.gz
+facets_suite/$1_$2/$1_$2_hisense.cncf.txt : facets_suite/$1_$2/$1_$2.snp_pileup.gz
 	$$(call RUN,-c -s 4G -m 6G -v $(FACETS_SUITE_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/run_facets,"set -o pipefail && \
 													      run-facets-wrapper.R --verbose \
 													      --counts-file $$(<) \
@@ -78,42 +78,41 @@ facets_suite/$1_$2/taskcomplete : facets_suite/$1_$2/$1_$2.snp_pileup.gz
 													      --normal-depth $$(NORMAL_DEPTH) \
 													      --seed 0 \
 													      --legacy-output True \
-													      --facets-lib-path $(FACETS_SUITE_ENV)/lib/R/library/ && \
-													      echo 'finished!' > $$(@)")
+													      --facets-lib-path $(FACETS_SUITE_ENV)/lib/R/library/")
 													      
-facets_suite/$1_$2/$1_$2_sunrise_matrix.txt : facets_suite/$1_$2/taskcomplete
+facets_suite/$1_$2/$1_$2_sunrise_matrix.txt : facets_suite/$1_$2/$1_$2_hisense.cncf.txt
 	$$(call RUN,-c -s 4G -m 6G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N $1_$2/sunrise,"set -o pipefail && \
 													  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 													  --option 1 \
-													  --file_in facets_suite/$1_$2/$1_$2_purity.cncf.txt \
+													  --file_in $$(<) \
 													  --file_out $$(@)")
     
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call run-facets,$(tumor.$(pair)),$(normal.$(pair)))))
 
-facets_suite/summary/aggregated-gene.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-gene.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_hisense.cncf.txt)
 	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N aggregate/gene,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 2 \
 														  --sample_pairs '$(SAMPLE_PAIRS)' \
 														  --file_out $(@)")
 														  
-facets_suite/summary/aggregated-log2.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-log2.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_hisense.cncf.txt)
 	$(call RUN, -c -n 1 -s 24G -m 48G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N aggregate/log2,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 3 \
 														  --sample_pairs '$(SAMPLE_PAIRS)' \
 														  --file_out $(@)")
 														  
-facets_suite/summary/aggregated-segmented.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-segmented.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_hisense.cncf.txt)
 	$(call RUN, -c -n 1 -s 12G -m 24G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N aggregate/segments,"set -o pipefail && \
 														      $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														      --option 4 \
 														      --sample_pairs '$(SAMPLE_PAIRS)' \
 														      --file_out $(@)")
 
-facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/taskcomplete)
+facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_suite/$(pair)/$(pair)_hisense.cncf.txt)
 	$(call RUN, -c -n 1 -s 4G -m 8G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_suite -N aggregate/purity,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_suite.R \
 														  --option 5 \
@@ -129,5 +128,4 @@ facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIR
 
 clean :
 	rm -f facets_suite/targets_dbsnp.vcf && \
-	rm -f facets_suite/*/*snp_pileup.gz && \
-	rm -f facets_suite/*/*taskcomplete
+	rm -f facets_suite/*/*snp_pileup.gz
