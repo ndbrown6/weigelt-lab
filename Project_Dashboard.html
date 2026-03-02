@@ -250,7 +250,7 @@ script+='# Generated Makefile execution script\n';
 script+='# Created: '+new Date().toLocaleString()+'\n';
 script+='# Targets: '+targets.length+'\n\n';
 script+='screen -dmS "'+screenName+'" \\\n';
-script+='  srun \\\n';
+script+='  salloc \\\n';
 script+='    --nodes='+nodes+' \\\n';
 script+='    --ntasks-per-node='+ntasks+' \\\n';
 script+='    --mem='+mem+' \\\n';
