@@ -127,5 +127,4 @@ facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIR
 .PHONY: clean
 
 clean :
-	rm -f facets_suite/targets_dbsnp.vcf && \
-	rm -f facets_suite/*/*snp_pileup.gz
+	rm -f facets_suite/targets_dbsnp.vcf
