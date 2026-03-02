@@ -12,8 +12,8 @@ facets : facets_suite/targets_dbsnp.vcf \
 	 facets_suite/summary/aggregated-purity_ploidy.txt
     
 FACETS_MAX_DEPTH ?= 15000
-FACETS_CVAL ?= 250
-FACETS_PURITY_CVAL ?= 1000
+FACETS_CVAL ?= 50
+FACETS_PURITY_CVAL ?= 250
 FACETS_MIN_NHET ?= 15
 FACETS_PURITY_MIN_NHET ?= 10
 SNP_WINDOW_SIZE ?= 250
