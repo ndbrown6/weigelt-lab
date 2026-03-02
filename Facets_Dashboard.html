@@ -374,7 +374,11 @@ input[type="file"]{display:none}
       <div class="card" style="height:100%;display:flex;flex-direction:column;margin-top:0">
         <div class="card-header" style="flex-shrink:0">
           <span id="pngTitle" style="font-family:'IBM Plex Mono',monospace;font-size:12px">CNCF Plot</span>
-          <span title="Drag the divider above to resize panels · scroll to pan the image" style="color:#ccc;cursor:default;font-size:13px">&#9432;</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <button class="nav-btn" id="cncfPrev" onclick="navigateCncf(-1)" title="Previous CNCF type"><i class="fa fa-chevron-left"></i></button>
+            <button class="nav-btn" id="cncfNext" onclick="navigateCncf(1)" title="Next CNCF type"><i class="fa fa-chevron-right"></i></button>
+            <span title="Drag the divider above to resize panels · scroll to pan the image" style="color:#ccc;cursor:default;font-size:13px;margin-left:2px">&#9432;</span>
+          </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:8px">
           <div class="png-empty" id="pngEmpty"><i class="fa fa-image" style="font-size:24px;display:block;margin-bottom:8px;color:#dadada"></i>CNCF plot will appear here</div>
@@ -431,6 +435,7 @@ let currentView = 'table';
 let solutions = {};        // name → {purity, ploidy, defaultPurity, defaultPloidy, flagged, source}
 let pngExpanded = false;
 let currentPngUrl = null;
+let currentCncfMode = 'purity'; // 'purity' or 'hisens'
 
 // ═══════════════════════════════════════════════════
 // Coordinate helpers
@@ -492,12 +497,15 @@ async function loadDirectory(rootDir) {
     const parts = mPath.split('/');
     if (parts.length < 2) return;
     const name = parts[parts.length - 2];
-    const pngKey = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+    const pngKeyPurity = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+    const pngKeyHisens = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_hisens.CNCF.png'));
     const sd = summaryData[name] || {};
     discovered[name] = {
       name,
       matrixPath: mPath,
-      pngPath: pngKey || null,
+      pngPath: pngKeyPurity || null,
+      pngPathPurity: pngKeyPurity || null,
+      pngPathHisens: pngKeyHisens || null,
       defaultPurity: sd.purity !== undefined ? sd.purity : null,
       defaultPloidy: sd.ploidy !== undefined ? sd.ploidy : null,
       isNA: sd.isNA || false,
@@ -509,10 +517,14 @@ async function loadDirectory(rootDir) {
   // Also include summary-only samples
   Object.keys(summaryData).forEach(name => {
     if (!discovered[name]) {
-      const pngKey = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+      const pngKeyPurity = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_purity.CNCF.png'));
+      const pngKeyHisens = Object.keys(allFiles).find(k => k.includes('/' + name + '/') && k.endsWith('_hisens.CNCF.png'));
       const sd = summaryData[name];
       discovered[name] = {
-        name, matrixPath: null, pngPath: pngKey || null,
+        name, matrixPath: null,
+        pngPath: pngKeyPurity || null,
+        pngPathPurity: pngKeyPurity || null,
+        pngPathHisens: pngKeyHisens || null,
         defaultPurity: sd.purity, defaultPloidy: sd.ploidy,
         isNA: sd.isNA || false, flagged: false, source: 'default'
       };
@@ -680,24 +692,30 @@ function updateSolutionPanel(sol) {
 // ═══════════════════════════════════════════════════
 // PNG viewer
 // ═══════════════════════════════════════════════════
+function navigateCncf(dir) {
+  const modes = ['purity', 'hisens'];
+  const idx = modes.indexOf(currentCncfMode);
+  currentCncfMode = modes[(idx + dir + modes.length) % modes.length];
+  if (currentIdx >= 0) loadPng(samples[currentIdx]);
+}
+
 function loadPng(s) {
   const img = document.getElementById('pngImg');
   const empty = document.getElementById('pngEmpty');
   if (currentPngUrl) { URL.revokeObjectURL(currentPngUrl); currentPngUrl = null; }
 
-  if (s.pngPath && allFiles[s.pngPath]) {
-    const url = URL.createObjectURL(allFiles[s.pngPath]);
+  // Pick path based on current mode
+  const pngPath = currentCncfMode === 'hisens' ? s.pngPathHisens : s.pngPathPurity;
+
+  // Update arrow states — disable direction if that mode has no file
+  const hasPurity = !!(s.pngPathPurity && allFiles[s.pngPathPurity]);
+  const hasHisens = !!(s.pngPathHisens && allFiles[s.pngPathHisens]);
+  document.getElementById('cncfPrev').disabled = currentCncfMode === 'purity' ? !hasHisens : !hasPurity;
+  document.getElementById('cncfNext').disabled = currentCncfMode === 'hisens' ? !hasPurity : !hasHisens;
+
+  if (pngPath && allFiles[pngPath]) {
+    const url = URL.createObjectURL(allFiles[pngPath]);
     currentPngUrl = url;
-    img.onload = function() {
-      // Set viewport to show top ~1/4 of the image
-      const viewport = document.getElementById('pngViewport');
-      if (!pngExpanded) {
-        const displayW = img.offsetWidth || viewport.clientWidth;
-        const scale = displayW / img.naturalWidth;
-        const quarterH = Math.round(img.naturalHeight * scale / 4);
-        viewport.style.maxHeight = Math.max(quarterH, 100) + 'px';
-      }
-    };
     img.src = url;
     img.style.display = 'block';
     empty.style.display = 'none';
@@ -705,7 +723,7 @@ function loadPng(s) {
   } else {
     img.style.display = 'none';
     empty.style.display = 'block';
-    document.getElementById('pngTitle').textContent = 'CNCF Plot — not found';
+    document.getElementById('pngTitle').textContent = `CNCF Plot — ${currentCncfMode} not found`;
   }
 }
 
