@@ -57,7 +57,7 @@ bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
 										   zcat $$(^) | gzip -c > $$(@)")
 
 bwamem/$1/taskcomplete.txt : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
-	$$(call RUN,-c -n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
+	$$(call RUN,-n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
 										touch $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\

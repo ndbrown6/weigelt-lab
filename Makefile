@@ -217,5 +217,9 @@ wgs_metrics :
 TARGETS += rnaseq_metrics
 rnaseq_metrics :
 	$(call RUN_MAKE,weigelt-lab/bam_tools/rnaseq_metrics.mk)
+	
+#==================================================
+# Miscellaneous
+#==================================================
 
 .PHONY : $(TARGETS)
