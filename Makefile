@@ -153,8 +153,6 @@ delly_tumor_normal :
 
 TARGETS += arriba_fusion
 arriba_fusion :
-	$(call RUN_MAKE,weigelt-lab/fastq_aligners/align_rnaseq_fastq.mk) && \
-	$(MAKE) -f weigelt-lab/fastq_aligners/align_rnaseq_fastq.mk clean
 	$(call RUN_MAKE,weigelt-lab/sv_callers/arriba_fusion.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
 	
