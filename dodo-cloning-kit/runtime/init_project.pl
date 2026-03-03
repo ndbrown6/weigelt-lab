@@ -23,6 +23,8 @@ unless (-e "summary_config.yaml") {
     copy("weigelt-lab/default_yaml/summary_config.yaml", "summary_config.yaml") or die "Unable to create summary_config.yaml: $!";
 }
 
-mkdir "html_dashboard" or die "Unable to create html dashboard: $!";
+unless (-e "html_dashboard") {
+    mkdir "html_dashboard" or die "Unable to create html dashboard: $!";
+}
 copy("weigelt-lab/html_dashboard/Project_Dashboard.html", "html_dashboard/Project_Dashboard.html") or die "Unable to create Project_Dashboard.html: $!";
 copy("weigelt-lab/html_dashboard/Facets_Dashboard.html", "html_dashboard/Facets_Dashboard.html") or die "Unable to create Facets_Dashboard.html: $!";
