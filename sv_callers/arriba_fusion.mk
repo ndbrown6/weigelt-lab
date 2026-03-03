@@ -8,7 +8,7 @@ smry : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
        arriba/fusion_summary.txt
 	 
 STAR_CORES ?= 16
-STAR_MEM_CORE ?= 2G
+STAR_MEM_CORE ?= 4G
 STAR_WALL_TIME ?= 72:00:00
 	 
 PROJECT_DIR := $(notdir $(CURDIR))
@@ -31,7 +31,6 @@ $(foreach sample,$(SAMPLES),\
 define run-star-arriba
 arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 	$$(call RUN,-c -n $(STAR_CORES) -s 1G -m $(STAR_MEM_CORE) -p $(PROJECT_DIR)/arriba -N $1/STAR -v $(ARRIBA_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
-																	     mkdir -p arriba/$1 && \
 																	     STAR \
 																	     --runThreadN $$(STAR_CORES) \
 																	     --genomeDir $$(STAR_INDEX_DIR) \
@@ -55,10 +54,13 @@ arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 																	     --chimSegmentReadGapMax 3 \
 																	     --chimMultimapNmax 50 \
 																	     --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
-										    
+
+arriba/$1/$1.Aligned.out.bam.bai : arriba/$1/$1.Aligned.out.bam
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/arriba -N $1/index,"set -o pipefail && \
+									      $(SAMTOOLS) index $$(<)")
+												  
 arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 	$$(call RUN,-c -n 1 -s 24G -m 36G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
-												  mkdir -p arriba/$1 && \
 												  $$(ARRIBA) -x arriba/$1/$1.Aligned.out.bam \
 												  -o arriba/$1/fusions.tsv \
 												  -O arriba/$1/discarded.tsv \
@@ -69,9 +71,8 @@ arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 												  -t $$(KNOWN_FUSIONS_TSV) \
 												  -p $$(PROTEIN_DOMAINS_GFF3)")
 
-arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.out.bam
+arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.out.bam arriba/$1/$1.Aligned.out.bam.bai
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/arriba -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
-														    mkdir -p arriba/$1 && \
 														    $$(RSCRIPT) $$(DRAW_FUSIONS) \
 														    --fusions=$$(<) \
 														    --annotation=$$(ANNOTATION_GTF) \
