@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Cwd;
 use File::Copy;
+use File::Copy::Recursive qw(dircopy);
 
 my $MAKEFILE = <<ENDL;
 include weigelt-lab/Makefile
