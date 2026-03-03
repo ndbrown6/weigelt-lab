@@ -7,8 +7,8 @@ smry : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
        $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.pdf) \
        arriba/fusion_summary.txt
 	 
-STAR_CORES ?= 16
-STAR_MEM_CORE ?= 4G
+STAR_THREADS ?= 16
+STAR_MEM_THREAD ?= 4G
 STAR_WALL_TIME ?= 72:00:00
 	 
 PROJECT_DIR := $(notdir $(CURDIR))
@@ -30,35 +30,31 @@ $(foreach sample,$(SAMPLES),\
 
 define run-star-arriba
 arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
-	$$(call RUN,-c -n $(STAR_CORES) -s 1G -m $(STAR_MEM_CORE) -p $(PROJECT_DIR)/arriba -N $1/STAR -v $(ARRIBA_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
-																	     STAR \
-																	     --runThreadN $$(STAR_CORES) \
-																	     --genomeDir $$(STAR_INDEX_DIR) \
-																	     --genomeLoad NoSharedMemory \
-																	     --readFilesIn $$(<) $$(<<) \
-																	     --readFilesCommand zcat \
-																	     --outStd BAM_Unsorted \
-																	     --outSAMtype BAM Unsorted \
-																	     --outSAMunmapped Within \
-																	     --outBAMcompression 0 \
-																	     --outFilterMultimapNmax 50 \
-																	     --peOverlapNbasesMin 10 \
-																	     --alignSplicedMateMapLminOverLmate 0.5 \
-																	     --alignSJstitchMismatchNmax 5 -1 5 5 \
-																	     --chimSegmentMin 10 \
-																	     --chimOutType WithinBAM HardClip \
-																	     --chimJunctionOverhangMin 10 \
-																	     --chimScoreDropMax 30 \
-																	     --chimScoreJunctionNonGTAG 0 \
-																	     --chimScoreSeparation 1 \
-																	     --chimSegmentReadGapMax 3 \
-																	     --chimMultimapNmax 50 \
-																	     --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
+	$$(call RUN,-c -n $(STAR_THREADS) -s 1G -m $(STAR_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/STAR -v $(ARRIBA_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
+																		 STAR \
+																		 --runThreadN $$(STAR_THREADS) \
+																		 --genomeDir $$(STAR_INDEX_DIR) \
+																		 --genomeLoad NoSharedMemory \
+																		 --readFilesIn $$(<) $$(<<) \
+																		 --readFilesCommand zcat \
+																		 --outStd BAM_Unsorted \
+																		 --outSAMtype BAM Unsorted \
+																		 --outSAMunmapped Within \
+																		 --outBAMcompression 0 \
+																		 --outFilterMultimapNmax 50 \
+																		 --peOverlapNbasesMin 10 \
+																		 --alignSplicedMateMapLminOverLmate 0.5 \
+																		 --alignSJstitchMismatchNmax 5 -1 5 5 \
+																		 --chimSegmentMin 10 \
+																		 --chimOutType WithinBAM HardClip \
+																		 --chimJunctionOverhangMin 10 \
+																		 --chimScoreDropMax 30 \
+																		 --chimScoreJunctionNonGTAG 0 \
+																		 --chimScoreSeparation 1 \
+																		 --chimSegmentReadGapMax 3 \
+																		 --chimMultimapNmax 50 \
+																		 --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
 
-arriba/$1/$1.Aligned.out.bam.bai : arriba/$1/$1.Aligned.out.bam
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/arriba -N $1/index,"set -o pipefail && \
-									      $(SAMTOOLS) index $$(<)")
-												  
 arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 	$$(call RUN,-c -n 1 -s 24G -m 36G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
 												  $$(ARRIBA) -x arriba/$1/$1.Aligned.out.bam \
@@ -71,7 +67,7 @@ arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 												  -t $$(KNOWN_FUSIONS_TSV) \
 												  -p $$(PROTEIN_DOMAINS_GFF3)")
 
-arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.out.bam arriba/$1/$1.Aligned.out.bam.bai
+arriba/$1/fusions.pdf : arriba/$1/fusions.tsv bam/$1.bam
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/arriba -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
 														    $$(RSCRIPT) $$(DRAW_FUSIONS) \
 														    --fusions=$$(<) \
@@ -97,6 +93,8 @@ arriba/fusion_summary.txt : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions
 .PHONY: clean
 
 clean : 
-	rm -f star/*/*_R1.fastq.gz && \
-	rm -f star/*/*_R2.fastq.gz && \
-	rm -f star/*/*.Aligned.out.bam*
+	rm -f arriba/*/*_R1.fastq.gz && \
+	rm -f arriba/*/*_R2.fastq.gz && \
+	rm -f arriba/*/*.Aligned.out.bam* && \
+	rm -f arriba/*/*.out && \
+	rm -f arriba/*/*.tab

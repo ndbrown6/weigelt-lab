@@ -137,4 +137,8 @@ summary/insert_summary.txt : $(foreach sample,$(SAMPLES),metrics/$(sample)_inser
 clean : 
 	rm -f star/*/*_R1.fastq.gz && \
 	rm -f star/*/*_R2.fastq.gz && \
-	rm -f star/*/*.Aligned.sortedByCoord.out.bam*
+	rm -f star/*/*.Aligned.sortedByCoord.out.bam* && \
+	rm -f star/*/*.out && \
+	rm -f star/*/*.tab && \
+	rm -rf star/*/*_STAR*
+	
