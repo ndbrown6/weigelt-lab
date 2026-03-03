@@ -27,6 +27,8 @@ DELLY_ENV ?= $(HOME)/share/env/delly-1.7.2
 JASMINE_ENV ?= $(HOME)/share/env/jasminesv-1.1.5
 SURVIVOR_ENV ?= $(HOME)/share/env/survivor-1.0.7
 ANNOTATESV_ENV ?= $(HOME)/share/env/annot_sv-3.1.3
+ARRIBA_ENV ?= $(HOME)/share/env/arriba-2.0.0
+GENOMIC_ALIGNMENTS_ENV ?= $(HOME)/share/env/r-genomicalignments-1.34.0
 
 # aliases
 PYTHON ?= python
@@ -47,6 +49,7 @@ MAF2MAF ?= maf2maf.pl
 CONFIGURE_STRELKA ?= $(STRELKA_ENV)/opt/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py
 CONFIGURE_MANTA ?= $(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py
 ANNOTATE_SV ?= $(ANNOTATESV_ENV)/opt/AnnotSV/bin/AnnotSV
+ARRIBA ?= $(ARRIBA_ENV)/opt/arriba_v2.0.0/arriba
 
 # picard command lines
 PICARD_MEM = 8G
