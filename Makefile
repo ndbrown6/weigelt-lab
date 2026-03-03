@@ -153,17 +153,17 @@ delly_tumor_normal :
 
 TARGETS += arriba_fusion
 arriba_fusion :
-	$(call RUN_MAKE,modules/sv_callers/arriba_fusion.mk) && \
+	$(call RUN_MAKE,weigelt-lab/sv_callers/arriba_fusion.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/arriba_fusion.mk clean
 	
 TARGETS += star_fusion
 star_fusion :
-	$(call RUN_MAKE,modules/sv_callers/star_fusion.mk) && \
+	$(call RUN_MAKE,weigelt-lab/sv_callers/star_fusion.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/star_fusion.mk clean
 
 TARGETS += fusion_catcher
 fusion_catcher :
-	$(call RUN_MAKE,modules/sv_callers/fusion_catcher.mk) && \
+	$(call RUN_MAKE,weigelt-lab/sv_callers/fusion_catcher.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/fusion_catcher.mk clean
 	
 #==================================================
