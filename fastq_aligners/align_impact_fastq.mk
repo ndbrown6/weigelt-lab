@@ -58,7 +58,7 @@ bwamem/$1/$1_R2.fastq.gz : $$(foreach split,$2,$$(word 2, $$(fq.$$(split))))
 
 bwamem/$1/taskcomplete.txt : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
 	$$(call RUN,-n 1 -s 0.5G -m 1G -p $(PROJECT_DIR)/bwamem -N $1/fastq,"set -o pipefail && \
-										touch $$(@)")
+									     touch $$(@)")
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call prepare-fastq,$(sample),$(split.$(sample)))))
