@@ -103,7 +103,12 @@ TARGETS += facets_suite
 facets_suite :
 	$(call RUN_MAKE,weigelt-lab/copy_number/facets_suite.mk) && \
 	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
-	
+
+TARGETS += facets_refit
+facets_refit :
+	$(call RUN_MAKE,weigelt-lab/copy_number/facets_refit.mk) && \
+	$(MAKE) -f weigelt-lab/copy_number/facets_refit.mk clean
+
 TARGETS += cnv_kit
 cnv_kit :
 	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_kit.mk) && \
