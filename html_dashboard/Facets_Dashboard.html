@@ -284,7 +284,7 @@ input[type="file"]{display:none}
       <div id="viewTable" class="sol-output-area">
         <table class="sol-table">
           <thead><tr>
-            <th>Sample</th><th>Purity</th><th>Ploidy</th><th>Source</th><th>Flag</th><th></th>
+            <th>Sample</th><th>Purity</th><th>Ploidy</th><th>dipLogR</th><th>Flag</th><th></th>
           </tr></thead>
           <tbody id="solTableBody"></tbody>
         </table>
@@ -1038,18 +1038,19 @@ function renderSolTable() {
   document.getElementById('tableEmpty').style.display = names.length ? 'none' : 'block';
   tbody.innerHTML = names.map((name, i) => {
     const sol = solutions[name];
-    // Effective values: pinned takes priority, else default
-    const effP = sol.purity !== null ? sol.purity : sol.defaultPurity;
-    const effPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
-    const pStr = effP !== null && effP !== undefined ? fmtPct(effP) : '<span style="color:#999">NA</span>';
-    const plStr = effPl !== null && effPl !== undefined ? fmtPl(effPl) : '<span style="color:#999">NA</span>';
-    const srcBadge = sol.purity !== null ? '<span class="badge badge-pinned">pinned</span>' : '<span class="badge badge-default">default</span>';
+    // Effective values: pinned takes priority, else default; NA falls back to 1/2
+    const effP  = sol.purity  !== null ? sol.purity  : (sol.defaultPurity  !== null ? sol.defaultPurity  : null);
+    const effPl = sol.ploidy  !== null ? sol.ploidy  : (sol.defaultPloidy  !== null ? sol.defaultPloidy  : null);
+    const pStr  = effP  !== null && effP  !== undefined ? fmtPct(effP)  : '<span style="color:#e65100;font-weight:700">NA</span>';
+    const plStr = effPl !== null && effPl !== undefined ? fmtPl(effPl)  : '<span style="color:#e65100;font-weight:700">NA</span>';
+    const dipLogR = computeDipLogR(effP, effPl);
+    const dipStr  = dipLogR !== null ? dipLogR.toFixed(4) : '<span style="color:#e65100;font-weight:700">NA</span>';
     const flagBadge = sol.flagged ? '<span class="badge badge-flag">flagged</span>' : '';
     return `<tr>
       <td class="mono" style="font-size:10px">${escHtml(name)}</td>
       <td class="mono">${pStr}</td>
       <td class="mono">${plStr}</td>
-      <td>${srcBadge}</td>
+      <td class="mono">${dipStr}</td>
       <td>${flagBadge}</td>
       <td><button class="btn btn-xs btn-outline" onclick="selectSample('${escHtml(name)}')">View</button></td>
     </tr>`;
@@ -1060,20 +1061,25 @@ function renderYaml() {
   const names = Object.keys(solutions);
   // Format: sample_attr.yaml style — ploidy: block then purity: block
   // purity stored as fraction (not %)
-  let ploidyBlock = 'ploidy:\n';
-  let purityBlock = 'purity:\n';
+  let ploidyBlock   = 'ploidy:\n';
+  let purityBlock   = 'purity:\n';
+  let dipLogRBlock  = 'dipLogR:\n';
   names.forEach(name => {
     const sol = solutions[name];
-    const effP = sol.purity !== null ? sol.purity : sol.defaultPurity;
-    const effPl = sol.ploidy !== null ? sol.ploidy : sol.defaultPloidy;
-    const plVal = sol.isNA ? 'NA' : (effPl !== null && effPl !== undefined ? effPl.toFixed(4) : 'NA');
-    const pVal  = sol.isNA ? 'NA' : (effP  !== null && effP  !== undefined ? effP.toFixed(4)  : 'NA');
-    ploidyBlock += `    ${name}: ${plVal}\n`;
-    purityBlock += `    ${name}: ${pVal}\n`;
+    const effP  = sol.purity !== null ? sol.purity  : sol.defaultPurity;
+    const effPl = sol.ploidy !== null ? sol.ploidy  : sol.defaultPloidy;
+    // NA fallback: purity=1, ploidy=2, dipLogR=0
+    const isNA = effP === null || effP === undefined || effPl === null || effPl === undefined;
+    const expP  = isNA ? 1   : effP;
+    const expPl = isNA ? 2   : effPl;
+    const dip   = isNA ? 0   : (computeDipLogR(expP, expPl) ?? 0);
+    ploidyBlock  += `    ${name}: ${expPl.toFixed(4)}\n`;
+    purityBlock  += `    ${name}: ${expP.toFixed(4)}\n`;
+    dipLogRBlock += `    ${name}: ${dip.toFixed(4)}\n`;
   });
   const out = names.length
-    ? ploidyBlock + purityBlock
-    : 'ploidy:\n    # No samples loaded\npurity:\n    # No samples loaded\n';
+    ? ploidyBlock + purityBlock + dipLogRBlock
+    : 'ploidy:\n    # No samples loaded\npurity:\n    # No samples loaded\ndipLogR:\n    # No samples loaded\n';
   document.getElementById('viewYaml').textContent = out;
 }
 
@@ -1115,6 +1121,12 @@ function showLoading(show) {
 // ═══════════════════════════════════════════════════
 function fmtPct(v) { return v!==null&&v!==undefined ? (v*100).toFixed(1)+'%' : '—'; }
 function fmtPl(v)  { return v!==null&&v!==undefined ? parseFloat(v).toFixed(3) : '—'; }
+function computeDipLogR(purity, ploidy) {
+  if (purity===null||purity===undefined||ploidy===null||ploidy===undefined) return null;
+  const denom = (purity * ploidy) + (1 - purity) * 2;
+  if (!denom) return null;
+  return Math.log2(2 / denom);
+}
 function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 
