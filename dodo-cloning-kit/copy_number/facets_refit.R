@@ -47,7 +47,8 @@ if (as.numeric(opt$option) == 1) {
 	} else {
 		qt2 = obs_qt2
 	}
-	cat(qt2, file = as.character(opt$file_out), append = FALSE)
+	
+	cat(exp_qt2, file = as.character(opt$file_out), append = FALSE)
 
 } else if (as.numeric(opt$option) == 2) {
 	data = readr::read_tsv(file = as.character(opt$file_in), col_names = TRUE, col_types = cols(.default = col_character())) %>%
