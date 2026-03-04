@@ -35,7 +35,7 @@ facets_refit/$1_$2/$1_$2_hisens.cncf.txt : facets_suite/$1_$2/$1_$2.snp_pileup.g
 													      run-facets-wrapper.R --verbose \
 													      --counts-file $$(<) \
 													      --sample-id $1_$2 \
-													      --directory facets_suite/$1_$2/ \
+													      --directory facets_refit/$1_$2/ \
 													      --everything \
 													      --genome hg19 \
 													      --cval $$(FACETS_CVAL) \
