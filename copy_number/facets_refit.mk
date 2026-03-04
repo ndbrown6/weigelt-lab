@@ -84,7 +84,7 @@ facets_refit/summary/aggregated-segmented.txt : $(foreach pair,$(SAMPLE_PAIRS),f
 facets_refit/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIRS),facets_refit/$(pair)/$(pair)_hisens.cncf.txt)
 	$(call RUN, -c -n 1 -s 4G -m 8G -v $(WEIGELT_LAB_ENV) -p $(PROJECT_DIR)/facets_refit -N aggregate/purity,"set -o pipefail && \
 														  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/facets_refit.R \
-														  --option 5 \
+														  --option 6 \
 														  --sample_pairs '$(SAMPLE_PAIRS)' \
 														  --file_out $(@)")
 
