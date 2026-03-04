@@ -10,8 +10,6 @@ if (!interactive()) {
 }
 
 args_list <- list(make_option("--option", default = NA, type = 'character', help = "type of analysis"),
-		  make_option("--purity", default = NA, type = 'character', help = "user specified purity estimate"),
-		  make_option("--ploidy", default = NA, type = 'character', help = "user specified ploidy"),
 		  make_option("--sample_pairs", default = NA, type = 'character', help = "sample pairs"),
 		  make_option("--file_in", default = NA, type = 'character', help = "sample pairs"),
 		  make_option("--file_out", default = NA, type = 'character', help = "sample pairs"))
@@ -20,38 +18,6 @@ arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
 
 if (as.numeric(opt$option) == 1) {
-	if (is.na(as.numeric(opt$purity))) {
-		purity = 1
-	} else {
-		purity = as.numeric(opt$purity)
-	}
-	if (purity>1) {
-		purity = purity/100
-	}
-	
-	if (is.na(as.numeric(opt$ploidy))) {
-		ploidy = 2
-	} else {
-		ploidy = as.numeric(opt$ploidy)
-	}
-	
-	exp_qt2 = log2(((purity*2) + (1-purity)*2)/((purity*ploidy) + (1-purity)*2))
-	obs_qt2 = readr::read_tsv(file = as.character(opt$file_in), col_names = TRUE, col_types = cols(.default = col_character())) %>%
-		  readr::type_convert() %>%
-		  dplyr::mutate(tcn = round(((2^cnlr.median)*((purity*ploidy)+2*(1-purity)) - 2*(1-purity))/purity)) %>%
-		  dplyr::filter(tcn == 2) %>%
-		  .[["cnlr.median"]] %>%
-		  mean(na.rm=TRUE)
-	if (is.na(obs_qt2)) {
-		qt2 = exp_qt2
-	} else {
-		qt2 = obs_qt2
-	}
-	# export diploid log2 expected given ploidy/ purity (not empirical/ observed)
-	qt2 = exp_qt2
-	cat(qt2, file = as.character(opt$file_out), append = FALSE)
-
-} else if (as.numeric(opt$option) == 2) {
 	data = readr::read_tsv(file = as.character(opt$file_in), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	       readr::type_convert()
 	sunrise = matrix(NA, nrow = 100, ncol = 100)
@@ -73,7 +39,7 @@ if (as.numeric(opt$option) == 1) {
 	dplyr::as_tibble() %>%
 	readr::write_tsv(path = as.character(opt$file_out), append = FALSE, col_names = FALSE)
 	
-} else if (as.numeric(opt$option) == 3) {
+} else if (as.numeric(opt$option) == 2) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
 	data = list()
 	for (i in 1:length(sample_names)) {
@@ -86,7 +52,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, path = as.character(opt$file_out), col_names = TRUE, append = FALSE)
 
-} else if (as.numeric(opt$option) == 4) {
+} else if (as.numeric(opt$option) == 3) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
 	data = list()
 	for (i in 1:length(sample_names)) {
@@ -105,7 +71,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	
-} else if (as.numeric(opt$option) == 5) {
+} else if (as.numeric(opt$option) == 4) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
 	data = list()
 	for (i in 1:length(sample_names)) {
@@ -126,7 +92,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, path = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 
-} else if (as.numeric(opt$option) == 6) {
+} else if (as.numeric(opt$option) == 5) {
 	sample_names = unlist(strsplit(as.character(opt$sample_pairs), split = " ", fixed = TRUE))
 	purity = ploidy = list()
 	for (i in 1:length(sample_names)) {
