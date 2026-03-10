@@ -15,22 +15,22 @@ PROJECT_DIR := $(notdir $(CURDIR))
 define svaba-tumor-normal
 svaba/$1_$2/$1_$2.svaba.somatic.sv.vcf : bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -n $(SVABA_CORES) -s 1G -m $(SVABA_MEM_CORE) -p $(PROJECT_DIR)/svaba -N $1_$2/run -v $(SVABA_ENV) -w $(SVABA_WALL_TIME),"set -o pipefail && \
-																		mkdir -p svaba/$1_$2 && \
-																		cd svaba/$1_$2 && \
-																		svaba run \
-																		-t ../../bam/$1.bam \
-																		-n ../../bam/$2.bam \
-																		-p $$(SVABA_CORES) \
-																		-D $$(SVABA_DBSNP) \
-																		-L 100000 \
-																		-x 25000 \
-																		-k $$(SVABA_BLACKLIST) \
-																		-a $1_$2 \
-																		-G $$(REF_FASTA)")
+																																			mkdir -p svaba/$1_$2 && \
+																																			cd svaba/$1_$2 && \
+																																			svaba run \
+																																			-t ../../bam/$1.bam \
+																																			-n ../../bam/$2.bam \
+																																			-p $$(SVABA_CORES) \
+																																			-D $$(SVABA_DBSNP) \
+																																			-L 100000 \
+																																			-x 25000 \
+																																			-k $$(SVABA_BLACKLIST) \
+																																			-a $1_$2 \
+																																			-G $$(REF_FASTA)")
 
 svaba/$1_$2/$1_$2.vcf : svaba/$1_$2/$1_$2.svaba.somatic.sv.vcf
 	$$(call RUN,-c -n 1 -s 1G -m 2G -p $(PROJECT_DIR)/svaba -N $1_$2/copy -v $(SVABA_ENV),"set -o pipefail && \
-											       cat $$(<) > $$(@)")
+																					       cat $$(<) > $$(@)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\

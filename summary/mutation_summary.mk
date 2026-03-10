@@ -34,11 +34,11 @@ endef
 
 summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_summary.maf) facets_suite/summary/aggregated-gene.txt
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N combine-maf,"set -o pipefail && \
-										   mkdir -p summary && \
-										   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
-										   $(maf-args) \
-										   --facets_gene facets_suite/summary/aggregated-gene.txt \
-										   --output $(@)")
+																			   mkdir -p summary && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
+																			   $(maf-args) \
+																			   --facets_gene facets_suite/summary/aggregated-gene.txt \
+																			   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	R --version >> version/mutation_summary.txt)
