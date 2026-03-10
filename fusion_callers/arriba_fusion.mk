@@ -10,6 +10,9 @@ smry : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
 STAR_THREADS ?= 16
 STAR_MEM_THREAD ?= 4G
 STAR_WALL_TIME ?= 72:00:00
+
+SAMTOOLS_THREADS ?= 8
+SAMTOOLS_MEM_THREAD ?= 2G
 	 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -55,6 +58,15 @@ arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 																		 --chimMultimapNmax 50 \
 																		 --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
 
+arriba/$1/$1.Aligned.sortedByCoord.out.bam : arriba/$1/$1.Aligned.out.bam
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/sort,"set -o pipefail && \
+														   samtools sort \
+														   -@ $(SAMTOOLS_THREADS) \
+														   -m $(SAMTOOLS_MEM_THREAD) \
+														   -o $$(@) \
+														   $$(<) && \
+														   samtools index $$(@)")
+																	 
 arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 	$$(call RUN,-c -n 1 -s 24G -m 36G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
 												  $$(ARRIBA) -x arriba/$1/$1.Aligned.out.bam \
@@ -66,8 +78,8 @@ arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 												  -k $$(KNOWN_FUSIONS_TSV) \
 												  -t $$(KNOWN_FUSIONS_TSV) \
 												  -p $$(PROTEIN_DOMAINS_GFF3)")
-
-arriba/$1/fusions.pdf : arriba/$1/fusions.tsv bam/$1.bam
+												  
+arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.sortedByCoord.out.bam
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/arriba -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
 														    $$(RSCRIPT) $$(DRAW_FUSIONS) \
 														    --fusions=$$(<) \
@@ -96,5 +108,6 @@ clean :
 	rm -f arriba/*/*_R1.fastq.gz && \
 	rm -f arriba/*/*_R2.fastq.gz && \
 	rm -f arriba/*/*.Aligned.out.bam* && \
+	rm -f arriba/*/*.Aligned.sortedByCoord.out.bam* && \
 	rm -f arriba/*/*.out && \
 	rm -f arriba/*/*.tab
