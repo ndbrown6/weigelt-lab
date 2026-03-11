@@ -8,14 +8,24 @@ REQUIRED_CALLERS = mutect
 OPTIONAL_CALLERS = strelka varscan scalpel platypus
 CALLERS = $(REQUIRED_CALLERS) $(OPTIONAL_CALLERS)
 CALLER_MAKEFILES = mutect:weigelt-lab/variant_callers/mutect_tumor_normal.mk \
-		   strelka:weigelt-lab/variant_callers/strelka_tumor_normal.mk \
-		   varscan:weigelt-lab/variant_callers/varscan_tumor_normal.mk \
-		   scalpel:weigelt-lab/variant_callers/scalpel_tumor_normal.mk \
-		   platypus:weigelt-lab/variant_callers/platypus_tumor_normal.mk
+				   strelka:weigelt-lab/variant_callers/strelka_tumor_normal.mk \
+				   varscan:weigelt-lab/variant_callers/varscan_tumor_normal.mk \
+				   scalpel:weigelt-lab/variant_callers/scalpel_tumor_normal.mk \
+				   platypus:weigelt-lab/variant_callers/platypus_tumor_normal.mk
 
 get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 
 PROJECT_DIR := $(notdir $(CURDIR))
+
+FACETS_SOURCE ?= default
+
+ifeq ($(FACETS_SOURCE),reviewed)
+FACETS_GENE_FILE = facets_refit/summary/aggregated-gene.txt
+FACETS_MK = weigelt-lab/copy_number/facets_refit.mk
+else
+FACETS_GENE_FILE = facets_suite/summary/aggregated-gene.txt
+FACETS_MK = weigelt-lab/copy_number/facets_suite.mk
+endif
 
 define caller-rule
 $(1)/mutation_summary.maf :
@@ -24,9 +34,9 @@ $(1)/mutation_summary.maf :
 endef
 $(foreach caller,$(CALLERS), \
 	$(eval $(call caller-rule,$(caller))))
-
-facets_suite/summary/aggregated-gene.txt :
-	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk facets
+	
+$(FACETS_GENE_FILE) :
+	$(MAKE) -f $(FACETS_MK) facets
 
 define maf-args
 $(foreach caller,$(CALLERS),--$(caller)_maf $(caller)/mutation_summary.maf)
@@ -37,7 +47,7 @@ summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 																			   mkdir -p summary && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/mutation_summary.R \
 																			   $(maf-args) \
-																			   --facets_gene facets_suite/summary/aggregated-gene.txt \
+																			   --facets_gene $(FACETS_GENE_FILE) \
 																			   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \

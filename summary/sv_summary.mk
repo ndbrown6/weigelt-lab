@@ -10,8 +10,8 @@ REQUIRED_CALLERS ?= manta
 OPTIONAL_CALLERS ?= svaba gridss
 CALLERS ?= $(REQUIRED_CALLERS) $(OPTIONAL_CALLERS)
 CALLER_MAKEFILES = manta:weigelt-lab/sv_callers/manta_tumor_normal.mk \
-		   svaba:weigelt-lab/sv_callers/svaba_tumor_normal.mk \
-		   gridss:weigelt-lab/sv_callers/gridss_tumor_normal.mk
+				   svaba:weigelt-lab/sv_callers/svaba_tumor_normal.mk \
+				   gridss:weigelt-lab/sv_callers/gridss_tumor_normal.mk
 
 get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 get_vcf_path = $(1)/$(2)_$(3)/$(2)_$(3).vcf

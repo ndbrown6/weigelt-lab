@@ -6,11 +6,14 @@ use_cluster: true
 # reference genome
 ref: b37
 
-# source file for alignment
+# fastq source for alignment [local | irb]
 fastq_source: local
 
-# source file for facets
+# bam source for facets [local | irb]
 bam_source: local
+
+# facets summary [default | reviewed]
+facets_source: default
 
 # target bed file
 targets_file: ~/share/lib/bed_files/targets/IMPACT505/b37/IMPACT505_b37_targets.bed
