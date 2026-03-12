@@ -32,7 +32,7 @@ starfusion/$1/taskcomplete : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 																																				  cd starfusion/$1 && \
 																																			      STAR-Fusion \
 																																			      --left_fq $1_R1.fastq \
-																																			      --right_fq $2_R2.fastq \
+																																			      --right_fq $1_R2.fastq \
 																																			      --CPU $$(STAR_THREADS) \
 																																			      --output_dir . \
 																																			      --genome_lib_dir $$(CTAT_LIB) && \
