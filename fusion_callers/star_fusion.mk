@@ -5,8 +5,8 @@ LOGDIR ?= log/star_fusion.$(NOW)
 smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete) \
 	   starfusion/fusion_summary.txt
 	      
-STAR_THREADS ?= 16
-STAR_MEM_THREAD ?= 4G
+STAR_THREADS ?= 4
+STAR_MEM_THREAD ?= 15G
 STAR_WALL_TIME ?= 36:00:00
 
 CTAT_LIB ?= $(HOME)/share/lib/ref_files/CTAT_GRCh37/GRCh37_gencode_v19_CTAT_lib_Apr032020/ctat_genome_lib_build_dir/
