@@ -142,7 +142,7 @@ CHECK_MD5 = for i in {0..20}; do if md5sum -c $(filter %.md5,$^); then break; fi
 <<<<< = $(word 5,$^)
 5< = $(word 5,$^)
 
-CHECK_UVCF = if [ `grep -v '^\#' $(<) | wc -l` -eq 0 ] && [ `grep '^\#CHROM' $$(<) | wc -l` -eq 1 ]; then sed 's/FILTER\tINFO/FILTER\tUPS-COORDINATE\tINFO/' $(<) > $(@); else $1; fi
+CHECK_UVCF = if [ `grep -v '^\#' $(<) | wc -l` -eq 0 ] && [ `grep '^\#CHROM' $(<) | wc -l` -eq 1 ]; then sed 's/FILTER\tINFO/FILTER\tUPS-COORDINATE\tINFO/' $(<) > $(@); else $1; fi
 
 define R_INIT
 dir.create('$(@D)', showWarnings = F, recursive = T)
