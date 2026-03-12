@@ -29,14 +29,13 @@ $(foreach sample,$(SAMPLES),\
 define star-fusion
 starfusion/$1/taskcomplete : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 	$$(call RUN,-n $(STAR_THREADS) -s 1G -m $(STAR_MEM_THREAD) -p $(PROJECT_DIR)/starfusion -N $1/STAR -v $(STARFUSION_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
-																																				  cd starfusion/$1 && \
 																																			      STAR-Fusion \
-																																			      --left_fq $1_R1.fastq \
-																																			      --right_fq $1_R2.fastq \
+																																			      --left_fq $$(<) \
+																																			      --right_fq $$(<<) \
 																																			      --CPU $$(STAR_THREADS) \
-																																			      --output_dir . \
+																																			      --output_dir starfusion/$1 \
 																																			      --genome_lib_dir $$(CTAT_LIB) && \
-																																			      touch taskcomplete")
+																																			      touch $$(@)")
 
 endef
 $(foreach sample,$(SAMPLES),\
