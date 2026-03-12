@@ -41,10 +41,10 @@ endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call star-fusion,$(sample))))
 		
-starfusion/summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete)
-	echo "FusionName\tJunctionReadCount\tSpanningFragCount\tSpliceType\tLeftGene\tLeftBreakpoint\tRightGene\tRightBreakpoint\tLargeAnchorSupport\tFFPM\tLeftBreakDinuc\tLeftBreakEntropy\tRightBreakDinuc\tRightBreakEntropy\tannots\tSampleName" > starfusion/summary.txt; \
+starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete)
+	echo "FusionName\tJunctionReadCount\tSpanningFragCount\tSpliceType\tLeftGene\tLeftBreakpoint\tRightGene\tRightBreakpoint\tLargeAnchorSupport\tFFPM\tLeftBreakDinuc\tLeftBreakEntropy\tRightBreakDinuc\tRightBreakEntropy\tannots\tSampleName" > starfusion/fusion_summary.txt; \
 	for i in $(SAMPLES); do \
-		sed -e "1d" starfusion/$$i/star-fusion.fusion_predictions.abridged.tsv | sed "s/$$/\t$$i/" >> starfusion/summary.txt; \
+		sed -e "1d" starfusion/$$i/star-fusion.fusion_predictions.abridged.tsv | sed "s/$$/\t$$i/" >> starfusion/fusion_summary.txt; \
 	done
 	
 
