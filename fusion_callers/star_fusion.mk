@@ -11,6 +11,8 @@ STAR_WALL_TIME ?= 36:00:00
 
 CTAT_LIB ?= $(HOME)/share/lib/ref_files/CTAT_GRCh37/GRCh37_gencode_v19_CTAT_lib_Apr032020/ctat_genome_lib_build_dir/
 
+PROJECT_DIR := $(notdir $(CURDIR))
+
 define merge-fastq
 starfusion/$1/$1_R1.fastq : $$(foreach split,$2,$$(word 1, $$(fq.$$(split))))
 	$$(call RUN,-c -n 1 -s 1G -m 2G -w 12:00:00 -v $(PIGZ_ENV) -p $(PROJECT_DIR)/starfusion -N $1/merge_R1,"set -o pipefail && \
