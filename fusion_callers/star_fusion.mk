@@ -1,5 +1,6 @@
 include weigelt-lab/Makefile.inc
 
+
 LOGDIR ?= log/star_fusion.$(NOW)
 
 smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete) \
