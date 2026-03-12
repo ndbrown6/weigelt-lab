@@ -67,11 +67,8 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	
 define annotate-pair-vcf
 scalpel/$1_$2/$1_$2_ft.uvcf : scalpel/$1_$2/$1_$2_ft.vcf
-	$$(call RUN,-c -n 1 -s 6G -m 12G -p $(PROJECT_DIR)/scalpel -N $1_$2/ups-indel -v $(UPSINDEL_ENV),"set -o pipefail && \
-																									  ups_indel $$(REF_FASTA) \
-																									  $$(<) \
-																									  scalpel/$1_$2/$1_$2_ft \
-																									  -hd=true")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(UPSINDEL_ENV) -p $(PROJECT_DIR)/scalpel -N $1_$2/ups-indel,"set -o pipefail && \
+																									 $$(call CHECK_UVCF,ups_indel $$(REF_FASTA) $$(<) scalpel/$1_$2/$1_$2_ft -hd=true)")
 
 scalpel/$1_$2/$1_$2_ft.maf : scalpel/$1_$2/$1_$2_ft.vcf
 	$$(call RUN,-c -n 12 -s 1G -m 2G -v $(VCF2MAF_ENV) -p $(PROJECT_DIR)/scalpel -N $1_$2/vcf2maf ,"set -o pipefail && \
