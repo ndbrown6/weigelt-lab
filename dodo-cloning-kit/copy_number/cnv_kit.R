@@ -30,7 +30,7 @@ if (as.numeric(opt$option) == 1) {
 	
 	data_normal = list()
 	for (i in 1:length(normal_names)) {
-		data_normal[[i]] = readr::read_tsv(file = paste0("cnv_kit/normalized_log2/", normal_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
+		data_normal[[i]] = readr::read_tsv(file = paste0("cnv_kit/", normal_names[i], "/", normal_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 						   readr::type_convert() %>%
 						   dplyr::mutate(Position = round(.5*(start + end))) %>%
 						   dplyr::select(Chromosome = chromosome,
@@ -63,7 +63,7 @@ if (as.numeric(opt$option) == 1) {
 
 	data_tumor = list()
 	for (i in 1:length(tumor_names)) {
-		data_tumor[[i]] = readr::read_tsv(file = paste0("cnv_kit/normalized_log2/", tumor_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
+		data_tumor[[i]] = readr::read_tsv(file = paste0("cnv_kit/", tumor_names[i], "/", tumor_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 						  readr::type_convert() %>%
 						  dplyr::mutate(Position = round(.5*(start + end))) %>%
 						  dplyr::select(Chromosome = chromosome,

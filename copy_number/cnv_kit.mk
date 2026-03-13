@@ -3,9 +3,9 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/cnv_kit.$(NOW)
 
 cnvkit : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
-		 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/$(sample)/$(sample).txt)
-#		 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt) \
-#		 $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv) \
+		 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
+		 $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).txt) \
+		 $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).tsv)
 #		 cnv_kit/summary/aggregated-log2.txt \
 #		 cnv_kit/summary/aggregated-segmented.txt
 	 
@@ -68,9 +68,9 @@ cnv_kit/read_counts/reference.cnr : $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/r
 
 define cnvkit-tumor-cnr
 cnv_kit/$1/$1.txt : cnv_kit/read_counts/T/$1.targetcoverage.cnn cnv_kit/read_counts/T/$1.antitargetcoverage.cnn cnv_kit/read_counts/reference.cnr
-	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalized_log2 -N $1/fix,"set -o pipefail && \
-																								  mkdir -p cnv_kit/$1 && \
-																							      cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalize_log2 -N $1/fix,"set -o pipefail && \
+																								 mkdir -p cnv_kit/$1 && \
+																							     cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
 
 endef
  $(foreach sample,$(TUMOR_SAMPLES),\
@@ -78,16 +78,16 @@ endef
 		
 define cnvkit-normal-cnr
 cnv_kit/$1/$1.txt : cnv_kit/read_counts/N/$1.targetcoverage.cnn cnv_kit/read_counts/N/$1.antitargetcoverage.cnn cnv_kit/read_counts/reference.cnr
-	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalized_log2 -N $1/fix,"set -o pipefail && \
-																								  mkdir -p cnv_kit/$1 && \
-																							      cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -v $(CNVKIT_ENV) -p $(PROJECT_DIR)/normalize_log2 -N $1/fix,"set -o pipefail && \
+																								 mkdir -p cnv_kit/$1 && \
+																							     cnvkit.py fix $$(<) $$(<<) $$(<<<) -o $$(@)")
 
 endef
  $(foreach sample,$(NORMAL_SAMPLES),\
 		$(eval $(call cnvkit-normal-cnr,$(sample))))
 		
 define aggregate-copy-number
-cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/normalized_log2/$(sample).txt)
+cnv_kit/$1/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt)
 	$$(call RUN,-c -n 1 -s 4G -m 6G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2/$1,"set -o pipefail && \
 																							     $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																							     --option 1 \
@@ -96,7 +96,7 @@ cnv_kit/normalized_log2/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/norma
 																							     --file_out $$(@) \
 																							     --sigma $(MAX_SIGMA)")
 
-cnv_kit/normalized_log2/$1.tsv : cnv_kit/normalized_log2/$1.txt
+cnv_kit/$1/$1.tsv : cnv_kit/$1/$1.txt
 	$$(call RUN,-c -n 1 -s 4G -m 6G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segmented/$1,"set -o pipefail && \
 																									  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																									  --option 2 \
