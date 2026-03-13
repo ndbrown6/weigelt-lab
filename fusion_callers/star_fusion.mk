@@ -45,7 +45,13 @@ starfusion/$1/fusions.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 																																			      --output_dir starfusion/$1 \
 																																			      --genome_lib_dir $$(CTAT_LIB) && \
 																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@)")
-																																			      
+
+starfusion/$1/fusions.txt : starfusion/$1/fusions.tsv
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/starfusion -N $1/reformat_fusions,"set -o pipefail && \
+																						 $$(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
+																						 --option 1 \
+																						 --sample_names $1")
+																						 																																			      
 starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
 	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/starfusion -N $1/sort,"set -o pipefail && \
 																												   samtools sort \
@@ -54,12 +60,6 @@ starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
 																												   -o $$(@) \
 																												   starfusion/$1/Aligned.out.bam && \
 																												   samtools index $$(@)")
-
-starfusion/$1/fusions.txt : starfusion/$1/fusions.tsv
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/starfusion -N $1/reformat_fusions,"set -o pipefail && \
-																						 $$(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
-																						 --option 1 \
-																						 --sample_names $1")
 
 endef
 $(foreach sample,$(SAMPLES),\
