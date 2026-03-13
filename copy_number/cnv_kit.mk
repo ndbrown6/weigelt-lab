@@ -4,7 +4,8 @@ LOGDIR ?= log/cnv_kit.$(NOW)
 
 cnvkit : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
 		 cnv_kit/summary/aggregated-log2.txt \
-		 cnv_kit/summary/aggregated-segmented.txt
+		 cnv_kit/summary/aggregated-segmented.txt \
+		 $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).pdf)
 	 
 MAX_SIGMA ?= 0.25
 WINSORIZE_TAU ?= 2.5
@@ -103,7 +104,7 @@ cnv_kit/$1/$1.tsv : cnv_kit/$1/$1.txt
 																									  --file_out $$(@) \
 																									  --tumor_sample '$(tumors.$1)' \
 																									  --tau $(WINSORIZE_TAU) \
-																									  --k $(WINSORIZE_K)\
+																									  --k $(WINSORIZE_K) \
 																									  --gamma $(PCF_GAMMA)")
 
 endef
@@ -125,6 +126,19 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 																									    --option 4 \
 																									    --file_in '$(^)' \
 																									    --file_out $(@)")
+																									    
+define cnvkit-tumor-plot
+cnv_kit/$1/$1.pdf : cnv_kit/summary/aggregated-log2.txt cnv_kit/summary/aggregated-segmented.txt
+	$$(call RUN,-c -n 1 -s 24G -m 36G -v $(GGPLOT2_ENV) -p $(PROJECT_DIR) -N $1/plot,"set -o pipefail && \
+																					  $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
+																					  --option 5 \
+																					  --tumor_sample $1 \
+																					  --tau $(WINSORIZE_TAU) \
+																					  --k $(WINSORIZE_K)")
+
+endef
+ $(foreach sample,$(TUMOR_SAMPLES),\
+		$(eval $(call cnvkit-tumor-cnr,$(sample))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnv_kit.txt; \

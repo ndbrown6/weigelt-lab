@@ -160,4 +160,84 @@ if (as.numeric(opt$option) == 1) {
 	
 	readr::write_tsv(x = data, file = as.character(opt$file_out), append = FALSE, col_names = TRUE)
 	
+} else if (as.numeric(opt$option) == 5) {
+
+	suppressPackageStartupMessages(library("ggplot2"))
+	
+	smoothed_log2 = readr::read_tsv(file = "cnv_kit/summary/aggregated-log2.txt", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+					reshape2::melt(id.vars = c("Chromosome", "Position", "Hugo_Symbol"), variable.name = "Sample_Name", value.name = "Log2_Ratio") %>%
+					dplyr::filter(Sample_Name == as.character(opt$tumor_sample)) %>%
+					dplyr::filter(Chromosome %in% c(1:23, "X")) %>%
+					dplyr::mutate(Chromosome = ifelse(Chromosome == "X", "23", Chromosome)) %>%
+					readr::type_convert() %>%
+					dplyr::select(Chromosome, Position, Log2_Ratio) %>%
+					dplyr::arrange(Chromosome, Position) %>%
+					copynumber::winsorize(method = "mad", , tau = as.numeric(opt$tau), k = as.numeric(opt$k), verbose = FALSE) %>%
+					dplyr::rename(Chromosome = chrom, Position = pos) %>%
+					dplyr::mutate(Sample_Name = as.character(opt$tumor_sample))
+	
+	segmented_log2 = readr::read_tsv(file = "cnv_kit/summary/aggregated-segmented.txt", col_names = TRUE, col_types = cols(.default = col_character())) %>%
+					 dplyr::filter(Sample_Name == as.character(opt$tumor_sample)) %>%
+					 dplyr::filter(Chromosome %in% c(1:23, "X")) %>%
+					 dplyr::mutate(Chromosome = ifelse(Chromosome == "X", "23", Chromosome)) %>%
+					 readr::type_convert() %>%
+					 dplyr::arrange(Chromosome, Start_Position, End_Position)
+					 
+	plot_ = smoothed_log2 %>%
+			dplyr::mutate(Color = Chromosome %% 2) %>%
+			dplyr::mutate(Chromosome = as.character(Chromosome)) %>%
+			dplyr::mutate(Chromosome = case_when(
+					Chromosome == "23" ~ "X",
+					TRUE ~ as.character(Chromosome)
+			)) %>%
+			dplyr::mutate(Chromosome = factor(Chromosome, levels = c(1:22, "X"), ordered = TRUE)) %>%
+			dplyr::mutate(Color = factor(Color, levels = c(0, 1), ordered = FALSE)) %>%
+			ggplot(aes(x = Position, y = Log2_Ratio, color = Color)) +
+			geom_point(stat = "identity", fill = NA, shape = 16, size = .75, alpha = 1) +
+			scale_color_manual(values = c("0" = "grey", "1" = "lightblue")) +
+			geom_segment(data = segmented_log2 %>%
+								dplyr::mutate(Chromosome = as.character(Chromosome)) %>%
+								dplyr::mutate(Chromosome = case_when(
+													Chromosome == "23" ~ "X",
+													TRUE ~ as.character(Chromosome)
+								)) %>%
+								dplyr::mutate(Chromosome = factor(Chromosome, levels = c(1:22, "X"), ordered = TRUE)),
+					     mapping = aes(x = Start_Position, y = Log2_Ratio, xend = End_Position, yend = Log2_Ratio),
+					     color = "#e41a1c", inherit.aes = FALSE, size = 1, lineend = "round") +
+			geom_line(data = segmented_log2 %>%
+							 tidyr::pivot_longer(c(Start_Position, End_Position)) %>%
+							 dplyr::mutate(Chromosome = as.character(Chromosome)) %>%
+							 dplyr::mutate(Chromosome = case_when(
+												Chromosome == "23" ~ "X",
+												TRUE ~ as.character(Chromosome)
+							 )) %>%
+							 dplyr::mutate(Chromosome = factor(Chromosome, levels = c(1:22, "X"), ordered = TRUE)),
+						     mapping = aes(x = value, y = Log2_Ratio),
+						     color = "#e41a1c", inherit.aes = FALSE, size = .1, lineend = "round") +
+			geom_hline(yintercept = 0, color = "grey50", linetype = 2, size = .5) +
+			xlab("\n\n") +
+			ylab(expression(Log[2]~"Ratio")) +
+			scale_x_continuous() +
+			scale_y_continuous(expand = c(0, 0),
+							   breaks = c(-3, -2, -1, 0, 1, 2, 3),
+							   labels = c(-3, -2, -1, 0, 1, 2, 3),
+							   limits = c(-3, 3)) +
+			theme_minimal() +
+			theme(axis.text.x = element_blank(),
+			      axis.ticks.x = element_blank(),
+			      axis.text.y = element_text(size = 8),
+			      axis.title.y = element_text(size = 9, margin = margin(r = 20)),
+			      strip.text.x = element_text(size = 7),
+			      strip.text.y = element_text(size = 9),
+			      panel.spacing.x = unit(0.05, 'lines'),
+			      panel.spacing.y = unit(2, 'lines'),
+			      panel.grid.minor = element_blank(),
+			      plot.margin = unit(c(1.5, 1, 1.5, 1), "cm")) +
+			facet_grid(""~Chromosome, scales = "free_x", space = "free_x", switch = "x") +
+			guides(color = "none")
+			
+			pdf(file = paste0("cnv_kit/", as.character(opt$tumor_sample), "/", as.character(opt$tumor_sample), ".pdf"), width = 24/3, height = 3.25)
+			print(plot_)
+			dev.off()
+
 }
