@@ -138,7 +138,7 @@ cnv_kit/$1/$1.pdf : cnv_kit/summary/aggregated-log2.txt cnv_kit/summary/aggregat
 
 endef
  $(foreach sample,$(TUMOR_SAMPLES),\
-		$(eval $(call cnvkit-tumor-cnr,$(sample))))
+		$(eval $(call cnvkit-tumor-plot,$(sample))))
 
 ..DUMMY := $(shell mkdir -p version; \
 	python $(CNVKIT_ENV)/bin/cnvkit.py version &> version/cnv_kit.txt; \
