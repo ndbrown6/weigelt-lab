@@ -94,9 +94,9 @@ $(foreach sample,$(SAMPLES),\
                 $(eval $(call run-star-arriba,$(sample))))
 				
 arriba/fusion_summary.txt : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv)
-	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/arriba -N $1/summary,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/arriba_summary.R \
-																			  --sample_names '$(SAMPLES)'")
+	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/arriba -N summary,"set -o pipefail && \
+	    																   $(RSCRIPT) $(SCRIPTS_DIR)/summary/arriba_summary.R \
+																		   --sample_names '$(SAMPLES)'")
 									   
 ..DUMMY := $(shell mkdir -p version; \
 	$(ARRIBA) -h > version/arriba_fusion.txt)
