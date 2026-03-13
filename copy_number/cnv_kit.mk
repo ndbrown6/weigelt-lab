@@ -89,6 +89,7 @@ endef
 define aggregate-copy-number
 cnv_kit/$1/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt)
 	$$(call RUN,-c -n 1 -s 4G -m 6G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2/$1,"set -o pipefail && \
+																								 mkdir -p cnv_kit/$1 && \
 																							     $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																							     --option 1 \
 																							     --tumor_sample '$(tumors.$1)' \
@@ -98,6 +99,7 @@ cnv_kit/$1/$1.txt : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample
 
 cnv_kit/$1/$1.tsv : cnv_kit/$1/$1.txt
 	$$(call RUN,-c -n 1 -s 4G -m 6G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segmented/$1,"set -o pipefail && \
+																									  mkdir -p cnv_kit/$1 && \
 																									  $$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																									  --option 2 \
 																									  --file_in $$(<) \
@@ -111,15 +113,17 @@ endef
 $(foreach set,$(SAMPLE_SETS),\
 		$(eval $(call aggregate-copy-number,$(set))))
 
-cnv_kit/summary/aggregated-log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).txt)
+cnv_kit/summary/aggregated-log2.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).txt)
 	$(call RUN,-c -n 1 -s 24G -m 36G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/log2/sets,"set -o pipefail && \
+																									mkdir -p cnv_kit/summary/ && \
 																									$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																									--option 3 \
 																									--file_in '$(^)' \
 																									--file_out $(@)")
 
-cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/normalized_log2/$(set).tsv)
+cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).tsv)
 	$(call RUN,-c -n 1 -s 8G -m 16G -v $(COPYNUMBER_ENV) -p $(PROJECT_DIR) -N aggregate/segmented/sets,"set -o pipefail && \
+																										mkdir -p cnv_kit/summary/ && \
 																									    $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/cnv_kit.R \
 																									    --option 4 \
 																									    --file_in '$(^)' \
