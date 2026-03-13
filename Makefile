@@ -163,8 +163,8 @@ arriba_fusion :
 	
 TARGETS += star_fusion
 star_fusion :
-	$(call RUN_MAKE,weigelt-lab/fusion_callers/star_fusion.mk)
-#	$(MAKE) -f weigelt-lab/fusion_callers/star_fusion.mk clean
+	$(call RUN_MAKE,weigelt-lab/fusion_callers/star_fusion.mk) && \
+	$(MAKE) -f weigelt-lab/fusion_callers/star_fusion.mk clean
 
 TARGETS += fusion_catcher
 fusion_catcher :
