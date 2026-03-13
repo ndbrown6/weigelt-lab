@@ -75,10 +75,10 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call star-fusion,$(sample))))
 		
 starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
-	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/arriba -N $1/summary,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
-																			  --option 2 \
-																			  --sample_names '$(SAMPLES)'")
+	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/starfusion -N summary,"set -o pipefail && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
+																			   --option 2 \
+																			   --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(STARFUSION_ENV)/bin/STAR-Fusion --version &> version/star_fusion.txt)
@@ -87,15 +87,16 @@ starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)
 .PHONY: clean
 
 clean : 
-	rm -f starfusion/*/*_R1.fastq && \
-	rm -f starfusion/*/*_R2.fastq && \
-	rm -f starfusion/*/*.bam && \
+	rm -f starfusion/*/*.fastq && \
+	rm -f starfusion/*/*.bam* && \
 	rm -f starfusion/*/*.cmds && \
 	rm -f starfusion/*/*.out && \
 	rm -f starfusion/*/*.tab && \
 	rm -f starfusion/*/*.junction && \
+	rm -f starfusion/*/*.txt && \
 	rm -rf starfusion/*/_starF_checkpoints && \
 	rm -rf starfusion/*/star-fusion.preliminary && \
 	rm -rf starfusion/*/_STARgenome && \
-	rm -rf starfusion/*/_STARpass1
+	rm -rf starfusion/*/_STARpass1 && \
+	rm -rf starfusion/*/star-fusion.fusion_predictions.tsv
 	
