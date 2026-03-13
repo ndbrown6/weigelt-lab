@@ -4,11 +4,8 @@ include weigelt-lab/config/arriba.inc
 LOGDIR ?= log/star_fusion.$(NOW)
 
 smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
-	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.txt) \
-	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/Aligned.sortedByCoord.out.bam) \
-	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf)
-#	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
-#	   starfusion/fusion_summary.txt
+	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
+	   starfusion/fusion_summary.txt
 	      
 STAR_THREADS ?= 4
 STAR_MEM_THREAD ?= 15G
@@ -62,6 +59,7 @@ starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
 																												   -o $$(@) \
 																												   starfusion/$1/Aligned.out.bam && \
 																												   samtools index $$(@)")
+
 starfusion/$1/fusions.pdf : starfusion/$1/fusions.txt starfusion/$1/Aligned.sortedByCoord.out.bam
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/starfusion -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
     																											    $$(RSCRIPT) $$(DRAW_FUSIONS) \
@@ -77,11 +75,10 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call star-fusion,$(sample))))
 		
 starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
-	echo "FusionName\tJunctionReadCount\tSpanningFragCount\tSpliceType\tLeftGene\tLeftBreakpoint\tRightGene\tRightBreakpoint\tLargeAnchorSupport\tFFPM\tLeftBreakDinuc\tLeftBreakEntropy\tRightBreakDinuc\tRightBreakEntropy\tannots\tSampleName\n" > starfusion/fusion_summary.txt; \
-	for i in $(SAMPLES); do \
-		sed -e "1d" starfusion/$$i/star-fusion.fusion_predictions.abridged.tsv | sed "s/$$/\t$$i/" >> starfusion/fusion_summary.txt; \
-	done
-	
+	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/arriba -N $1/summary,"set -o pipefail && \
+																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
+																			  --option 2 \
+																			  --sample_names '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(STARFUSION_ENV)/bin/STAR-Fusion --version &> version/star_fusion.txt)
