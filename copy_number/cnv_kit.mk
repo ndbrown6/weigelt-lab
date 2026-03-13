@@ -136,4 +136,5 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 clean :
 	rm -rf cnv_kit/bed_files && \
 	rm -rf cnv_kit/read_counts && \
-	rm -rf cnv_kit/*_*
+	for set in $(SAMPLE_SETS); do rm -rf cnv_kit/$$set/; done && \
+	for sample in $(NORMAL_SAMPLES); do rm -rf cnv_kit/$$sample/; done
