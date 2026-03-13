@@ -2,7 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/star_fusion.$(NOW)
 
-smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete) \
+smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/star-fusion.fusion_predictions.abridged.tsv) \
 	   starfusion/fusion_summary.txt
 	      
 STAR_THREADS ?= 4
@@ -29,21 +29,20 @@ $(foreach sample,$(SAMPLES),\
 
 
 define star-fusion
-starfusion/$1/taskcomplete : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
+starfusion/$1/star-fusion.fusion_predictions.abridged.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 	$$(call RUN,-n $(STAR_THREADS) -s 1G -m $(STAR_MEM_THREAD) -p $(PROJECT_DIR)/starfusion -N $1/STAR -v $(STARFUSION_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
 																																			      STAR-Fusion \
 																																			      --left_fq $$(<) \
 																																			      --right_fq $$(<<) \
 																																			      --CPU $$(STAR_THREADS) \
 																																			      --output_dir starfusion/$1 \
-																																			      --genome_lib_dir $$(CTAT_LIB) && \
-																																			      touch $$(@)")
+																																			      --genome_lib_dir $$(CTAT_LIB)")
 
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call star-fusion,$(sample))))
 		
-starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/taskcomplete)
+starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/star-fusion.fusion_predictions.abridged.tsv)
 	echo "FusionName\tJunctionReadCount\tSpanningFragCount\tSpliceType\tLeftGene\tLeftBreakpoint\tRightGene\tRightBreakpoint\tLargeAnchorSupport\tFFPM\tLeftBreakDinuc\tLeftBreakEntropy\tRightBreakDinuc\tRightBreakEntropy\tannots\tSampleName\n" > starfusion/fusion_summary.txt; \
 	for i in $(SAMPLES); do \
 		sed -e "1d" starfusion/$$i/star-fusion.fusion_predictions.abridged.tsv | sed "s/$$/\t$$i/" >> starfusion/fusion_summary.txt; \
@@ -58,4 +57,14 @@ starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)
 
 clean : 
 	rm -f starfusion/*/*_R1.fastq && \
-	rm -f starfusion/*/*_R2.fastq
+	rm -f starfusion/*/*_R2.fastq && \
+	rm -f starfusion/*/*.bam && \
+	rm -f starfusion/*/*.cmds && \
+	rm -f starfusion/*/*.out && \
+	rm -f starfusion/*/*.tab && \
+	rm -f starfusion/*/*.junction && \
+	rm -rf starfusion/*/_starF_checkpoints && \
+	rm -rf starfusion/*/star-fusion.preliminary && \
+	rm -rf starfusion/*/_STARgenome && \
+	rm -rf starfusion/*/_STARpass1
+	
