@@ -1,13 +1,18 @@
 include weigelt-lab/Makefile.inc
+include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/star_fusion.$(NOW)
 
-smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/star-fusion.fusion_predictions.abridged.tsv) \
-	   starfusion/fusion_summary.txt
+smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
+#	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
+#	   starfusion/fusion_summary.txt
 	      
 STAR_THREADS ?= 4
 STAR_MEM_THREAD ?= 15G
 STAR_WALL_TIME ?= 36:00:00
+
+SAMTOOLS_THREADS ?= 8
+SAMTOOLS_MEM_THREAD ?= 2G
 
 CTAT_LIB ?= $(HOME)/share/lib/ref_files/CTAT_GRCh37/GRCh37_gencode_v19_CTAT_lib_Apr032020/ctat_genome_lib_build_dir/
 
@@ -29,20 +34,40 @@ $(foreach sample,$(SAMPLES),\
 
 
 define star-fusion
-starfusion/$1/star-fusion.fusion_predictions.abridged.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
+starfusion/$1/fusions.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 	$$(call RUN,-n $(STAR_THREADS) -s 1G -m $(STAR_MEM_THREAD) -p $(PROJECT_DIR)/starfusion -N $1/STAR -v $(STARFUSION_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
 																																			      STAR-Fusion \
 																																			      --left_fq $$(<) \
 																																			      --right_fq $$(<<) \
 																																			      --CPU $$(STAR_THREADS) \
 																																			      --output_dir starfusion/$1 \
-																																			      --genome_lib_dir $$(CTAT_LIB)")
+																																			      --genome_lib_dir $$(CTAT_LIB) && \
+																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@)")
+																																			      
+starfusion/$1/$1.Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/sort,"set -o pipefail && \
+																											   samtools sort \
+																											   -@ $(SAMTOOLS_THREADS) \
+																											   -m $(SAMTOOLS_MEM_THREAD) \
+																											   -o $$(@) \
+																											   starfusion/$1/$1.Aligned.out.bam && \
+																											   samtools index $$(@)")
+
+starfusion/$1/fusions.pdf : starfusion/$1/fusions.tsv starfusion/$1/$1.Aligned.sortedByCoord.out.bam
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/arriba -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
+																											    $$(RSCRIPT) $$(DRAW_FUSIONS) \
+																											    --fusions=$$(<) \
+																											    --annotation=$$(ANNOTATION_GTF) \
+																											    --alignments=$$(<<) \
+																											    --cytobands=$$(CYTOBAND) \
+																											    --proteinDomains=$$(PROTEIN_DOMAINS_GFF3) \
+																											    --output=$$(@)")
 
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call star-fusion,$(sample))))
 		
-starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/star-fusion.fusion_predictions.abridged.tsv)
+starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
 	echo "FusionName\tJunctionReadCount\tSpanningFragCount\tSpliceType\tLeftGene\tLeftBreakpoint\tRightGene\tRightBreakpoint\tLargeAnchorSupport\tFFPM\tLeftBreakDinuc\tLeftBreakEntropy\tRightBreakDinuc\tRightBreakEntropy\tannots\tSampleName\n" > starfusion/fusion_summary.txt; \
 	for i in $(SAMPLES); do \
 		sed -e "1d" starfusion/$$i/star-fusion.fusion_predictions.abridged.tsv | sed "s/$$/\t$$i/" >> starfusion/fusion_summary.txt; \
