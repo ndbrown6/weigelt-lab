@@ -19,7 +19,6 @@ opt = arguments$options
 if (as.numeric(opt$option) == 1) {
 
 	sample_name = unlist(strsplit(x=opt$sample_names, split=" ", fixed=TRUE))
-	print("ok")
 	fusions = readr::read_tsv(file = paste0("starfusion/", sample_name, "/fusions.tsv"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			  readr::type_convert() %>%
 			  dplyr::mutate(`#gene1`= unlist(lapply(`#FusionName`, function(x) { (strsplit(x, split = "--")[[1]])[1] })),
@@ -70,7 +69,7 @@ if (as.numeric(opt$option) == 1) {
 									.[["target_id"]]
 	}
 							
-	readr::write_tsv(x = fusions, path = paste0("starfusion/, sample_name, "/fusions.txt"), append=FALSE, col_names=TRUE, quote_escape=FALSE)
+	readr::write_tsv(x = fusions, path = paste0("starfusion/", sample_name, "/fusions.txt"), append=FALSE, col_names=TRUE, quote_escape=FALSE)
 
 } else if (as.numeric(opt$option) == 2) {
 	
