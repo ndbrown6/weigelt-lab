@@ -29,6 +29,7 @@ SURVIVOR_ENV ?= $(HOME)/share/env/survivor-1.0.7
 ANNOTATESV_ENV ?= $(HOME)/share/env/annot_sv-3.1.3
 ARRIBA_ENV ?= $(HOME)/share/env/arriba-2.0.0
 GENOMIC_ALIGNMENTS_ENV ?= $(HOME)/share/env/r-genomicalignments-1.34.0
+GGPLOT2_ENV ?= $(HOME)/share/env/r-tidyverse-2.0.0
 STARFUSION_ENV ?= $(HOME)/share/env/star-fusion-1.6.0
 
 # aliases
