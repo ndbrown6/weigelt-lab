@@ -3,7 +3,8 @@ include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/star_fusion.$(NOW)
 
-smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
+smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
+	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/Aligned.sortedByCoord.out.bam)
 #	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
 #	   starfusion/fusion_summary.txt
 	      
@@ -44,13 +45,13 @@ starfusion/$1/fusions.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 																																			      --genome_lib_dir $$(CTAT_LIB) && \
 																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@)")
 																																			      
-starfusion/$1/$1.Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
+starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
 	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/sort,"set -o pipefail && \
 																											   samtools sort \
 																											   -@ $(SAMTOOLS_THREADS) \
 																											   -m $(SAMTOOLS_MEM_THREAD) \
 																											   -o $$(@) \
-																											   starfusion/$1/$1.Aligned.out.bam && \
+																											   starfusion/$1/Aligned.out.bam && \
 																											   samtools index $$(@)")
 
 starfusion/$1/fusions.pdf : starfusion/$1/fusions.tsv starfusion/$1/$1.Aligned.sortedByCoord.out.bam
