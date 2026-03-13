@@ -5,7 +5,8 @@ LOGDIR ?= log/star_fusion.$(NOW)
 
 smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
 	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.txt) \
-	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/Aligned.sortedByCoord.out.bam)
+	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/Aligned.sortedByCoord.out.bam) \
+	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf)
 #	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
 #	   starfusion/fusion_summary.txt
 	      
@@ -61,6 +62,15 @@ starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
 																												   -o $$(@) \
 																												   starfusion/$1/Aligned.out.bam && \
 																												   samtools index $$(@)")
+starfusion/$1/fusions.pdf : starfusion/$1/fusions.txt starfusion/$1/Aligned.sortedByCoord.out.bam
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/starfusion -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
+    																											    $$(RSCRIPT) $$(DRAW_FUSIONS) \
+																												    --fusions=$$(<) \
+																												    --annotation=$$(ANNOTATION_GTF) \
+																												    --alignments=$$(<<) \
+																												    --cytobands=$$(CYTOBAND) \
+																												    --proteinDomains=$$(PROTEIN_DOMAINS_GFF3) \
+																												    --output=$$(@)")
 
 endef
 $(foreach sample,$(SAMPLES),\
