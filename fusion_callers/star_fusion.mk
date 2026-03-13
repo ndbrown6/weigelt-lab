@@ -42,7 +42,8 @@ starfusion/$1/fusions.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 																																			      --CPU $$(STAR_THREADS) \
 																																			      --output_dir starfusion/$1 \
 																																			      --genome_lib_dir $$(CTAT_LIB) && \
-																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@)")
+																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@) && \
+																																			      mv starfusion/$1/star-fusion.fusion_predictions.tsv starfusion/$1/predictions.tsv")
 
 starfusion/$1/fusions.txt : starfusion/$1/fusions.tsv
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/starfusion -N $1/reformat,"set -o pipefail && \
@@ -97,6 +98,4 @@ clean :
 	rm -rf starfusion/*/_starF_checkpoints && \
 	rm -rf starfusion/*/star-fusion.preliminary && \
 	rm -rf starfusion/*/_STARgenome && \
-	rm -rf starfusion/*/_STARpass1 && \
-	rm -rf starfusion/*/star-fusion.fusion_predictions.tsv
-	
+	rm -rf starfusion/*/_STARpass1
