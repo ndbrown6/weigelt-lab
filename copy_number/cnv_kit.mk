@@ -3,9 +3,6 @@ include weigelt-lab/Makefile.inc
 LOGDIR ?= log/cnv_kit.$(NOW)
 
 cnvkit : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
-		 $(foreach sample,$(NORMAL_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
-		 $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).txt) \
-		 $(foreach set,$(SAMPLE_SETS),cnv_kit/$(set)/$(set).tsv) \
 		 cnv_kit/summary/aggregated-log2.txt \
 		 cnv_kit/summary/aggregated-segmented.txt
 	 
@@ -138,4 +135,5 @@ cnv_kit/summary/aggregated-segmented.txt : $(foreach set,$(SAMPLE_SETS),cnv_kit/
 
 clean :
 	rm -rf cnv_kit/bed_files && \
-	rm -rf cnv_kit/read_counts
+	rm -rf cnv_kit/read_counts && \
+	rm -rf cnv_kit/*_*
