@@ -19,6 +19,7 @@ opt = arguments$options
 if (as.numeric(opt$option) == 1) {
 
 	sample_name = unlist(strsplit(x=opt$sample_names, split=" ", fixed=TRUE))
+	print("ok")
 	fusions = readr::read_tsv(file = paste0("starfusion/", sample_name, "/fusions.tsv"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 			  readr::type_convert() %>%
 			  dplyr::mutate(`#gene1`= unlist(lapply(`#FusionName`, function(x) { (strsplit(x, split = "--")[[1]])[1] })),
