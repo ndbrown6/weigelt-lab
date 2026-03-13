@@ -76,7 +76,7 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(x=opt$sample_names, split=" ", fixed=TRUE))
 	smry = list()
 	for (i in 1:length(sample_names)) {
-		smry[[i]] = readr::read_tsv(file=paste0("starfusion/", sample_names[i], "/fusions.txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
+		smry[[i]] = readr::read_tsv(file=paste0("starfusion/", sample_names[i], "/fusions.tsv"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				    dplyr::mutate(sample_name = sample_names[i])
 	}
 	smry = do.call(rbind, smry)
