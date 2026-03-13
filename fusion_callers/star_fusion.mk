@@ -50,7 +50,7 @@ starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)
 	
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(STARFUSION_ENV)/bin/STAR-Fusion --help &> version/star_fusion.txt)
+	$(STARFUSION_ENV)/bin/STAR-Fusion --version &> version/star_fusion.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
