@@ -10,7 +10,7 @@ cnvkit : $(foreach sample,$(TUMOR_SAMPLES),cnv_kit/$(sample)/$(sample).txt) \
 MAX_SIGMA ?= 0.25
 WINSORIZE_TAU ?= 2.5
 WINSORIZE_K ?= 25
-PCF_GAMMA ?= 50
+PCF_GAMMA ?= 30
 
 REF_FLAT ?= ~/share/lib/resource_files/refFlat_ensembl.v75.txt
 EXCLUDE_BED ?= ~/share/lib/bed_files/access-excludes.b37.bed
