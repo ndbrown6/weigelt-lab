@@ -38,10 +38,6 @@ sv_summary :
 	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk) && \
 	$(MAKE) -f weigelt-lab/summary/sv_summary.mk clean
 	
-TARGETS += fusion_summary
-fusion_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk)
-
 #==================================================
 # FASTQ aligners
 #==================================================
@@ -122,11 +118,6 @@ TARGETS += kallisto_quant
 kallisto_quant :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/kallisto_quant.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
-	
-TARGETS += salmon_quant
-salmon_quant :
-	$(call RUN_MAKE,weigelt-lab/rna_seq/salmon_quant.mk) && \
-	$(MAKE) -f weigelt-lab/rna_seq/salmon_quant.mk clean
 	
 #==================================================
 # DNA structural variant callers
@@ -217,6 +208,79 @@ wgs_metrics :
 TARGETS += rnaseq_metrics
 rnaseq_metrics :
 	$(call RUN_MAKE,weigelt-lab/bam_tools/rnaseq_metrics.mk)
-	
 
+#==================================================
+# Beta test
+#==================================================
+
+TARGETS += fusion_summary
+fusion_summary :
+	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk) && \
+	$(MAKE) -f weigelt-lab/summary/fusion_summary.mk clean
+
+TARGETS += hla_polysolver
+hla_polysolver :
+	$(call RUN_MAKE,weigelt-lab/misc/hla_polysolver.mk) && \
+	$(MAKE) -f weigelt-lab/misc/hla_polysolver.mk clean
+	
+TARGETS += immune_deconvolution
+immune_deconvolution :
+	$(call RUN_MAKE,weigelt-lab/misc/immune_deconvolution.mk) && \
+	$(MAKE) -f weigelt-lab/misc/immune_deconvolution.mk clean	
+	
+TARGETS += msi_sensor
+msi_sensor :
+	$(call RUN_MAKE,weigelt-lab/misc/msi_sensor.mk) && \
+	$(MAKE) -f weigelt-lab/misc/msi_sensor.mk clean
+
+TARGETS += mi_msi
+mi_msi :
+	$(call RUN_MAKE,weigelt-lab/misc/mi_msi.mk) && \
+	$(MAKE) -f weigelt-lab/misc/mi_msi.mk clean
+
+TARGETS += hr_detect
+hr_detect :
+	$(call RUN_MAKE,weigelt-lab/misc/hr_detect.mk) && \
+	$(MAKE) -f weigelt-lab/misc/hr_detect.mk clean
+	
+TARGETS += cn_hrd
+cn_hrd :
+	$(call RUN_MAKE,weigelt-lab/misc/cn_hrd.mk) && \
+	$(MAKE) -f weigelt-lab/misc/cn_hrd.mk clean	
+
+TARGETS += deconstruct_sigs
+deconstruct_sigs :
+	$(call RUN_MAKE,weigelt-lab/misc/deconstruct_sigs.mk) && \
+	$(MAKE) -f weigelt-lab/misc/deconstruct_sigs.mk clean
+	
+TARGETS += sv_signtaure
+sv_signtaure :
+	$(call RUN_MAKE,weigelt-lab/misc/sv_signtaure.mk) && \
+	$(MAKE) -f weigelt-lab/misc/sv_signtaure.mk clean
+
+TARGETS += star_fish
+star_fish :
+	$(call RUN_MAKE,weigelt-lab/misc/star_fish.mk) && \
+	$(MAKE) -f weigelt-lab/misc/star_fish.mk clean
+	
+TARGETS += sufam_genotype
+sufam_genotype :
+	$(call RUN_MAKE,weigelt-lab/misc/sufam_genotype.mk) && \
+	$(MAKE) -f weigelt-lab/misc/sufam_genotype.mk clean
+	
+TARGETS += pyclone_vi
+hla_polysolver :
+	$(call RUN_MAKE,weigelt-lab/misc/pyclone_vi.mk) && \
+	$(MAKE) -f weigelt-lab/misc/pyclone_vi.mk clean
+	
+TARGETS += medicc2_cn
+medicc2_cn :
+	$(call RUN_MAKE,weigelt-lab/misc/medicc2_cn.mk) && \
+	$(MAKE) -f weigelt-lab/misc/medicc2_cn.mk clean
+	
+TARGETS += cluster_samples
+cluster_samples :
+	$(call RUN_MAKE,weigelt-lab/misc/cluster_samples.mk) && \
+	$(MAKE) -f weigelt-lab/misc/cluster_samples.mk clean
+	
 .PHONY : $(TARGETS)
