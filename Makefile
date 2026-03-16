@@ -269,7 +269,7 @@ sufam_genotype :
 	$(MAKE) -f weigelt-lab/misc/sufam_genotype.mk clean
 	
 TARGETS += pyclone_vi
-hla_polysolver :
+pyclone_vi :
 	$(call RUN_MAKE,weigelt-lab/misc/pyclone_vi.mk) && \
 	$(MAKE) -f weigelt-lab/misc/pyclone_vi.mk clean
 	
