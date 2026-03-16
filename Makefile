@@ -38,6 +38,11 @@ sv_summary :
 	$(call RUN_MAKE,weigelt-lab/summary/sv_summary.mk) && \
 	$(MAKE) -f weigelt-lab/summary/sv_summary.mk clean
 	
+TARGETS += fusion_summary
+fusion_summary :
+	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk) && \
+	$(MAKE) -f weigelt-lab/summary/fusion_summary.mk clean	
+	
 #==================================================
 # FASTQ aligners
 #==================================================
@@ -212,11 +217,6 @@ rnaseq_metrics :
 #==================================================
 # Beta test
 #==================================================
-
-TARGETS += fusion_summary
-fusion_summary :
-	$(call RUN_MAKE,weigelt-lab/summary/fusion_summary.mk) && \
-	$(MAKE) -f weigelt-lab/summary/fusion_summary.mk clean
 
 TARGETS += hla_polysolver
 hla_polysolver :
