@@ -11,7 +11,7 @@ if (!interactive()) {
 
 optList = list(make_option(c("--arriba"), type="character", default=NULL, help="Arriba fusion summary"),
                make_option(c("--starfusion"), type="character", default=NULL, help="STAR fusion summary"),
-               make_option(c("--ensmbl"), type="character", default=NULL, help="Ensembl database"),
+               make_option(c("--ensembl"), type="character", default=NULL, help="Ensembl database"),
                make_option(c("--output"), type="character", default=NULL, help="Output file name"))
 parser = OptionParser(usage = "%prog", option_list = optList)
 arguments = parse_args(parser, positional_arguments = T)
