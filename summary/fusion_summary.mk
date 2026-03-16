@@ -29,6 +29,7 @@ summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(
 																										$(RSCRIPT) $(SCRIPTS_DIR)/summary/fusion_summary.R \
 																										--arriba arriba/fusion_summary.txt \
 																										--starfusion starfusion/fusion_summary.txt \
+																										--ensembl $(HOME)/share/lib/resource_files/Hugo_ENST_ensembl75_fixed.txt \
 																										--output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
