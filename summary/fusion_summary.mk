@@ -16,9 +16,9 @@ get_smry_path = $(1)/fusion_summary.txt
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
-$(foreach caller,$(CALLERS), \
-	$(foreach sample,$(SAMPLES), \
-		$(eval $(call get_tsv_path,$(caller),$(sample)) : ; $(MAKE) -f $(call get_makefile,$(caller)))))
+#$(foreach caller,$(CALLERS), \
+#	$(foreach sample,$(SAMPLES), \
+#		$(eval $(call get_tsv_path,$(caller),$(sample)) : ; $(MAKE) -f $(call get_makefile,$(caller)))))
 
 $(foreach caller,$(CALLERS), \
 	$(eval $(call get_smry_path,$(caller)) : ; $(MAKE) -f $(call get_makefile,$(caller))))
