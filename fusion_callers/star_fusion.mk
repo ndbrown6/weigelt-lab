@@ -3,9 +3,12 @@ include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/star_fusion.$(NOW)
 
-smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
-	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
-	   starfusion/fusion_summary.txt
+call_fusions : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
+			   starfusion/fusion_summary.txt
+
+draw_fusions : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf)
+
+smry : call_fusions draw_fusion
 	      
 STAR_THREADS ?= 4
 STAR_MEM_THREAD ?= 15G
@@ -45,6 +48,11 @@ starfusion/$1/fusions.tsv : starfusion/$1/$1_R1.fastq starfusion/$1/$1_R2.fastq
 																																			      mv starfusion/$1/star-fusion.fusion_predictions.abridged.tsv $$(@) && \
 																																			      mv starfusion/$1/star-fusion.fusion_predictions.tsv starfusion/$1/predictions.tsv")
 
+endef
+$(foreach sample,$(SAMPLES),\
+	$(eval $(call star-fusion,$(sample))))
+
+define draw-fusions	
 starfusion/$1/fusions.txt : starfusion/$1/fusions.tsv
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/starfusion -N $1/reformat,"set -o pipefail && \
 																				 $$(RSCRIPT) $(SCRIPTS_DIR)/summary/starfusion_summary.R \
@@ -52,7 +60,7 @@ starfusion/$1/fusions.txt : starfusion/$1/fusions.tsv
 																				 --sample_names $1 \
 																				 --ensembl $(HOME)/share/lib/resource_files/Hugo_ENST_ensembl75_fixed.txt")
 																						 																																			      
-starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.tsv
+starfusion/$1/Aligned.sortedByCoord.out.bam : starfusion/$1/fusions.txt
 	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/starfusion -N $1/sort,"set -o pipefail && \
 																												   samtools sort \
 																												   -@ $(SAMTOOLS_THREADS) \
@@ -71,9 +79,8 @@ starfusion/$1/fusions.pdf : starfusion/$1/fusions.txt starfusion/$1/Aligned.sort
 																												    --proteinDomains=$$(PROTEIN_DOMAINS_GFF3) \
 																												    --output=$$(@)")
 
-endef
 $(foreach sample,$(SAMPLES),\
-	$(eval $(call star-fusion,$(sample))))
+	$(eval $(call draw-fusions,$(sample))))
 		
 starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
 	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/starfusion -N summary,"set -o pipefail && \
@@ -85,7 +92,7 @@ starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)
 	$(STARFUSION_ENV)/bin/STAR-Fusion --version &> version/star_fusion.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean : 
 	rm -f starfusion/*/*.fastq && \

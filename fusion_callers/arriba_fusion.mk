@@ -3,9 +3,12 @@ include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/arriba_fusion.$(NOW)
 
-smry : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
-       $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.pdf) \
-       arriba/fusion_summary.txt
+call_fusions : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
+			   arriba/fusion_summary.txt
+
+draw_fusions : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.pdf)
+
+smry : call_fusions draw_fusion
 	 
 STAR_THREADS ?= 16
 STAR_MEM_THREAD ?= 4G
@@ -31,7 +34,7 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
 
 
-define run-star-arriba
+define run-arriba
 arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 	$$(call RUN,-c -n $(STAR_THREADS) -s 1G -m $(STAR_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/STAR -v $(ARRIBA_ENV) -w $(STAR_WALL_TIME),"set -o pipefail && \
 																																			 STAR \
@@ -58,16 +61,7 @@ arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 																																			 --chimMultimapNmax 50 \
 																																			 --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
 
-arriba/$1/$1.Aligned.sortedByCoord.out.bam : arriba/$1/$1.Aligned.out.bam
-	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/sort,"set -o pipefail && \
-																											   samtools sort \
-																											   -@ $(SAMTOOLS_THREADS) \
-																											   -m $(SAMTOOLS_MEM_THREAD) \
-																											   -o $$(@) \
-																											   $$(<) && \
-																											   samtools index $$(@)")
-																	 
-arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam arriba/$1/$1.Aligned.sortedByCoord.out.bam
+arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
 	$$(call RUN,-c -n 1 -s 24G -m 36G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
 																							  $$(ARRIBA) -x arriba/$1/$1.Aligned.out.bam \
 																							  -o arriba/$1/fusions.tsv \
@@ -78,6 +72,20 @@ arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam arriba/$1/$1.Aligned.sorted
 																							  -k $$(KNOWN_FUSIONS_TSV) \
 																							  -t $$(KNOWN_FUSIONS_TSV) \
 																							  -p $$(PROTEIN_DOMAINS_GFF3)")
+																							  
+endef
+$(foreach sample,$(SAMPLES),\
+                $(eval $(call run-arriba,$(sample))))
+
+define draw-fusions	  
+arriba/$1/$1.Aligned.sortedByCoord.out.bam : arriba/$1/$1.Aligned.out.bam arriba/$1/fusions.tsv
+	$$(call RUN,-c -n $(SAMTOOLS_THREADS) -s 1G -m $(SAMTOOLS_MEM_THREAD) -p $(PROJECT_DIR)/arriba -N $1/sort,"set -o pipefail && \
+																											   samtools sort \
+																											   -@ $(SAMTOOLS_THREADS) \
+																											   -m $(SAMTOOLS_MEM_THREAD) \
+																											   -o $$(@) \
+																											   $$(<) && \
+																											   samtools index $$(@)")
 
 arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.sortedByCoord.out.bam
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/arriba -N $1/draw_fusions -v $(GENOMIC_ALIGNMENTS_ENV),"set -o pipefail && \
@@ -91,7 +99,7 @@ arriba/$1/fusions.pdf : arriba/$1/fusions.tsv arriba/$1/$1.Aligned.sortedByCoord
 
 endef
 $(foreach sample,$(SAMPLES),\
-                $(eval $(call run-star-arriba,$(sample))))
+                $(eval $(call draw-fusions,$(sample))))
 				
 arriba/fusion_summary.txt : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv)
 	$(call RUN, -c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/arriba -N summary,"set -o pipefail && \
@@ -102,7 +110,7 @@ arriba/fusion_summary.txt : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions
 	$(ARRIBA) -h > version/arriba_fusion.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean : 
 	rm -f arriba/*/*_R1.fastq.gz && \

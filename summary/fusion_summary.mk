@@ -18,10 +18,10 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 $(foreach caller,$(CALLERS), \
 	$(foreach sample,$(SAMPLES), \
-		$(eval $(call get_tsv_path,$(caller),$(sample)) : ; $(MAKE) -f $(call get_makefile,$(caller)))))
+		$(eval $(call get_tsv_path,$(caller),$(sample)) : ; $(MAKE) -f $(call get_makefile,$(caller)) call_fusions)))
 
-$(foreach caller,$(CALLERS), \
-	$(eval $(call get_smry_path,$(caller)) : ; $(MAKE) -f $(call get_makefile,$(caller))))
+# $(foreach caller,$(CALLERS), \
+# 	$(eval $(call get_smry_path,$(caller)) : ; $(MAKE) -f $(call get_makefile,$(caller))))
 
 summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(caller)))
 	$(call RUN,-c -n 1 -s 8G -m 16G -v $(FUSIONSUMMARY_ENV) -p $(PROJECT_DIR)/summary -N merge_fusions,"set -o pipefail && \
