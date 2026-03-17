@@ -3,12 +3,13 @@ include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/arriba_fusion.$(NOW)
 
-call_fusions : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv) \
-			   arriba/fusion_summary.txt
-
+call_fusions : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.tsv)
+smry_fusions : arriba/fusion_summary.txt
 draw_fusions : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions.pdf)
 
-smry : call_fusions draw_fusion
+smry : call_fusions \
+	   smry_fusions \
+	   draw_fusions
 	 
 STAR_THREADS ?= 16
 STAR_MEM_THREAD ?= 4G
