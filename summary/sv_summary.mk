@@ -53,7 +53,7 @@ annotate_sv/$1_$2/$1_$2.txt : annotate_sv/$1_$2/$1_$2.vcf
 																							 mv ./annotate_sv/$1_$2/$1_$2.tsv $$(@)")
 							       
 $$(foreach caller,$$(CALLERS), \
-	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; $$(MAKE) -f $$(call get_makefile,$$(caller))))
+	$$(eval $$(call get_vcf_path,$$(caller),$1,$2) : ; +$$(MAKE) -f $$(call get_makefile,$$(caller))))
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\

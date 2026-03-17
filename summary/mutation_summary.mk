@@ -29,14 +29,14 @@ endif
 
 define caller-rule
 $(1)/mutation_summary.maf :
-	$$(MAKE) -f $$(call get_makefile,$(1)) $$(@)
+	+$$(MAKE) -f $$(call get_makefile,$(1)) $$(@)
 
 endef
 $(foreach caller,$(CALLERS), \
 	$(eval $(call caller-rule,$(caller))))
 	
 $(FACETS_GENE_FILE) :
-	$(MAKE) -f $(FACETS_MK) facets
+	+$(MAKE) -f $(FACETS_MK) facets
 
 define maf-args
 $(foreach caller,$(CALLERS),--$(caller)_maf $(caller)/mutation_summary.maf)
@@ -57,5 +57,5 @@ summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 .PHONY: smry clean
 
 clean:
-	$(foreach caller,$(CALLERS),$(MAKE) -f $(call get_makefile,$(caller)) clean;)
-	$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
+	$(foreach caller,$(CALLERS),+$(MAKE) -f $(call get_makefile,$(caller)) clean;)
+	+$(MAKE) -f weigelt-lab/copy_number/facets_suite.mk clean
