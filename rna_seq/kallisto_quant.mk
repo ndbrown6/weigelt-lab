@@ -1,6 +1,6 @@
 include weigelt-lab/Makefile.inc
 
-LOGDIR = log/kallisto.$(NOW)
+LOGDIR = log/kallisto_quant.$(NOW)
 
 kallisto : $(foreach sample,$(SAMPLES),kallisto/$(sample)/$(sample)_R1.fastq) \
 		   $(foreach sample,$(SAMPLES),kallisto/$(sample)/$(sample)_R2.fastq) \
@@ -48,9 +48,9 @@ kallisto/tpm_bygene.txt : $(foreach sample,$(SAMPLES),kallisto/$(sample)/abundan
 																							     --samples '$(SAMPLES)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	$(SAMTOOLS) --version > version/kallisto.txt; \
-	~/share/env/kallisto-0.46.2/bin/kallisto version >> version/kallisto.txt; \
-	~/share/env/kallisto-0.46.2/bin/R --version >> version/kallisto.txt;)
+	$(SAMTOOLS) --version > version/kallisto_quant.txt; \
+	~/share/env/kallisto-0.46.2/bin/kallisto version >> version/kallisto_quant.txt; \
+	~/share/env/kallisto-0.46.2/bin/R --version >> version/kallisto_quant.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: kallisto clean

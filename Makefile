@@ -124,6 +124,11 @@ kallisto_quant :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/kallisto_quant.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
 
+TARGETS += immune_deconvolution
+immune_deconvolution :
+	$(call RUN_MAKE,weigelt-lab/rna_seq/immune_deconvolution.mk) && \
+	$(MAKE) -f weigelt-lab/rna_seq/immune_deconvolution.mk clean
+
 #==================================================
 # DNA structural variant callers
 #==================================================
@@ -222,11 +227,6 @@ TARGETS += hla_polysolver
 hla_polysolver :
 	$(call RUN_MAKE,weigelt-lab/misc/hla_polysolver.mk) && \
 	$(MAKE) -f weigelt-lab/misc/hla_polysolver.mk clean
-
-TARGETS += immune_deconvolution
-immune_deconvolution :
-	$(call RUN_MAKE,weigelt-lab/misc/immune_deconvolution.mk) && \
-	$(MAKE) -f weigelt-lab/misc/immune_deconvolution.mk clean
 
 TARGETS += msi_sensor
 msi_sensor :
