@@ -34,7 +34,7 @@ immune_deconvolution/cibersort.txt : kallisto/tpm_bygene.txt
 																									--output_file $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
-	~/share/usr/env/r-immunedeconv-2.1.0/bin/R --version >> version/immune_deconvolution.txt;)
+	~/share/env/r-immunedeconv-2.1.0/bin/R --version >> version/immune_deconvolution.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
