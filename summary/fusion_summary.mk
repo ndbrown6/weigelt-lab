@@ -14,7 +14,7 @@ get_smry_path = $(1)/fusion_summary.txt
 PROJECT_DIR := $(notdir $(CURDIR))
 
 $(foreach caller,$(CALLERS), \
-	$(eval $(call get_smry_path,$(caller)) : ; $(MAKE) -f $(call get_makefile,$(caller)) smry_fusions))
+	$(eval $(call get_smry_path,$(caller)) : ; +$(MAKE) -f $(call get_makefile,$(caller)) smry_fusions))
 
 summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(caller)))
 	$(call RUN,-c -n 1 -s 8G -m 16G -v $(FUSIONSUMMARY_ENV) -p $(PROJECT_DIR)/summary -N merge_fusions,"set -o pipefail && \
@@ -33,5 +33,5 @@ summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(
 .PHONY: clean
 
 clean :
-	$(MAKE) -f $(call get_makefile,arriba) clean
-	$(MAKE) -f $(call get_makefile,starfusion) clean
+	+$(MAKE) -f $(call get_makefile,arriba) clean
+	+$(MAKE) -f $(call get_makefile,starfusion) clean
