@@ -79,6 +79,7 @@ starfusion/$1/fusions.pdf : starfusion/$1/fusions.txt starfusion/$1/Aligned.sort
 																												    --proteinDomains=$$(PROTEIN_DOMAINS_GFF3) \
 																												    --output=$$(@)")
 
+endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call draw-fusions,$(sample))))
 		
