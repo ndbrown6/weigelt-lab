@@ -222,46 +222,45 @@ rnaseq_metrics :
 #==================================================
 # Beta test
 #==================================================
+TARGETS += mi_msi
+mi_msi :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/mi_msi.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/mi_msi.mk clean
+
+TARGETS += msi_sensor
+msi_sensor :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/msi_sensor.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/msi_sensor.mk clean
+
+TARGETS += deconstruct_sigs
+deconstruct_sigs :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/deconstruct_sigs.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/deconstruct_sigs.mk clean
+	
+TARGETS += hrd_cn
+hrd_cn :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/hrd_cn.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/hrd_cn.mk clean
+	
+TARGETS += star_fish
+star_fish :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/star_fish.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/star_fish.mk clean
+
+TARGETS += sv_signtaure
+sv_signtaure :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/sv_signtaure.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/sv_signtaure.mk clean
+
+TARGETS += hr_detect
+hr_detect :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/hr_detect.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/hr_detect.mk clean
 
 TARGETS += hla_polysolver
 hla_polysolver :
 	$(call RUN_MAKE,weigelt-lab/misc/hla_polysolver.mk) && \
 	$(MAKE) -f weigelt-lab/misc/hla_polysolver.mk clean
-
-TARGETS += msi_sensor
-msi_sensor :
-	$(call RUN_MAKE,weigelt-lab/misc/msi_sensor.mk) && \
-	$(MAKE) -f weigelt-lab/misc/msi_sensor.mk clean
-
-TARGETS += mi_msi
-mi_msi :
-	$(call RUN_MAKE,weigelt-lab/misc/mi_msi.mk) && \
-	$(MAKE) -f weigelt-lab/misc/mi_msi.mk clean
-
-TARGETS += hr_detect
-hr_detect :
-	$(call RUN_MAKE,weigelt-lab/misc/hr_detect.mk) && \
-	$(MAKE) -f weigelt-lab/misc/hr_detect.mk clean
-
-TARGETS += cn_hrd
-cn_hrd :
-	$(call RUN_MAKE,weigelt-lab/misc/cn_hrd.mk) && \
-	$(MAKE) -f weigelt-lab/misc/cn_hrd.mk clean
-
-TARGETS += deconstruct_sigs
-deconstruct_sigs :
-	$(call RUN_MAKE,weigelt-lab/misc/deconstruct_sigs.mk) && \
-	$(MAKE) -f weigelt-lab/misc/deconstruct_sigs.mk clean
-
-TARGETS += sv_signtaure
-sv_signtaure :
-	$(call RUN_MAKE,weigelt-lab/misc/sv_signtaure.mk) && \
-	$(MAKE) -f weigelt-lab/misc/sv_signtaure.mk clean
-
-TARGETS += star_fish
-star_fish :
-	$(call RUN_MAKE,weigelt-lab/misc/star_fish.mk) && \
-	$(MAKE) -f weigelt-lab/misc/star_fish.mk clean
 
 TARGETS += sufam_genotype
 sufam_genotype :
