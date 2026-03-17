@@ -32,6 +32,7 @@ GENOMIC_ALIGNMENTS_ENV ?= $(HOME)/share/env/r-genomicalignments-1.34.0
 GGPLOT2_ENV ?= $(HOME)/share/env/r-tidyverse-2.0.0
 STARFUSION_ENV ?= $(HOME)/share/env/star-fusion-1.6.0
 FUSIONSUMMARY_ENV ?= $(HOME)/share/env/fusion-summary-0.0.1
+IMMUNE_ENV ?= $(HOME)/share/env/r-immunedeconv-2.1.0
 
 # aliases
 PYTHON ?= python
