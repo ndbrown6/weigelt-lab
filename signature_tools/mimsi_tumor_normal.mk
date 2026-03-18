@@ -1,6 +1,6 @@
 include weigelt-lab/Makefile.inc
 
-LOGDIR ?= log/mi_msi.$(NOW)
+LOGDIR ?= log/mimsi_tumor_normal.$(NOW)
 
 smry : $(foreach pair,$(SAMPLE_PAIRS),mimsi/$(pair)/$(pair).txt) \
 	   mimsi/msi_summary.txt
@@ -36,13 +36,10 @@ mimsi/msi_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),mimsi/$(pair)/$(pair).txt
 																		 --sample_names '$(SAMPLE_PAIRS)'")
 
 ..DUMMY := $(shell mkdir -p version; \
-	     $(POLYSOLVER_ENV)/bin/shell_call_hla_type --help &> version/hla_polysolver.txt; \
-	     $(POLYSOLVER_ENV)/bin/shell_call_hla_mutations_from_type --help &>> version/hla_polysolver.txt; \
-	     $(POLYSOLVER_ENV)/bin/shell_annotate_hla_mutations --help &>> version/hla_polysolver.txt)
+	$(MIMSI_ENV)/bin/analyze --version &> version/mimsi_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: clean
 
 clean :
-#	rm -f mimsi/*/*.log && \
-#	rm -f mimsi/*/*.so
+	rm -f mimsi/*/*.npy

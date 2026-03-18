@@ -228,10 +228,10 @@ rnaseq_metrics :
 # Beta test
 #==================================================
 
-TARGETS += mi_msi
-mi_msi :
-	$(call RUN_MAKE,weigelt-lab/signature_tools/mi_msi.mk) && \
-	$(MAKE) -f weigelt-lab/signature_tools/mi_msi.mk clean
+TARGETS += mimsi_tumor_normal
+mimsi_tumor_normal :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/mimsi_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/mimsi_tumor_normal.mk clean
 
 TARGETS += msi_sensor
 msi_sensor :
