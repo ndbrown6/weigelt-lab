@@ -233,10 +233,10 @@ mimsi_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/mimsi_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/signature_tools/mimsi_tumor_normal.mk clean
 
-TARGETS += msi_sensor
-msi_sensor :
-	$(call RUN_MAKE,weigelt-lab/signature_tools/msi_sensor.mk) && \
-	$(MAKE) -f weigelt-lab/signature_tools/msi_sensor.mk clean
+TARGETS += msisensor_tumor_normal
+msisensor_tumor_normal :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/msisensor_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/msisensor_tumor_normal.mk clean
 
 TARGETS += deconstruct_sigs
 deconstruct_sigs :
