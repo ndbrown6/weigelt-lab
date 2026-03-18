@@ -79,4 +79,8 @@ hla_polysolver/summary/strelka_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_
 clean :
 	rm -f hla_polysolver/*/*.out && \
 	rm -f hla_polysolver/*/*.vcf && \
-	rm -f hla_polysolver/*/ids_*
+	rm -f hla_polysolver/*/ids_* && \
+	rm -f hla_polysolver/*/*.fastq && \
+	rm -f hla_polysolver/*/temp.* && \
+	rm -f hla_polysolver/*/*.lik* && \
+	rm -f hla_polysolver/*/*.R0k6
