@@ -13,6 +13,43 @@ polysolver : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/winners.hla.t
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
+BAM_SOURCE ?= local
+
+ifeq ($(BAM_SOURCE),irb)
+define hla-polysolver
+hla_polysolver/$1_$2/winners.hla.txt :
+	$$(call RUN,-c -n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/hla_type -N $1/$2 -w 72:00:00, "set -o pipefail && \
+																										   shell_call_hla_type \
+																										   /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$2.bam \
+																										   Unknown \
+																										   1 \
+																										   hg19 \
+																										   STDFQ \
+																										   0 \
+																										   hla_polysolver/$1_$2")
+
+hla_polysolver/$1_$2/hla.intervals : hla_polysolver/$1_$2/winners.hla.txt
+	$$(call RUN,-c -n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/hla_mutations -N $1/$2 -w 72:00:00, "set -o pipefail && \
+																											    shell_call_hla_mutations_from_type \
+																											    /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$2.bam \
+																											    /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam \
+																											    $$(<) \
+																											    hg19 \
+																											    STDFQ \
+																											    hla_polysolver/$1_$2")
+
+hla_polysolver/$1_$2/$1_$2.mutect.unfiltered.annotated : hla_polysolver/$1_$2/hla.intervals
+	$$(call RUN,-n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/annotate -N $1/$2 -w 72:00:00, "set -o pipefail && \
+																										shell_annotate_hla_mutations \
+																										$1_$2 \
+																										hla_polysolver/$1_$2")
+
+hla_polysolver/$1_$2/$1_$2.strelka_indels.unfiltered.annotated : hla_polysolver/$1_$2/$1_$2.mutect.unfiltered.annotated
+
+endef
+$(foreach pair,$(SAMPLE_PAIRS),\
+	$(eval $(call hla-polysolver,$(tumor.$(pair)),$(normal.$(pair)))))
+else
 define hla-polysolver
 hla_polysolver/$1_$2/winners.hla.txt : bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/hla_type -N $1/$2 -w 72:00:00, "set -o pipefail && \
@@ -46,6 +83,7 @@ hla_polysolver/$1_$2/$1_$2.strelka_indels.unfiltered.annotated : hla_polysolver/
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call hla-polysolver,$(tumor.$(pair)),$(normal.$(pair)))))
+endif
 
 hla_polysolver/summary/hla_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/winners.hla.txt)
 	$(call RUN,-s 12G -m 24G -p $(PROJECT_DIR)/summary -N hla_summary,"set -o pipefail && \
