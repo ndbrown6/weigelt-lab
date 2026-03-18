@@ -50,7 +50,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 hla_polysolver/summary/hla_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/winners.hla.txt)
 	$(call RUN,-s 12G -m 24G -p $(PROJECT_DIR)/summary -N hla_summary,"set -o pipefail && \
 																	   mkdir -p hla_polysolver/summary && \
-																	   $(RSCRIPT) $(SCRIPTS_DIR)variant_callers/polysolver.R \
+																	   $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/polysolver.R \
 																	   --option 1 \
 																	   --sample_names '$(SAMPLE_PAIRS)'")
 
