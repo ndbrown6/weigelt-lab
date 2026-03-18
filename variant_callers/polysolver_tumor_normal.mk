@@ -47,26 +47,26 @@ endef
 $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call hla-polysolver,$(tumor.$(pair)),$(normal.$(pair)))))
 
-hla_polysolver/summary/hla_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).mutect.unfiltered.annotated) $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).strelka_indels.unfiltered.annotated)
-	$(call RUN,-c -s 12G -m 24G -p $(PROJECT_DIR)/summary -N hla_summary,"set -o pipefail && \
-																		  mkdir -p hla_polysolver/summary && \
-																		  $(RSCRIPT) $(SCRIPTS_DIR)variant_callers/polysolver.R \
-																		  --option 1 \
-																		  --sample_names '$(SAMPLE_PAIRS)'")
+hla_polysolver/summary/hla_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/winners.hla.txt)
+	$(call RUN,-s 12G -m 24G -p $(PROJECT_DIR)/summary -N hla_summary,"set -o pipefail && \
+																	   mkdir -p hla_polysolver/summary && \
+																	   $(RSCRIPT) $(SCRIPTS_DIR)variant_callers/polysolver.R \
+																	   --option 1 \
+																	   --sample_names '$(SAMPLE_PAIRS)'")
 
 hla_polysolver/summary/mutect_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).mutect.unfiltered.annotated) $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).strelka_indels.unfiltered.annotated)
-	$(call RUN,-c -s 12G -m 24G -p $(PROJECT_DIR)/summary -N mutect_summary,"set -o pipefail && \
-																			 mkdir -p hla_polysolver/summary && \
-																			 $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/polysolver.R \
-																			 --option 2 \
-																			 --sample_names '$(SAMPLE_PAIRS)'")
+	$(call RUN,-s 12G -m 24G -p $(PROJECT_DIR)/summary -N mutect_summary,"set -o pipefail && \
+																		  mkdir -p hla_polysolver/summary && \
+																		  $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/polysolver.R \
+																		  --option 2 \
+																		  --sample_names '$(SAMPLE_PAIRS)'")
 
 hla_polysolver/summary/strelka_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).mutect.unfiltered.annotated) $(foreach pair,$(SAMPLE_PAIRS),hla_polysolver/$(pair)/$(pair).strelka_indels.unfiltered.annotated)
-	$(call RUN,-c -s 12G -m 24G -p $(PROJECT_DIR)/summary -N strelka_summary,"set -o pipefail && \
-																			  mkdir -p hla_polysolver/summary && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/polysolver.R \
-																			  --option 3 \
-																			  --sample_names '$(SAMPLE_PAIRS)'")
+	$(call RUN,-s 12G -m 24G -p $(PROJECT_DIR)/summary -N strelka_summary,"set -o pipefail && \
+																		   mkdir -p hla_polysolver/summary && \
+																		   $(RSCRIPT) $(SCRIPTS_DIR)/variant_callers/polysolver.R \
+																		   --option 3 \
+																		   --sample_names '$(SAMPLE_PAIRS)'")
 
 ..DUMMY := $(shell mkdir -p version; \
 	$(POLYSOLVER_ENV)/bin/shell_call_hla_type --help &> version/polysolver_tumor_normal.txt; \
