@@ -36,10 +36,10 @@ hla_polysolver/$1_$2/hla.intervals : bam/$1.bam bam/$2.bam hla_polysolver/$1_$2/
 																											    hla_polysolver/$1_$2")
 
 hla_polysolver/$1_$2/$1_$2.mutect.unfiltered.annotated : hla_polysolver/$1_$2/hla.intervals
-	$$(call RUN,-c -n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/annotate -N $1/$2 -w 72:00:00, "set -o pipefail && \
-																										   shell_annotate_hla_mutations \
-																										   $1_$2 \
-																										   hla_polysolver/$1_$2")
+	$$(call RUN,-n 8 -s 2G -m 4G -v $(POLYSOLVER_ENV) -p $(PROJECT_DIR)/annotate -N $1/$2 -w 72:00:00, "set -o pipefail && \
+																										shell_annotate_hla_mutations \
+																										$1_$2 \
+																										hla_polysolver/$1_$2")
 
 hla_polysolver/$1_$2/$1_$2.strelka_indels.unfiltered.annotated : hla_polysolver/$1_$2/$1_$2.mutect.unfiltered.annotated
 
