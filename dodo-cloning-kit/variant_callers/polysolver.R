@@ -3,12 +3,13 @@ suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("magrittr"))
 
-options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+if (!interactive()) {
+	options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
+}
 
-optList <- list(make_option("--option", default = "NA", help = "which option?"),
-                make_option("--sample_names", default = "NA", help = "sample names"))
-
-parser <- OptionParser(usage = "%prog [options]", option_list = optList)
+args_list <- list(make_option("--option", default = "NA", help = "which option?"),
+	              make_option("--sample_names", default = "NA", help = "sample names"))
+parser <- OptionParser(usage = "%prog", option_list = args_list)
 arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
 
