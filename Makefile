@@ -96,6 +96,11 @@ platypus_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/variant_callers/platypus_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/variant_callers/platypus_tumor_normal.mk clean
 
+TARGETS += polysolver_tumor_normal
+polysolver_tumor_normal :
+	$(call RUN_MAKE,weigelt-lab/variant_callers/polysolver_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/variant_callers/polysolver_tumor_normal.mk clean
+
 #==================================================
 # Copy number aberrations
 #==================================================
@@ -222,6 +227,7 @@ rnaseq_metrics :
 #==================================================
 # Beta test
 #==================================================
+
 TARGETS += mi_msi
 mi_msi :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/mi_msi.mk) && \
@@ -256,11 +262,6 @@ TARGETS += hr_detect
 hr_detect :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/hr_detect.mk) && \
 	$(MAKE) -f weigelt-lab/signature_tools/hr_detect.mk clean
-
-TARGETS += hla_polysolver
-hla_polysolver :
-	$(call RUN_MAKE,weigelt-lab/misc/hla_polysolver.mk) && \
-	$(MAKE) -f weigelt-lab/misc/hla_polysolver.mk clean
 
 TARGETS += sufam_genotype
 sufam_genotype :
