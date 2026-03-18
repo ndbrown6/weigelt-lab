@@ -13,6 +13,7 @@ MODEL = $(HOME)/share/lib/resource_files/mimsi/mi_msi_v0_4_0_200x.model
 BAM_SOURCE ?= local
 
 ifeq ($(BAM_SOURCE),irb)
+define mimsi-tumor-normal
 mimsi/$1_$2/$1_$2.txt :
 	$$(call RUN,-c -n 8 -s 1G -m 2G -v $(MIMSI_ENV) -p $(PROJECT_DIR)/mimsi -N $1/$2,"set -o pipefail && \
 																					  mkdir -p mimsi/$1_$2/ && \
