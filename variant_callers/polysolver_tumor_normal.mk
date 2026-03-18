@@ -82,5 +82,10 @@ clean :
 	rm -f hla_polysolver/*/ids_* && \
 	rm -f hla_polysolver/*/*.fastq && \
 	rm -f hla_polysolver/*/temp.* && \
-	rm -f hla_polysolver/*/*.lik* && \
+	rm -f hla_polysolver/*/hla_a_*.lik1 && \
+	rm -f hla_polysolver/*/hla_a_*.lik2 && \
+	rm -f hla_polysolver/*/hla_b_*.lik1 && \
+	rm -f hla_polysolver/*/hla_b_*.lik2 && \
+	rm -f hla_polysolver/*/hla_c_*.lik1 && \
+	rm -f hla_polysolver/*/hla_c_*.lik2 && \
 	rm -f hla_polysolver/*/*.R0k6
