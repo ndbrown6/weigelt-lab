@@ -24,6 +24,6 @@ if (as.numeric(opt$option)==1) {
 				    readr::type_convert()
 	}
 	smry = do.call(rbind, smry)
-	write_tsv(smry, path = "mimsi/summary.txt", append = FALSE, col_names = TRUE)
+	write_tsv(smry, path = "mimsi/msi_summary.txt", append = FALSE, col_names = TRUE)
 
 }
