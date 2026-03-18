@@ -9,10 +9,10 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-optList = list(make_option('--sample_names', type = 'character', default = NA, help = 'list of samples names'))
-parser = OptionParser(usage = "%prog",  option_list=optList)
-arguments = parse_args(parser, positional_arguments = T)
-opt = arguments$options
+optList <- list(make_option('--sample_names', type = 'character', default = NA, help = 'list of samples names'))
+parser <- OptionParser(usage = "%prog",  option_list=optList)
+arguments <- parse_args(parser, positional_arguments = T)
+opt <- arguments$options
 
 sample_names = unlist(strsplit(x=opt$sample_names, split=" ", fixed=TRUE))
 smry = list()

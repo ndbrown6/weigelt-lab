@@ -11,12 +11,12 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-optList = list(make_option('--option', type = 'character', default = NA, help = 'Immune deconv algorithm'),
-               make_option('--input_file', type = 'character', default = NA, help = 'Expression input file'),
-	       make_option('--output_file', type = 'character', default = NA, help = 'Immune cell output file'))
-parser = OptionParser(usage = "%prog",  option_list=optList)
-arguments = parse_args(parser, positional_arguments = T)
-opt = arguments$options
+optList <- list(make_option('--option', type = 'character', default = NA, help = 'Immune deconv algorithm'),
+	            make_option('--input_file', type = 'character', default = NA, help = 'Expression input file'),
+		        make_option('--output_file', type = 'character', default = NA, help = 'Immune cell output file'))
+parser <- OptionParser(usage = "%prog",  option_list=optList)
+arguments <- parse_args(parser, positional_arguments = T)
+opt <- arguments$options
 
 set_cibersort_binary("~/share/lib/resource_files/CIBERSORT/CIBERSORT.R")
 set_cibersort_mat("~/share/lib/resource_files/CIBERSORT/LM22.txt")

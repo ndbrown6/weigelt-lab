@@ -9,9 +9,9 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-args_list <- list(make_option("--option", default = NA, type = 'character', help = "type of analysis"),
-				  make_option("--sample_names", default = NA, type = 'character', help = "sample name"))
-parser <- OptionParser(usage = "%prog", option_list = args_list)
+optList <- list(make_option("--option", default = NA, type = 'character', help = "type of analysis"),
+				make_option("--sample_names", default = NA, type = 'character', help = "sample name"))
+parser <- OptionParser(usage = "%prog", option_list = optList)
 arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
 

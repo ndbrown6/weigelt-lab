@@ -9,13 +9,13 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-optList = list(make_option(c("--arriba"), type="character", default=NULL, help="Arriba fusion summary"),
-               make_option(c("--starfusion"), type="character", default=NULL, help="STAR fusion summary"),
-               make_option(c("--ensembl"), type="character", default=NULL, help="Ensembl database"),
-               make_option(c("--output"), type="character", default=NULL, help="Output file name"))
-parser = OptionParser(usage = "%prog", option_list = optList)
-arguments = parse_args(parser, positional_arguments = T)
-opt = arguments$options
+optList <- list(make_option(c("--arriba"), type="character", default=NULL, help="Arriba fusion summary"),
+                make_option(c("--starfusion"), type="character", default=NULL, help="STAR fusion summary"),
+                make_option(c("--ensembl"), type="character", default=NULL, help="Ensembl database"),
+                make_option(c("--output"), type="character", default=NULL, help="Output file name"))
+parser <- OptionParser(usage = "%prog", option_list = optList)
+arguments <- parse_args(parser, positional_arguments = T)
+opt <- arguments$options
 
 arriba = readr::read_tsv(opt$arriba, col_names = TRUE, col_types = cols(.default = col_character())) %>%
 		 dplyr::mutate(fusion_uuid = paste0(trimws(`#gene1`), "--", trimws(gene2))) %>%

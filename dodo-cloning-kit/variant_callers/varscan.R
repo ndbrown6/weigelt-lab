@@ -11,14 +11,14 @@ if (!interactive()) {
 }
 
 args_list <- list(make_option("--option", default = NA, type = 'character', help = "type of analysis"),
-		  make_option(c("-i", "--input"), default = NULL, type = "character", help = "Input BED file path", metavar = "character"),
-		  make_option(c("-o", "--out_prefix"), default = "chunk", type = "character", help = "Output file prefix [default = %default]", metavar = "character"),
-		  make_option(c("-n", "--num_chunks"), default = 100, type = "integer", help = "Number of chunks to split into [default = %default]", metavar = "integer"),
-		  make_option(c("-d", "--output_dir"), default = ".", type = "character", help = "Output directory [default = %default]", metavar = "character"),
-		  make_option(c("-s", "--sample_name"), default = ".", type = "character", help = "Sample name [default = %default]", metavar = "character"),
-		  make_option(c("-c", "--chunks"), default = ".", type = "character", help = "List of chunks [default = %default]", metavar = "character"),
-		  make_option(c("-fi", "--file_in"), default = ".", type = "character", help = "Input file name [default = %default]", metavar = "character"),
-		  make_option(c("-fo", "--file_out"), default = ".", type = "character", help = "Output file name [default = %default]", metavar = "character"))
+				  make_option(c("-i", "--input"), default = NULL, type = "character", help = "Input BED file path", metavar = "character"),
+				  make_option(c("-o", "--out_prefix"), default = "chunk", type = "character", help = "Output file prefix [default = %default]", metavar = "character"),
+				  make_option(c("-n", "--num_chunks"), default = 100, type = "integer", help = "Number of chunks to split into [default = %default]", metavar = "integer"),
+				  make_option(c("-d", "--output_dir"), default = ".", type = "character", help = "Output directory [default = %default]", metavar = "character"),
+				  make_option(c("-s", "--sample_name"), default = ".", type = "character", help = "Sample name [default = %default]", metavar = "character"),
+				  make_option(c("-c", "--chunks"), default = ".", type = "character", help = "List of chunks [default = %default]", metavar = "character"),
+				  make_option(c("-fi", "--file_in"), default = ".", type = "character", help = "Input file name [default = %default]", metavar = "character"),
+				  make_option(c("-fo", "--file_out"), default = ".", type = "character", help = "Output file name [default = %default]", metavar = "character"))
 parser <- OptionParser(usage = "%prog", option_list = args_list)
 arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options

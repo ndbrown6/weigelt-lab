@@ -11,11 +11,11 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-optList = list(make_option('--annotation', type = 'character', default = NA, help = 'path to annotation file'),
-               make_option('--samples', type = 'character', default = NA, help = 'list of samples names'))
-parser = OptionParser(usage = "%prog",  option_list=optList)
-arguments = parse_args(parser, positional_arguments = T)
-opt = arguments$options
+optList <- list(make_option('--annotation', type = 'character', default = NA, help = 'path to annotation file'),
+	            make_option('--samples', type = 'character', default = NA, help = 'list of samples names'))
+parser <- OptionParser(usage = "%prog",  option_list=optList)
+arguments <- parse_args(parser, positional_arguments = T)
+opt <- arguments$options
 
 sample_names = unlist(strsplit(x=opt$samples, split=" ", fixed=TRUE))
 annotation = readr::read_tsv(file=opt$annotation, col_names=TRUE, col_types=cols(.default=col_character()))
