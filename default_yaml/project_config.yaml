@@ -9,7 +9,7 @@ ref: b37
 # fastq source for alignment [local | irb]
 fastq_source: local
 
-# bam source for facets, cnvkit, mimsi & hla-polysolver [local | irb]
+# bam source for facets, cnvkit, mimsi, msisensor, hla-polysolver [local | irb]
 bam_source: local
 
 # facets summary [default | reviewed]
