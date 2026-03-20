@@ -34,6 +34,8 @@ STARFUSION_ENV ?= $(HOME)/share/env/star-fusion-1.6.0
 FUSIONSUMMARY_ENV ?= $(HOME)/share/env/fusion-summary-0.0.1
 IMMUNE_ENV ?= $(HOME)/share/env/r-immunedeconv-2.1.0
 MIMSI_ENV ?= $(HOME)/share/env/mimsi-0.4.4
+MSISENSOR_ENV ?= $(HOME)/share/env/msisensor-0.5/
+MSISENSOR_PRO_ENV ?= $(HOME)/share/env/msisensor-pro-1.3.0/
 POLYSOLVER_ENV ?= $(HOME)/share/env/hla-polysolver-0.0.1
 
 # aliases
