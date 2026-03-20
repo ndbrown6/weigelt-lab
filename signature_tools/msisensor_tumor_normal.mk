@@ -2,7 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/msisensor_tumor_normal.$(NOW)
 
-smry : $(foreach pair,$(SAMPLE_PAIRS),msisensor/$(pair).msi) \
+smry : $(foreach pair,$(SAMPLE_PAIRS),msisensor/$(pair)/$(pair).msi) \
 	   msisensor/msi_summary.txt
 	   
 PROJECT_DIR := $(notdir $(CURDIR))
@@ -14,8 +14,9 @@ BAM_SOURCE ?= local
 
 ifeq ($(BAM_SOURCE),irb)
 define msisensor-tumor-normal
-msisensor/$1_$2.msi :
+msisensor/$1_$2/$1_$2.msi :
 	$$(call RUN,-c -n 8 -s 1G -m 2G -v $(MSISENSOR_ENV) -p $(PROJECT_DIR)/msisensor -N $1/$2,"set -o pipefail && \
+																							  mkdir -p msisensor/$1_$2/ && \
 																							  msisensor msi $$(MSISENSOR_OPTS) \
 																							  -d $$(MICROSATELLITES_LIST) \
 																							  -e $$(MSI_REGIONS) \
@@ -28,8 +29,9 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call msisensor-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 else
 define msisensor-tumor-normal
-msisensor/$1_$2.msi : bam/$1.bam bam/$2.bam
+msisensor/$1_$2/$1_$2.msi : bam/$1.bam bam/$2.bam
 	$$(call RUN,-c -n 8 -s 1G -m 2G -v $(MSISENSOR_ENV) -p $(PROJECT_DIR)/msisensor -N $1/$2,"set -o pipefail && \
+																							  mkdir -p msisensor/$1_$2/ && \
 																							  msisensor msi $$(MSISENSOR_OPTS) \
 																							  -d $$(MICROSATELLITES_LIST) \
 																							  -e $$(MSI_REGIONS) \
@@ -42,7 +44,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	$(eval $(call msisensor-tumor-normal,$(tumor.$(pair)),$(normal.$(pair)))))
 endif
 
-msisensor/msi_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),msisensor/$(pair).msi)
+msisensor/msi_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),msisensor/$(pair)/$(pair).msi)
 	$(INIT) (head -1 $< | sed 's/^/sample\t/'; for x in $^; do sed "1d; s/^/$$(basename $$x)\t/" $$x; done | sed 's/_.*msi//' ) > $@
 
 ..DUMMY := $(shell mkdir -p version; \
