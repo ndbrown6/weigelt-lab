@@ -225,7 +225,7 @@ rnaseq_metrics :
 	$(call RUN_MAKE,weigelt-lab/bam_tools/rnaseq_metrics.mk)
 
 #==================================================
-# Beta test
+# Signature tools
 #==================================================
 
 TARGETS += mimsi_tumor_normal
@@ -238,30 +238,34 @@ msisensor_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/msisensor_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/signature_tools/msisensor_tumor_normal.mk clean
 
-TARGETS += deconstruct_sigs
-deconstruct_sigs :
-	$(call RUN_MAKE,weigelt-lab/signature_tools/deconstruct_sigs.mk) && \
-	$(MAKE) -f weigelt-lab/signature_tools/deconstruct_sigs.mk clean
-	
-TARGETS += hrd_cn
-hrd_cn :
-	$(call RUN_MAKE,weigelt-lab/signature_tools/hrd_cn.mk) && \
-	$(MAKE) -f weigelt-lab/signature_tools/hrd_cn.mk clean
-	
+TARGETS += hr_detect
+hr_detect :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/hr_detect.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/hr_detect.mk clean
+
+TARGETS += hrd_metrics
+hrd_metrics :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/hrd_metrics.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/hrd_metrics.mk clean
+
 TARGETS += star_fish
 star_fish :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/star_fish.mk) && \
 	$(MAKE) -f weigelt-lab/signature_tools/star_fish.mk clean
 
+TARGETS += deconstruct_sigs
+deconstruct_sigs :
+	$(call RUN_MAKE,weigelt-lab/signature_tools/deconstruct_sigs.mk) && \
+	$(MAKE) -f weigelt-lab/signature_tools/deconstruct_sigs.mk clean
+	
 TARGETS += sv_signtaure
 sv_signtaure :
 	$(call RUN_MAKE,weigelt-lab/signature_tools/sv_signtaure.mk) && \
 	$(MAKE) -f weigelt-lab/signature_tools/sv_signtaure.mk clean
 
-TARGETS += hr_detect
-hr_detect :
-	$(call RUN_MAKE,weigelt-lab/signature_tools/hr_detect.mk) && \
-	$(MAKE) -f weigelt-lab/signature_tools/hr_detect.mk clean
+#==================================================
+# Work in progress ...
+#==================================================
 
 TARGETS += sufam_genotype
 sufam_genotype :
