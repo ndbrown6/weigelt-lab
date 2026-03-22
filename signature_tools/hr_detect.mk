@@ -10,7 +10,7 @@ smry :  $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair)/$(pair).png) \
 PROJECT_DIR := $(notdir $(CURDIR))
 
 MIN_SIZE = 1
-MAX_SIZE = 100000000000000000000
+MAX_SIZE = 500000000
 
 define hr-detect-snv
 hr_detect/$1_$2/$1_$2.snv.vcf : summary/tsv/all.tsv
@@ -21,24 +21,24 @@ hr_detect/$1_$2/$1_$2.snv.vcf : summary/tsv/all.tsv
 																									    --sample_name $1_$2")
 
 hr_detect/$1_$2/$1_$2.snv.vcf.bgz : hr_detect/$1_$2/$1_$2.snv.vcf
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/snv/bgzip -N $1/$2,"set -o pipefail && \
-																			bgzip -c $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/snv/bgzip -N $1/$2,"set -o pipefail && \
+																		  bgzip -c $$(<) > $$(@)")
 
 hr_detect/$1_$2/$1_$2.snv.vcf.bgz.tbi : hr_detect/$1_$2/$1_$2.snv.vcf.bgz
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/snv/tabix -N $1/$2,"set -o pipefail && \
-																			tabix -p vcf $$(<)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/snv/tabix -N $1/$2,"set -o pipefail && \
+																		  tabix -p vcf $$(<)")
 
 hr_detect/$1_$2/$1_$2.snv.fix.vcf : hr_detect/$1_$2/$1_$2.snv.vcf.bgz hr_detect/$1_$2/$1_$2.snv.vcf.bgz.tbi
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/snv/fix/unzip -N $1/$2,"set -o pipefail && \
-																		  		bcftools view $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/snv/fix/unzip -N $1/$2,"set -o pipefail && \
+																		  	  bcftools view $$(<) > $$(@)")
 								
 hr_detect/$1_$2/$1_$2.snv.fix.vcf.bgz : hr_detect/$1_$2/$1_$2.snv.fix.vcf
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/snv/fix/bgzip -N $1/$2,"set -o pipefail && \
-																				bgzip -c $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/snv/fix/bgzip -N $1/$2,"set -o pipefail && \
+																			  bgzip -c $$(<) > $$(@)")
 
 hr_detect/$1_$2/$1_$2.snv.fix.vcf.bgz.tbi : hr_detect/$1_$2/$1_$2.snv.fix.vcf.bgz
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/snv/fix/tabix -N $1/$2,"set -o pipefail && \
-																				tabix -p vcf $$(<)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/snv/fix/tabix -N $1/$2,"set -o pipefail && \
+																			  tabix -p vcf $$(<)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
@@ -53,24 +53,24 @@ hr_detect/$1_$2/$1_$2.indel.vcf : summary/tsv/all.tsv
 																									      --sample_name $1_$2")
 								     
 hr_detect/$1_$2/$1_$2.indel.vcf.bgz : hr_detect/$1_$2/$1_$2.indel.vcf
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/indel/bgzip -N $1/$2,"set -o pipefail && \
-																			  bgzip -c $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/indel/bgzip -N $1/$2,"set -o pipefail && \
+																			bgzip -c $$(<) > $$(@)")
 
 hr_detect/$1_$2/$1_$2.indel.vcf.bgz.tbi : hr_detect/$1_$2/$1_$2.indel.vcf.bgz
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/indel/tabix -N $1/$2,"set -o pipefail && \
-																			  tabix -p vcf $$(<)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/indel/tabix -N $1/$2,"set -o pipefail && \
+																			tabix -p vcf $$(<)")
 								
 hr_detect/$1_$2/$1_$2.indel.fix.vcf : hr_detect/$1_$2/$1_$2.indel.vcf.bgz hr_detect/$1_$2/$1_$2.indel.vcf.bgz.tbi
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/indel/fix/unzip -N $1/$2,"set -o pipefail && \
-																				  bcftools view $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/indel/fix/unzip -N $1/$2,"set -o pipefail && \
+																				bcftools view $$(<) > $$(@)")
 
 hr_detect/$1_$2/$1_$2.indel.fix.vcf.bgz : hr_detect/$1_$2/$1_$2.indel.fix.vcf
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/indel/fix/bgzip -N $1/$2,"set -o pipefail && \
-																				  bgzip -c $$(<) > $$(@)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/indel/fix/bgzip -N $1/$2,"set -o pipefail && \
+																				bgzip -c $$(<) > $$(@)")
 
 hr_detect/$1_$2/$1_$2.indel.fix.vcf.bgz.tbi : hr_detect/$1_$2/$1_$2.indel.fix.vcf.bgz
-	$$(call RUN,-c -n 1 -s 12G -m 16G -p $(PROJECT_DIR)/indel/fix/tabix -N $1/$2,"set -o pipefail && \
-																				  tabix -p vcf $$(<)")
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/indel/fix/tabix -N $1/$2,"set -o pipefail && \
+																				tabix -p vcf $$(<)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
@@ -173,19 +173,19 @@ hr_detect/signatures_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pa
 .PHONY: clean
 
 clean :
-	rm -f hr_detect/*_*/*_*.snv.vcf) && \
-	rm -f hr_detect/*_*/*_*.snv.vcf.bgz) && \
-	rm -f hr_detect/*_*/*_*.snv.vcf.bgz.tbi) && \
-	rm -f hr_detect/*_*/*_*.snv.fix.vcf) && \
-	rm -f hr_detect/*_*/*_*.snv.fix.vcf.bgz) && \
-	rm -f hr_detect/*_*/*_*.snv.fix.vcf.bgz.tbi) && \
-	rm -f hr_detect/*_*/*_*.indel.vcf) && \
-	rm -f hr_detect/*_*/*_*.indel.vcf.bgz) && \
-	rm -f hr_detect/*_*/*_*.indel.vcf.bgz.tbi) && \
-	rm -f hr_detect/*_*/*_*.indel.fix.vcf) && \
-	rm -f hr_detect/*_*/*_*.indel.fix.vcf.bgz) && \
-	rm -f hr_detect/*_*/*_*.indel.fix.vcf.bgz.tbi) && \
-	rm -f hr_detect/*_*/*_*.merged.bed) && \
-	rm -f hr_detect/*_*/*_*.merged.bedpe) && \
-	rm -f hr_detect/*_*/*_*.sv.bedpe) && \
-	rm -f hr_detect/*_*/*_*.cn.txt)
+	rm -f hr_detect/*_*/*_*.snv.vcf && \
+	rm -f hr_detect/*_*/*_*.snv.vcf.bgz && \
+	rm -f hr_detect/*_*/*_*.snv.vcf.bgz.tbi && \
+	rm -f hr_detect/*_*/*_*.snv.fix.vcf && \
+	rm -f hr_detect/*_*/*_*.snv.fix.vcf.bgz && \
+	rm -f hr_detect/*_*/*_*.snv.fix.vcf.bgz.tbi && \
+	rm -f hr_detect/*_*/*_*.indel.vcf && \
+	rm -f hr_detect/*_*/*_*.indel.vcf.bgz && \
+	rm -f hr_detect/*_*/*_*.indel.vcf.bgz.tbi && \
+	rm -f hr_detect/*_*/*_*.indel.fix.vcf && \
+	rm -f hr_detect/*_*/*_*.indel.fix.vcf.bgz && \
+	rm -f hr_detect/*_*/*_*.indel.fix.vcf.bgz.tbi && \
+	rm -f hr_detect/*_*/*_*.merged.bed && \
+	rm -f hr_detect/*_*/*_*.merged.bedpe && \
+	rm -f hr_detect/*_*/*_*.sv.bedpe && \
+	rm -f hr_detect/*_*/*_*.cn.txt
