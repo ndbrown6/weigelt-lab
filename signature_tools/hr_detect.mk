@@ -16,7 +16,7 @@ define hr-detect-snv
 hr_detect/$1_$2/$1_$2.snv.vcf : summary/tsv/all.tsv
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/snv/maf2vcf -N $1/$2,"set -o pipefail && \
 																										mkdir -p hr_detect/$1_$2/ && \
-																						   			    $(RSCRIPT) modules/scripts/hr_detect.R \
+																						   			    $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																									    --option 1 \
 																									    --sample_name $1_$2")
 
@@ -48,7 +48,7 @@ define hr-detect-indel
 hr_detect/$1_$2/$1_$2.indel.vcf : summary/tsv/all.tsv
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/indel/maf2vcf -N $1/$2,"set -o pipefail && \
 																										  mkdir -p hr_detect/$1_$2/ && \
-																									      $(RSCRIPT) modules/scripts/hr_detect.R \
+																									      $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																									      --option 2 \
 																									      --sample_name $1_$2")
 								     
@@ -94,7 +94,7 @@ hr_detect/$1_$2/$1_$2.merged.bedpe : hr_detect/$1_$2/$1_$2.merged.bed
 					 
 hr_detect/$1_$2/$1_$2.sv.bedpe : hr_detect/$1_$2/$1_$2.merged.bedpe
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/bedpe2bedpe -N $1/$2,"set -o pipefail && \
-																									    $(RSCRIPT) modules/scripts/hr_detect.R \
+																									    $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																									    --option 3 \
 																									    --sample_name $1_$2")
 
@@ -106,7 +106,7 @@ define hr-detect-cn
 hr_detect/$1_$2/$1_$2.cn.txt : facets/cncf/$1_$2.txt
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/facets -N $1/$2,"set -o pipefail && \
 																								   mkdir -p hr_detect/$1_$2/ && \
-																								   $(RSCRIPT) modules/scripts/hr_detect.R \
+																								   $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																								   --option 4 \
 																								   --sample_name $1_$2")
 
@@ -123,7 +123,7 @@ hr_detect/$1_$2/$1_$2.png : hr_detect/$1_$2/$1_$2.snv.fix.vcf.bgz \
 							hr_detect/$1_$2/$1_$2.sv.bedpe \
 							hr_detect/$1_$2/$1_$2.cn.txt
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/plot/png -N $1/$2,"set -o pipefail && \
-																								     $(RSCRIPT) modules/scripts/hr_detect.R \
+																								     $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																								     --option 5 \
 																								     --sample_name $1_$2 && \
 																								     mv hr_detect/$1_$2/$1_$2.genomePlot.png $$(@)")
@@ -135,7 +135,7 @@ hr_detect/$1_$2/$1_$2.svg : hr_detect/$1_$2/$1_$2.snv.fix.vcf.bgz \
 							hr_detect/$1_$2/$1_$2.sv.bedpe \
 							hr_detect/$1_$2/$1_$2.cn.txt
 	$$(call RUN,-c -n 1 -s 12G -m 16G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/plot/svg -N $1/$2,"set -o pipefail && \
-																								     $(RSCRIPT) modules/scripts/hr_detect.R \
+																								     $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																								     --option 6 \
 																								     --sample_name $1_$2 && \
 																								     mv hr_detect/$1_$2/$1_$2.genomePlot.svg $$(@)")
@@ -151,7 +151,7 @@ hr_detect/hrdetect_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair
 								 $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair)/$(pair).sv.bedpe) \
 								 $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair)/$(pair).cn.txt)
 	$(call RUN, -c -n 4 -s 6G -m 9G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/summary -N hrdetect,"set -o pipefail && \
-																						  			 $(RSCRIPT) modules/scripts/hr_detect.R \
+																						  			 $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																						  			 --option 7 \
 																						  			 --sample_name '$(SAMPLE_PAIRS)'")
 
@@ -162,7 +162,7 @@ hr_detect/signatures_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pa
 								   $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair)/$(pair).sv.bedpe) \
 								   $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pair)/$(pair).cn.txt)
 	$(call RUN, -c -n 4 -s 6G -m 9G -v $(SIGNATURE_TOOLS_ENV) -p $(PROJECT_DIR)/summary -N signatures,"set -o pipefail && \
-																						  			   $(RSCRIPT) modules/scripts/hr_detect.R \
+																						  			   $(RSCRIPT) $(SCRIPTS_DIR)/signature_tools/hr_detect.R \
 																						  			   --option 8 \
 																						  			   --sample_name '$(SAMPLE_PAIRS)'")
 		
