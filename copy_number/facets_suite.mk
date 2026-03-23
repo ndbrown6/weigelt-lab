@@ -18,6 +18,7 @@ FACETS_MIN_NHET ?= 15
 FACETS_PURITY_MIN_NHET ?= 10
 SNP_WINDOW_SIZE ?= 250
 NORMAL_DEPTH ?= 25
+PSEUDO_SNPS ?= NULL
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
@@ -38,7 +39,7 @@ facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf
 																									      --tumor-bam /data1/share001/share/impact_12_245/`echo $1 | cut -c 1-1`/`echo $1 | cut -c 2-2`/$1.bam \
 																									      --normal-bam /data1/share001/share/impact_12_245/`echo $2 | cut -c 1-1`/`echo $2 | cut -c 2-2`/$2.bam \
 																									      --output-prefix facets_suite/$1_$2/$1_$2 \
-																									      --pseudo-snps 50 \
+																									      --pseudo-snps $$(PSEUDO_SNPS) \
 																									      --max-depth $$(FACETS_MAX_DEPTH)")
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
@@ -54,7 +55,7 @@ facets_suite/$1_$2/$1_$2.snp_pileup.gz : facets_suite/targets_dbsnp.vcf bam/$1.b
 																									      --tumor-bam $$(<<) \
 																									      --normal-bam $$(<<<) \
 																									      --output-prefix facets_suite/$1_$2/$1_$2 \
-																									      --pseudo-snps 50 \
+																									      --pseudo-snps $$(PSEUDO_SNPS) \
 																									      --max-depth $$(FACETS_MAX_DEPTH)")
 endef
 $(foreach pair,$(SAMPLE_PAIRS),\
