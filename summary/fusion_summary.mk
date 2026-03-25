@@ -33,5 +33,5 @@ summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(
 .PHONY: clean
 
 clean :
-	+$(MAKE) -f $(call get_makefile,arriba) clean
-	+$(MAKE) -f $(call get_makefile,starfusion) clean
+	$(MAKE) -f $(call get_makefile,arriba) clean
+	$(MAKE) -f $(call get_makefile,starfusion) clean
