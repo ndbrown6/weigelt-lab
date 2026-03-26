@@ -112,7 +112,7 @@ hla_polysolver/summary/strelka_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hla_
 	$(POLYSOLVER_ENV)/bin/shell_annotate_hla_mutations --help &>> version/polysolver_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: polysolver clean
 
 clean :
 	rm -f hla_polysolver/*/*.out && \

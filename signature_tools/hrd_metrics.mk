@@ -80,6 +80,6 @@ hrd_metrics/hrd_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hrd_metrics/$(pair)
 	R --version &> version/hrd_metrics.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean :

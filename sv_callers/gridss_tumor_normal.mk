@@ -49,7 +49,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	echo 'gridss' > version/gridss_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: vcf clean
 
 clean :
 	rm -f gridss/*/*.log && \

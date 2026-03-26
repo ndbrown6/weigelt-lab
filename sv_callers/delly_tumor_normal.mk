@@ -71,7 +71,7 @@ summary/sv_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),delly/$(pair)/$(pair).tx
     $(DELLY_ENV)/bin/delly &> version/delly_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: vcf clean
 
 clean :
 	rm -f delly/*/*.tsv && \

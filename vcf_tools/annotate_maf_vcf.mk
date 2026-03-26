@@ -25,4 +25,4 @@ $(foreach sample,$(SAMPLES),\
 	R --version >> version/annotate_maf_vcf.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY:
+.PHONY: annotate

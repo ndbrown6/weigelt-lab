@@ -42,7 +42,7 @@ $(foreach pair,$(SAMPLE_PAIRS), \
 	$(MANTA_ENV)/opt/manta-0.29.6.centos5_x86_64/bin/configManta.py --version >> version/manta_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: vcf clean
 
 clean :
 	rm -rf manta/*/results && \

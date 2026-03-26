@@ -62,7 +62,7 @@ mimsi/msi_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),mimsi/$(pair)/$(pair).txt
 	$(MIMSI_ENV)/bin/analyze --version &> version/mimsi_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean :
 	rm -f mimsi/*/*.npy

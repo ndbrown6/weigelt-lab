@@ -170,7 +170,7 @@ hr_detect/signatures_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),hr_detect/$(pa
 	$(SIGNATURE_TOOLS_ENV)/bin/R --version &> version/hr_detect.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean :
 	rm -f hr_detect/*_*/*_*.snv.vcf && \

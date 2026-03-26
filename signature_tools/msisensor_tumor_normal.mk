@@ -51,6 +51,6 @@ msisensor/msi_summary.txt : $(foreach pair,$(SAMPLE_PAIRS),msisensor/$(pair)/$(p
 	$(MSISENSOR_ENV)/bin/msisensor &> version/msisensor_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean :

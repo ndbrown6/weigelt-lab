@@ -100,7 +100,7 @@ strelka/mutation_summary.maf : $(foreach pair,$(SAMPLE_PAIRS),strelka/$(pair)/$(
 	R --version >> version/strelka_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: vcf clean
 
 clean :
 	rm -f strelka/chunk_bed/* && \

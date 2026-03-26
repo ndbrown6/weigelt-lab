@@ -30,7 +30,7 @@ summary/fusion_summary.txt : $(foreach caller,$(CALLERS),$(call get_smry_path,$(
 	$(STARFUSION_ENV)/bin/STAR-Fusion --version &>> version/fusion_summary.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: smry clean
 
 clean :
 	$(MAKE) -f $(call get_makefile,arriba) clean

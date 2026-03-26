@@ -41,7 +41,7 @@ $(foreach pair,$(SAMPLE_PAIRS),\
 	$(SVABA_ENV)/bin/svaba --help &> version/svaba_tumor_normal.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: vcf clean
 
 clean :
 	rm -f svaba/*/*.txt.gz && \
