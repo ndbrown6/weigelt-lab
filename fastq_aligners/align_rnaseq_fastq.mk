@@ -132,7 +132,7 @@ summary/insert_summary.txt : $(foreach sample,$(SAMPLES),metrics/$(sample)_inser
 
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: star clean
 
 clean : 
 	rm -f star/*/*_R1.fastq.gz && \

@@ -286,7 +286,7 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 	     $(PICARD) MarkIlluminaAdapters --version &>> version/align_genome_fastq.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: bwamem clean
 
 clean :
 	rm -f bwamem/*/*_R1.fastq.gz && \
