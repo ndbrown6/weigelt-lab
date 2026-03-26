@@ -125,7 +125,7 @@ facets_suite/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIR
 	R --version >> version/facets_suite.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: facets clean
 
 clean :
 	rm -f facets_suite/targets_dbsnp.vcf

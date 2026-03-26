@@ -201,7 +201,7 @@ endef
 	$(COPYNUMBER_ENV)/bin/R --version >> version/cnv_kit.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: cnvkit clean
 
 clean :
 	rm -rf cnv_kit/bed_files && \

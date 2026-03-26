@@ -83,6 +83,6 @@ facets_refit/summary/aggregated-purity_ploidy.txt : $(foreach pair,$(SAMPLE_PAIR
 	R --version >> version/facets_refit.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: facets clean
 
 clean :
