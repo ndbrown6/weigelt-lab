@@ -37,7 +37,7 @@ immune_deconvolution/cibersort.txt : kallisto/tpm_bygene.txt
 	~/share/env/r-immunedeconv-2.1.0/bin/R --version >> version/immune_deconvolution.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: immune clean
 
 clean :
 	+$(MAKE) -f $(KALLISTO_MAKEFILE) clean

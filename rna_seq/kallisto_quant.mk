@@ -53,7 +53,7 @@ kallisto/tpm_bygene.txt : $(foreach sample,$(SAMPLES),kallisto/$(sample)/abundan
 	~/share/env/kallisto-0.46.2/bin/R --version >> version/kallisto_quant.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: clean
+.PHONY: kallisto clean
 
 clean:
 	rm -f kallisto/*/*_R1.fastq
