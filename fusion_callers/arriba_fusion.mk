@@ -111,7 +111,7 @@ arriba/fusion_summary.txt : $(foreach sample,$(SAMPLES),arriba/$(sample)/fusions
 	$(ARRIBA) -h > version/arriba_fusion.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: smry clean
+.PHONY: call_fusions smry_fusions draw_fusions smry clean
 
 clean : 
 	rm -f arriba/*/*_R1.fastq.gz && \
