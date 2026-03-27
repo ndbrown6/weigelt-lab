@@ -21,7 +21,8 @@ MUTECT_FILTERS = DuplicateRead \
 				 NotPrimaryAlignment \
 				 BadMate \
 				 MappingQualityUnavailable \
-				 UnmappedRead BadCigar
+				 UnmappedRead \
+				 BadCigar
 MUTECT_OPTS ?= --enable_extended_output \
 		       --max_alt_alleles_in_normal_count $(MUTECT_MAX_ALT_IN_NORMAL) \
 		       --max_alt_allele_in_normal_fraction $(MUTECT_MAX_ALT_IN_NORMAL_FRACTION) \
