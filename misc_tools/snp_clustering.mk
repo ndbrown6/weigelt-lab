@@ -3,7 +3,7 @@ include weigelt-lab/config/gatk.inc
 
 LOGDIR ?= log/snp_clustering.$(NOW)
 
-ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
+ifneq ($(findstring EXOME,$(TARGETS_FILE)),)
 DBSNP_SUBSET ?= $(HOME)/share/lib/bed_files/dbsnp_137.b37_exome.bed
 else
 DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37_impact.bed
