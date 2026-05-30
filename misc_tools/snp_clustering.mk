@@ -19,7 +19,7 @@ PROJECT_DIR := $(notdir $(CURDIR))
 define genotype-snps
 sample_vcf/$1.vcf : bam/$1.bam
 	$$(call RUN, -c -n 4 -s 2.5G -m 3G -p $(PROJECT_DIR)/sample_vcf -N $1/GATK,"set -o pipefail && \
-																				$(call GATK_MEM,8G) \
+																				$$(call GATK_MEM,8G) \
 																				-T UnifiedGenotyper \
 																				-rf BadCigar \
 																				-nt 4 \
