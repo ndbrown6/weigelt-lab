@@ -267,24 +267,12 @@ sv_signtaure :
 # Work in progress ...
 #==================================================
 
+TARGETS += snp_clustering
+snp_clustering :
+	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_clustering.mk)
+
 TARGETS += sufam_genotype
 sufam_genotype :
-	$(call RUN_MAKE,weigelt-lab/misc/sufam_genotype.mk) && \
-	$(MAKE) -f weigelt-lab/misc/sufam_genotype.mk clean
-
-TARGETS += pyclone_vi
-pyclone_vi :
-	$(call RUN_MAKE,weigelt-lab/misc/pyclone_vi.mk) && \
-	$(MAKE) -f weigelt-lab/misc/pyclone_vi.mk clean
-
-TARGETS += medicc2_cn
-medicc2_cn :
-	$(call RUN_MAKE,weigelt-lab/misc/medicc2_cn.mk) && \
-	$(MAKE) -f weigelt-lab/misc/medicc2_cn.mk clean
-
-TARGETS += cluster_samples
-cluster_samples :
-	$(call RUN_MAKE,weigelt-lab/misc/cluster_samples.mk) && \
-	$(MAKE) -f weigelt-lab/misc/cluster_samples.mk clean
+	$(call RUN_MAKE,weigelt-lab/misc_tools/sufam_regenotype.mk)
 
 .PHONY : $(TARGETS)
