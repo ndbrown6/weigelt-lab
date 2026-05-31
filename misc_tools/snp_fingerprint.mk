@@ -18,17 +18,17 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 define genotype-snps
 snp_fingerprint/$1.vcf : bam/$1.bam
-	$$(call RUN, -c -n 4 -s 2G -m 3G -p $(PROJECT_DIR)/snp_fingerprint -N $1/UnifiedGenotyper -w 24:00:00,"set -o pipefail && \
-																										   $$(call GATK_CMD,8G) \
-																										   -T UnifiedGenotyper \
-																										   -rf BadCigar \
-																										   -nt 4 \
-																										   -R $(REF_FASTA) \
-																										   --dbsnp $(DBSNP) \
-																										   -I $$(<) \
-																										   -L $(DBSNP_SUBSET) \
-																										   -o $$(@) \
-																										   --output_mode EMIT_ALL_SITES")
+	$$(call RUN, -c -n 4 -s 2G -m 3G -p $(PROJECT_DIR)/snp_fingerprint -N $1/UnifiedGenotyper,"set -o pipefail && \
+																							   $$(call GATK_CMD,8G) \
+																							   -T UnifiedGenotyper \
+																							   -rf BadCigar \
+																							   -nt 4 \
+																							   -R $(REF_FASTA) \
+																							   --dbsnp $(DBSNP) \
+																							   -I $$(<) \
+																							   -L $(DBSNP_SUBSET) \
+																							   -o $$(@) \
+																							   --output_mode EMIT_ALL_SITES")
 
 endef
 $(foreach sample,$(SAMPLES),\
