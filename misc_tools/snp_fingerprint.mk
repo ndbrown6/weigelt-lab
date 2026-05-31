@@ -9,9 +9,9 @@ snp_fingeprint : $(foreach sample,$(SAMPLES),snp_fingeprint/$(sample).vcf) \
 				 snp_fingeprint/sample_clustering.pdf
 
 ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
-DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37_impact.bed
+DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37.IMPACT.bed
 else
-DBSNP_SUBSET ?= $(HOME)/share/lib/bed_files/dbsnp_137.b37_exome.bed
+DBSNP_SUBSET ?= $(HOME)/share/lib/bed_files/dbsnp_137.b37.EXOME.bed
 endif
 				 
 PROJECT_DIR := $(notdir $(CURDIR))
