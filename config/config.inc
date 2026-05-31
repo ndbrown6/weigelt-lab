@@ -38,6 +38,7 @@ MSISENSOR_ENV ?= $(HOME)/share/env/msisensor-0.5/
 MSISENSOR_PRO_ENV ?= $(HOME)/share/env/msisensor-pro-1.3.0/
 POLYSOLVER_ENV ?= $(HOME)/share/env/hla-polysolver-0.0.1
 SIGNATURE_TOOLS_ENV ?= $(HOME)/share/env/r-signature.tools.lib-2.2.0
+VARIANT_ANNOTATION_ENV = $(HOME)/share/env/r-variantannotation-1.44.0
 
 # aliases
 PYTHON ?= python
