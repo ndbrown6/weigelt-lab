@@ -36,7 +36,7 @@ $(foreach sample,$(SAMPLES),\
 	
 snp_fingerprint/summary.vcf : $(foreach sample,$(SAMPLES),snp_fingerprint/$(sample).vcf)
 	$(call RUN, -c -s 16G -m 20G -p $(PROJECT_DIR)/snp_fingerprint -N CombineVariants,"set -o pipefail && \
-																					   $(call GATK_MEM,14G) \
+																					   $(call GATK_CMD,16G) \
 																					   -T CombineVariants \
 																					   $(foreach vcf,$^,--variant $(vcf) ) \
 																					   -o $@ \
