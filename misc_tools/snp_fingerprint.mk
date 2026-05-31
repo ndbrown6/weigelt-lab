@@ -5,8 +5,8 @@ LOGDIR ?= log/snp_fingerprint.$(NOW)
 
 snp_fingerprint : $(foreach sample,$(SAMPLES),snp_fingerprint/$(sample).vcf) \
 				 snp_fingerprint/summary.vcf \
-				 snp_fingerprint/summary_ft.vcf
-#				 snp_fingerprint/sample_clustering.pdf
+				 snp_fingerprint/summary_ft.vcf \
+				 snp_fingerprint/sample_clustering.pdf
 
 ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
 DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37.IMPACT.bed
@@ -46,7 +46,14 @@ snp_fingerprint/summary.vcf : $(foreach sample,$(SAMPLES),snp_fingerprint/$(samp
 snp_fingerprint/summary_ft.vcf : snp_fingerprint/summary.vcf
 	$(INIT) grep '^#' $< > $@ && grep -e '0/1' -e '1/1' $< >> $@
 
-
+snp_fingerprint/sample_clustering.pdf : snp_fingerprint/summary_ft.vcf
+	$(call RUN,-n 1 -s 16G -m 20G -p $(PROJECT_DIR)/snp_fingerprint -N plot -v $(VARIANT_ANNOTATION_ENV),"set -o pipefail && \
+																										  $(RSCRIPT) $(SCRIPTS_DIR)/misc_tools/sample_clustering.R \
+																										  --input_file $(<) \
+																										  --output_file $(@) \
+																										  --sample_pairs '$(SAMPLE_PAIRS)' \
+																										  --genome b37")
+								    
 ..DUMMY := $(shell mkdir -p version; \
 	echo "GATK" > version/snp_fingerprint.txt; \
 	R --version >> version/snp_fingerprint.txt)
