@@ -5,8 +5,8 @@ LOGDIR ?= log/snp_fingerprint.$(NOW)
 
 snp_fingerprint : $(foreach sample,$(SAMPLES),snp_fingerprint/$(sample).vcf) \
 				 snp_fingerprint/summary.vcf \
-				 snp_fingerprint/summary_ft.vcf \
-				 snp_fingerprint/sample_clustering.pdf
+				 snp_fingerprint/summary_ft.vcf
+#				 snp_fingerprint/sample_clustering.pdf
 
 ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
 DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37.IMPACT.bed
