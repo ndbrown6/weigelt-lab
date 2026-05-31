@@ -264,15 +264,15 @@ sv_signtaure :
 	$(MAKE) -f weigelt-lab/signature_tools/sv_signtaure.mk clean
 
 #==================================================
-# Work in progress ...
+# Miscellaneous tools
 #==================================================
 
-TARGETS += snp_clustering
-snp_clustering :
-	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_clustering.mk)
+TARGETS += snp_fingeprint
+snp_fingeprint :
+	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_fingeprint.mk)
 
 TARGETS += sufam_genotype
 sufam_genotype :
-	$(call RUN_MAKE,weigelt-lab/misc_tools/sufam_regenotype.mk)
+	$(call RUN_MAKE,weigelt-lab/misc_tools/sufam_genotype.mk)
 
 .PHONY : $(TARGETS)
