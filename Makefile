@@ -267,9 +267,9 @@ sv_signtaure :
 # Miscellaneous tools
 #==================================================
 
-TARGETS += snp_fingeprint
-snp_fingeprint :
-	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_fingeprint.mk)
+TARGETS += snp_fingerprint
+snp_fingerprint :
+	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_fingerprint.mk)
 
 TARGETS += sufam_genotype
 sufam_genotype :
