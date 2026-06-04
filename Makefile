@@ -102,7 +102,7 @@ polysolver_tumor_normal :
 	$(MAKE) -f weigelt-lab/variant_callers/polysolver_tumor_normal.mk clean
 
 #==================================================
-# Copy number aberrations
+# Copy number alterations
 #==================================================
 
 TARGETS += facets_suite
