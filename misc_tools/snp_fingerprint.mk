@@ -13,35 +13,37 @@ DBSNP_SUBSET = $(HOME)/share/lib/bed_files/dbsnp_137.b37.IMPACT.bed
 else
 DBSNP_SUBSET ?= $(HOME)/share/lib/bed_files/dbsnp_137.b37.EXOME.bed
 endif
+
+GATK_WALL_TIME ?= 6:00:00
 				 
 PROJECT_DIR := $(notdir $(CURDIR))
 
 define genotype-snps
 snp_fingerprint/$1.vcf : bam/$1.bam
-	$$(call RUN, -c -n 4 -s 2G -m 3G -p $(PROJECT_DIR)/snp_fingerprint -N $1/UnifiedGenotyper -w 24:00:00,"set -o pipefail && \
-																										   $$(call GATK_CMD,8G) \
-																										   -T UnifiedGenotyper \
-																										   -rf BadCigar \
-																										   -nt 4 \
-																										   -R $(REF_FASTA) \
-																										   --dbsnp $(DBSNP) \
-																										   -I $$(<) \
-																										   -L $(DBSNP_SUBSET) \
-																										   -o $$(@) \
-																										   --output_mode EMIT_ALL_SITES")
+	$$(call RUN, -c -n 4 -s 2G -m 3G -p $(PROJECT_DIR)/snp_fingerprint -N $1/UnifiedGenotyper -w $(GATK_WALL_TIME),"set -o pipefail && \
+																													$$(call GATK_CMD,8G) \
+																													-T UnifiedGenotyper \
+																													-rf BadCigar \
+																													-nt 4 \
+																													-R $(REF_FASTA) \
+																													--dbsnp $(DBSNP) \
+																													-I $$(<) \
+																													-L $(DBSNP_SUBSET) \
+																													-o $$(@) \
+																													--output_mode EMIT_ALL_SITES")
 
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call genotype-snps,$(sample))))
 	
 snp_fingerprint/summary.vcf : $(foreach sample,$(SAMPLES),snp_fingerprint/$(sample).vcf)
-	$(call RUN, -c -s 16G -m 20G -p $(PROJECT_DIR)/snp_fingerprint -N CombineVariants -w 24:00:00,"set -o pipefail && \
-																								   $(call GATK_CMD,16G) \
-																								   -T CombineVariants \
-																								   $(foreach vcf,$^,--variant $(vcf) ) \
-																								   -o $@ \
-																								   --genotypemergeoption UNSORTED \
-																								   -R $(REF_FASTA)")
+	$(call RUN, -c -s 16G -m 20G -p $(PROJECT_DIR)/snp_fingerprint -N CombineVariants -w $(GATK_WALL_TIME),"set -o pipefail && \
+																											$(call GATK_CMD,16G) \
+																											-T CombineVariants \
+																											$(foreach vcf,$^,--variant $(vcf) ) \
+																											-o $@ \
+																											--genotypemergeoption UNSORTED \
+																											-R $(REF_FASTA)")
 
 snp_fingerprint/summary_ft.vcf : snp_fingerprint/summary.vcf
 	$(INIT) grep '^#' $< > $@ && grep -e '0/1' -e '1/1' $< >> $@
