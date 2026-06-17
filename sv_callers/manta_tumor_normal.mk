@@ -30,7 +30,7 @@ manta/$1_$2/results/variants/somaticSV.vcf.gz : manta/$1_$2/runWorkflow.py
 																		
 manta/$1_$2/$1_$2.vcf : manta/$1_$2/results/variants/somaticSV.vcf.gz
 	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/manta -N $1_$2/gzip -v $(MANTA_ENV),"set -o pipefail && \
-																					       gzip -dc $$(<) > $$(@)"
+																					       gzip -dc $$(<) > $$(@)")
 
 endef
 $(foreach pair,$(SAMPLE_PAIRS), \
