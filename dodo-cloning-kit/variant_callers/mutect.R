@@ -84,7 +84,9 @@ if (as.numeric(opt$option) == 1) {
 	chr_levels = c(chr_levels, sort(other_chrs))
 	
 	vcf = vcf %>%
-	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels)) %>%
+	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels, ordered = TRUE)) %>%
+	      dplyr::mutate(POS = as.numeric(POS)) %>%
+	      tidyr::drop_na(`#CHROM`, POS) %>%
 	      dplyr::arrange(`#CHROM`, POS)
 	
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
@@ -107,7 +109,9 @@ if (as.numeric(opt$option) == 1) {
 	chr_levels = c(chr_levels, sort(other_chrs))
 	
 	tab = tab %>%
-	      dplyr::mutate(contig = factor(contig, levels = chr_levels)) %>%
+	      dplyr::mutate(contig = factor(contig, levels = chr_levels, ordered = TRUE)) %>%
+	      dplyr::mutate(position = as.numeric(position)) %>%
+	      tidyr::drop_na(contig, position) %>%
 	      dplyr::arrange(contig, position)
 	
 	cat("##MuTect:1.1.6-0-g6fe4f4c Gatk:2.7-1-g42d771f\n", file = opt$file_out, append = FALSE)
@@ -117,6 +121,20 @@ if (as.numeric(opt$option) == 1) {
 	vcf = readr::read_tsv(file = as.character(opt$file_in), comment = "##", col_names = TRUE, col_types = cols(.default = col_character())) %>%
 	      readr::type_convert() %>%
 	      dplyr::filter(FILTER=="PASS")
+	      
+	chr_levels = c(as.character(1:22), "X", "Y")
+	if (any(grepl("^chr", vcf$'#CHROM'))) {
+		chr_levels = paste0("chr", chr_levels)
+	}
+	other_chrs = setdiff(unique(vcf$'#CHROM'), chr_levels)
+	chr_levels = c(chr_levels, sort(other_chrs))
+	
+	vcf = vcf %>%
+	      dplyr::mutate(`#CHROM` = factor(`#CHROM`, levels = chr_levels, ordered = TRUE)) %>%
+	      dplyr::mutate(POS = as.numeric(POS)) %>%
+	      tidyr::drop_na(`#CHROM`, POS) %>%
+	      dplyr::arrange(`#CHROM`, POS)
+	      
 	
 	cat("##fileformat=VCFv4.1\n", file = opt$file_out, append = FALSE)
 	readr::write_tsv(x = vcf, path = opt$file_out, col_names = TRUE, append = TRUE)
