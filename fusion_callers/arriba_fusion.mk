@@ -63,7 +63,7 @@ arriba/$1/$1.Aligned.out.bam : arriba/$1/$1_R1.fastq.gz arriba/$1/$1_R2.fastq.gz
 																																			 --outFileNamePrefix arriba/$1/$1. > arriba/$1/$1.Aligned.out.bam")
 
 arriba/$1/fusions.tsv : arriba/$1/$1.Aligned.out.bam
-	$$(call RUN,-c -n 1 -s 24G -m 36G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 36G -m 72G -p $(PROJECT_DIR)/arriba -N $1/arriba -v $(ARRIBA_ENV),"set -o pipefail && \
 																							  $$(ARRIBA) -x arriba/$1/$1.Aligned.out.bam \
 																							  -o arriba/$1/fusions.tsv \
 																							  -O arriba/$1/discarded.tsv \
