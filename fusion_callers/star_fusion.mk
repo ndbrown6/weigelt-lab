@@ -3,13 +3,9 @@ include weigelt-lab/config/arriba.inc
 
 LOGDIR ?= log/star_fusion.$(NOW)
 
-call_fusions : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv)
-smry_fusions : starfusion/fusion_summary.txt
-draw_fusions : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf)
-
-smry : call_fusions \
-	   smry_fusions \
-	   draw_fusions
+smry : $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.tsv) \
+	   $(foreach sample,$(SAMPLES),starfusion/$(sample)/fusions.pdf) \
+	   starfusion/fusion_summary.txt
 	      
 STAR_THREADS ?= 4
 STAR_MEM_THREAD ?= 15G
@@ -94,7 +90,7 @@ starfusion/fusion_summary.txt : $(foreach sample,$(SAMPLES),starfusion/$(sample)
 	$(STARFUSION_ENV)/bin/STAR-Fusion --version &> version/star_fusion.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: call_fusions smry_fusions draw_fusions smry clean
+.PHONY: smry clean
 
 clean : 
 	rm -f starfusion/*/*.fastq && \
