@@ -15,9 +15,9 @@ if (!interactive()) {
     options(warn = -1, error = quote({ traceback(); q('no', status = 1) }))
 }
 
-optList <- list(make_option("--input", default = 'mutation_summary/mutation_summary.txt', help = "input file"),
+optList <- list(make_option("--input", default = 'summary/mutation_summary.txt', help = "input file"),
 				make_option("--filter", default = 'weigelt-lab/rda_cache/rpart.im.obj', help = "rpart classification tree"),
-				make_option("--output", default = 'mutation_summary/mutation_summary_ft.txt', help = "output file"))
+				make_option("--output", default = 'summary/mutation_summary_ft.txt', help = "output file"))
 
 parser <- OptionParser(usage = "%prog vcf.files", option_list = optList)
 arguments <- parse_args(parser, positional_arguments = T)
@@ -27,7 +27,7 @@ mutation_smry = readr::read_tsv(file = as.character(opt$input), col_names = TRUE
 			    readr::type_convert()
 
 #––––––––––––––––––––––––––––––––––––––––––––––––––
-# 1. Filter MAF from iris by replicating variant
+# 1. Filter MAF by replicating variant
 #    caller and variant class filters
 #––––––––––––––––––––––––––––––––––––––––––––––––––
 mutation_smry = mutation_smry %>%
@@ -76,47 +76,58 @@ mutation_smry = mutation_smry %>%
 				dplyr::filter(!(`Is_platypus?` == "yes" & (`Is_mutect?` == "no" & `Is_varscan?` == "no" & `Is_strelka?` == "no" & `Is_scalpel?` == "no")))
 				
 #––––––––––––––––––––––––––––––––––––––––––––––––––
-# 2. Get a table of all positives (TP + FP)
+# 2. Get a table of all positives
 #––––––––––––––––––––––––––––––––––––––––––––––––––
-mutation_smry = mutation_smry %>%
-			    dplyr::mutate(Reference_Allele_L = nchar(Reference_Allele)) %>%
-			    dplyr::mutate(Tumor_Seq_Allele2_L = nchar(Tumor_Seq_Allele2)) %>%
-			    dplyr::mutate(Variant_Length = case_when(
+df_to_filter = mutation_smry %>%
+			   dplyr::mutate(Reference_Allele_L = nchar(Reference_Allele)) %>%
+			   dplyr::mutate(Tumor_Seq_Allele2_L = nchar(Tumor_Seq_Allele2)) %>%
+			   dplyr::mutate(Variant_Length = case_when(
 		   			Reference_Allele_L > Tumor_Seq_Allele2_L ~ Reference_Allele_L,
 		   			TRUE ~ Tumor_Seq_Allele2_L
-			    )) %>%
-			    dplyr::mutate(n_maf = n_alt_count/n_depth,
-		   				      t_maf = t_alt_count/t_depth,
-		   				      `t/n maf` = t_maf/(n_maf+1e-9)) %>%
-			    dplyr::select(
-			   				  # annotations to use as variables
-
-			   				  Variant_Type, Variant_Length,
-			   				  n_alt_count,
-			   				  ExAC_AF,
-			   				  ExAC_AF_Adj,
-			   				  gnomAD_AF,
-			   				  FILTER,
-			   				  ExAC_FILTER,
-			   				  `Is_mutect?`, `Is_varscan?`, `Is_strelka?`, `Is_scalpel?`, `Is_platypus?`,
-			   				  Is_cmo_hotspot, Is_cancer_hotspot) %>%
-			    dplyr::mutate(Variant_Type = case_when(
+			   )) %>%
+			   dplyr::mutate(n_maf = n_alt_count/n_depth,
+		   				     t_maf = t_alt_count/t_depth,
+		   				     `t/n maf` = t_maf/(n_maf+1e-9)) %>%
+			   dplyr::select(Variant_Type, Variant_Length,
+			   				 n_alt_count,
+			   				 ExAC_AF,
+			   				 ExAC_AF_Adj,
+			   				 gnomAD_AF,
+			   				 FILTER,
+			   				 ExAC_FILTER,
+			   				 `Is_mutect?`, `Is_varscan?`, `Is_strelka?`, `Is_scalpel?`, `Is_platypus?`,
+			   				 Is_cmo_hotspot, Is_cancer_hotspot) %>%
+			   dplyr::mutate(Variant_Type = case_when(
 		   						   Variant_Type == "INS" | Variant_Type == "DEL" ~ "INDEL",
 		   						   TRUE ~ "SNP"),
-		   				      ExAC_AF = ifelse(is.na(ExAC_AF), 0, ExAC_AF),
-						      ExAC_AF_Adj = ifelse(is.na(ExAC_AF_Adj), 0, ExAC_AF_Adj),
-						      gnomAD_AF = ifelse(is.na(gnomAD_AF), 0, gnomAD_AF),
-						      ExAC_FILTER = case_when(
+		   				     ExAC_AF = ifelse(is.na(ExAC_AF), 0, ExAC_AF),
+						     ExAC_AF_Adj = ifelse(is.na(ExAC_AF_Adj), 0, ExAC_AF_Adj),
+						     gnomAD_AF = ifelse(is.na(gnomAD_AF), 0, gnomAD_AF),
+						     ExAC_FILTER = case_when(
 						 		   is.na(ExAC_FILTER) ~ "UNKNOWN",
 						 		   grepl("VQSRTranche", ExAC_FILTER) ~ "FAIL",
 						 		   grepl("InbreedingCoeff", ExAC_FILTER) ~ "FAIL",
 						 		   TRUE ~ ExAC_FILTER)) %>%
-		       readr::type_convert()
+		      readr::type_convert()
 
 #––––––––––––––––––––––––––––––––––––––––––––––––––
-# 6. Decision tree. Use parameter set that overfits
-#    and plot decision tree and ROC curve
+# 3. Classify variants using decision tree
 #––––––––––––––––––––––––––––––––––––––––––––––––––
 load(as.character(opt$filter))
-prd = predict(object = fit, newdata = mutation_smry, type = "prob")
-all_coords = pROC::roc(response = validation$`Is_lilac?`, predictor = prd[,"Lilac (+)"], ret = "all_coords")
+cl = predict(object = fit, newdata = df_to_filter, type = "class")
+pr = predict(object = fit, newdata = df_to_filter, type = "prob")
+df = dplyr::tibble(`Is_FP?` = cl,
+				   `Pr_FP`  = pr[,1]) %>%
+	 dplyr::mutate(`Is_FP?` = case_when(
+	 					`Is_FP?` == "Lilac (+)" ~ "No",
+	 					`Is_FP?` == "Lilac (-)" ~ "Yes"
+	 ))
+
+#––––––––––––––––––––––––––––––––––––––––––––––––––
+# 4. Write output
+#––––––––––––––––––––––––––––––––––––––––––––––––––
+mutation_summary %>%
+dplyr::bind_cols(df) %>%
+dplyr::filter(`Is_FP?` == "No") %>%
+readr::write_tsv(file = as.character(opt$output), append = FALSE, col_names = TRUE)
+
