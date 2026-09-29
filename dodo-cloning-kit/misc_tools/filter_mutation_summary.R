@@ -126,7 +126,7 @@ df = dplyr::tibble(`Is_FP?` = cl,
 #––––––––––––––––––––––––––––––––––––––––––––––––––
 # 4. Write output
 #––––––––––––––––––––––––––––––––––––––––––––––––––
-mutation_summary %>%
+mutation_smry %>%
 dplyr::bind_cols(df) %>%
 dplyr::filter(`Is_FP?` == "No") %>%
 readr::write_tsv(file = as.character(opt$output), append = FALSE, col_names = TRUE)
