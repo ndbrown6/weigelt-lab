@@ -12,12 +12,12 @@ else
 FILTER = weigelt-lab/rda_cache/rpart.im.obj
 endif
 
-summary/mutation_summary_ft.txt : summary/mutation_summary.txt
+summary/mutation_summary_ft.txt : summary/mutation_summary.txt $(FILTER)
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N filter-smry -v $(RPART_ENV),"set -o pipefail && \
 																							   mkdir -p summary && \
 																							   $(RSCRIPT) $(SCRIPTS_DIR)/summary/filter_mutation_summary.R \
-																							   --filter $(FILTER) \
 																							   --input $(<) \
+																							   --filter $(<<) \
 																							   --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
