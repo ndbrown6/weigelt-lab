@@ -267,6 +267,10 @@ sv_signtaure :
 # Miscellaneous tools
 #==================================================
 
+TARGETS += filter_mutation_summary
+filter_mutation_summary :
+	$(call RUN_MAKE,weigelt-lab/misc_tools/filter_mutation_summary.mk)
+
 TARGETS += snp_fingerprint
 snp_fingerprint :
 	$(call RUN_MAKE,weigelt-lab/misc_tools/snp_fingerprint.mk)
