@@ -2,7 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR ?= log/mutation_summary.$(NOW)
 
-smry : summary/mutation_summary.txt
+smry : summary/mutation_summary.txt \
+	   summary/mutation_summary_ft.txt
 
 REQUIRED_CALLERS = mutect
 OPTIONAL_CALLERS = strelka varscan scalpel platypus
@@ -18,6 +19,12 @@ get_makefile = $(patsubst $(1):%,%,$(filter $(1):%,$(CALLER_MAKEFILES)))
 PROJECT_DIR := $(notdir $(CURDIR))
 
 FACETS_SOURCE ?= default
+
+ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
+FILTER = weigelt-lab/rda_cache/rpart.im.obj
+else
+FILTER = weigelt-lab/rda_cache/rpart.im.obj
+endif
 
 ifeq ($(FACETS_SOURCE),reviewed)
 FACETS_GENE_FILE = facets_refit/summary/aggregated-gene.txt
@@ -49,6 +56,13 @@ summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 																			   $(maf-args) \
 																			   --facets_gene $(FACETS_GENE_FILE) \
 																			   --output $(@)")
+																			   
+summary/mutation_summary_ft.txt : summary/mutation_summary.txt $(FILTER)
+	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N filter-smry -v $(FPFILTER_ENV),"set -o pipefail && \
+																								  $(RSCRIPT) $(SCRIPTS_DIR)/misc_tools/filter_mutation_summary.R \
+																								  --input $(<) \
+																								  --filter $(<<) \
+																								  --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	R --version >> version/mutation_summary.txt)
