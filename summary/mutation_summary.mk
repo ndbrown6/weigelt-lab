@@ -22,8 +22,12 @@ FACETS_SOURCE ?= default
 
 ifneq ($(findstring IMPACT,$(TARGETS_FILE)),)
 FILTER = weigelt-lab/rda_cache/rpart.im.obj
+SOFT_MEM = 8G
+HARD_MEM = 12G
 else
 FILTER = weigelt-lab/rda_cache/rpart.im.obj
+SOFT_MEM = 36G
+HARD_MEM = 48G
 endif
 
 ifeq ($(FACETS_SOURCE),reviewed)
@@ -58,11 +62,11 @@ summary/mutation_summary.txt : $(foreach caller,$(CALLERS),$(caller)/mutation_su
 																			   --output $(@)")
 																			   
 summary/mutation_summary_ft.txt : summary/mutation_summary.txt $(FILTER)
-	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/summary -N filter-smry -v $(FPFILTER_ENV),"set -o pipefail && \
-																								  $(RSCRIPT) $(SCRIPTS_DIR)/misc_tools/filter_mutation_summary.R \
-																								  --input $(<) \
-																								  --filter $(<<) \
-																								  --output $(@)")
+	$(call RUN,-c -n 1 -s $(SOFT_MEM) -m $(HARD_MEM) -p $(PROJECT_DIR)/summary -N filter-smry -v $(FPFILTER_ENV),"set -o pipefail && \
+																												  $(RSCRIPT) $(SCRIPTS_DIR)/misc_tools/filter_mutation_summary.R \
+																												  --input $(<) \
+																												  --filter $(<<) \
+																												  --output $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	R --version >> version/mutation_summary.txt)
