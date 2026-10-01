@@ -43,6 +43,17 @@ $(foreach sample,$(SAMPLES),\
 		$(eval $(call merge-fastq,$(sample),$(split.$(sample)))))
 		
 define fastq-2-bam
+bwamem/$1/$1_aln.bam : bwamem/$1/$1_R1.fastq.gz bwamem/$1/$1_R2.fastq.gz
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/fastq2sam,"set -o pipefail && \
+																			  $$(FASTQ_TO_SAM) \
+																			  FASTQ=bwamem/$1/$1_R1.fastq.gz \
+																			  FASTQ2=bwamem/$1/$1_R2.fastq.gz \
+																			  OUTPUT=$$(@) \
+																			  SM=$1 \
+																			  LB=$1 \
+																			  PU=NA \
+																			  PL=illumina")
+																			  
 bwamem/$1/$1_cl.fastq.gz : bwamem/$1/$1_aln.bam
 	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/clip_adapters,"set -o pipefail && \
 																			      $$(MARK_ADAPTERS) \
