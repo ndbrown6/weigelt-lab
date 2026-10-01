@@ -164,32 +164,32 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call picard-metrics,$(sample))))
 	
 summary/idx_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/idx,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 1 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/idx,"set -o pipefail && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 1 --sample_names '$(SAMPLES)'")
                       
 summary/aln_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/aln,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 2 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/aln,"set -o pipefail && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 2 --sample_names '$(SAMPLES)'")
 
 summary/insert_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/insert,"set -o pipefail && \
-																			     $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 3 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/insert,"set -o pipefail && \
+																			      $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 3 --sample_names '$(SAMPLES)'")
                       
 summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/oxog,"set -o pipefail && \
-																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 4 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/oxog,"set -o pipefail && \
+																			    $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 4 --sample_names '$(SAMPLES)'")
                       
 summary/gc_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/gc,"set -o pipefail && \
-																			 $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 5 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/gc,"set -o pipefail && \
+																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 5 --sample_names '$(SAMPLES)'")
                       
 summary/wgs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/wgs,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 6 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/wgs,"set -o pipefail && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 6 --sample_names '$(SAMPLES)'")
                       
 summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt)
-	$(call RUN,-c -n 1 -s 8G -m 12G -p $(PROJECT_DIR)/summary -N summary/dup,"set -o pipefail && \
-																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 7 --sample_names '$(SAMPLES)'")
+	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/dup,"set -o pipefail && \
+																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 7 --sample_names '$(SAMPLES)'")
 
 
 ..DUMMY := $(shell mkdir -p version; \
