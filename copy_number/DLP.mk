@@ -1,7 +1,7 @@
 include weigelt-lab/Makefile.inc
 include weigelt-lab/config/gatk.inc
 
-LOGDIR ?= log/cnv_dlp.$(NOW)
+LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
@@ -79,16 +79,16 @@ bwamem/$1/$1_cl_aln_srt.bam : bwamem/$1/$1_cl_aln.bam
 																													 cp bwamem/$1/$1_cl_aln_srt.bam.bai bwamem/$1/$1_cl_aln_srt.bai")
 
 bwamem/$1/$1_cl_aln_srt_FX.bam : bwamem/$1/$1_cl_aln_srt.bam
-	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
-																			  $$(FIX_MATE) \
-																			  INPUT=$$(<) \
-																			  OUTPUT=$$(@) \
-																			  SORT_ORDER=coordinate \
-																			  COMPRESSION_LEVEL=9 \
-																			  CREATE_INDEX=true")
+	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/bwamem -N $1/fix_mate,"set -o pipefail && \
+																			 $$(FIX_MATE) \
+																			 INPUT=$$(<) \
+																			 OUTPUT=$$(@) \
+																			 SORT_ORDER=coordinate \
+																			 COMPRESSION_LEVEL=9 \
+																			 CREATE_INDEX=true")
 										      
 bwamem/$1/$1_cl_aln_srt_FX_MD.bam : bwamem/$1/$1_cl_aln_srt_FX.bam
-	$$(call RUN, -c -n 8 -s 2G -m 4G -v $(SAMBAMBA_ENV) -p $(PROJECT_DIR)/bwamem -N $1/mark_dup -w 12:00:00,"set -o pipefail && \
+	$$(call RUN, -c -n 8 -s 1G -m 2G -v $(SAMBAMBA_ENV) -p $(PROJECT_DIR)/bwamem -N $1/mark_dup -w 12:00:00,"set -o pipefail && \
 																											 $$(SAMBAMBA) \
 																											 markdup \
 																											 -t 8 \
@@ -110,20 +110,20 @@ $(foreach sample,$(SAMPLES),\
 
 define picard-metrics
 metrics/$1.idx_stats.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/idx_stats,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/idx_stats,"set -o pipefail && \
 																			    $$(BAM_INDEX) \
 																			    INPUT=$$(<) \
 																			    > $$(@)")
 									   
 metrics/$1.aln_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/aln_metrics,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/aln_metrics,"set -o pipefail && \
 																			      $$(COLLECT_ALIGNMENT_METRICS) \
 																			      REFERENCE_SEQUENCE=$$(REF_FASTA) \
 																			      INPUT=$$(<) \
 																			      OUTPUT=$$(@)")
 									   
 metrics/$1.insert_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/insert_metrics,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/insert_metrics,"set -o pipefail && \
 																					 $$(COLLECT_INSERT_METRICS) \
 																					 INPUT=$$(<) \
 																					 OUTPUT=$$(@) \
@@ -131,14 +131,14 @@ metrics/$1.insert_metrics.txt : bam/$1.bam
 																					 MINIMUM_PCT=0.05")
 									   
 metrics/$1.oxog_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/oxog_metrics,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/oxog_metrics,"set -o pipefail && \
 																			       $$(COLLECT_OXOG_METRICS) \
 																			       REFERENCE_SEQUENCE=$$(REF_FASTA) \
 																			       INPUT=$$(<) \
 																			       OUTPUT=$$(@)")
 					    
 metrics/$1.gc_metrics_summary.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/gc_metrics,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/gc_metrics,"set -o pipefail && \
 																			     $$(COLLECT_GC_BIAS) \
 																			     INPUT=$$(<) \
 																			     OUTPUT=metrics/$1.gc_metrics.txt \
@@ -147,14 +147,14 @@ metrics/$1.gc_metrics_summary.txt : bam/$1.bam
 																			     SUMMARY_OUTPUT=$$(@)")
 																			     
 metrics/$1.wgs_metrics.txt : bam/$1.bam
-	$$(call RUN,-c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/wgs_metrics,"set -o pipefail && \
+	$$(call RUN,-c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/wgs_metrics,"set -o pipefail && \
 																				 $$(COLLECT_WGS_METRICS) \
 																				 INPUT=$$(<) \
 																				 OUTPUT=$$(@) \
 																				 REFERENCE_SEQUENCE=$$(REF_FASTA)")
 
 metrics/$1.duplicate_metrics.txt : bam/$1.bam
-	$$(call RUN, -c -n 1 -s 4G -m 8G -p $(PROJECT_DIR)/metrics -N $1/dup_metrics,"set -o pipefail && \
+	$$(call RUN, -c -n 1 -s 2G -m 4G -p $(PROJECT_DIR)/metrics -N $1/dup_metrics,"set -o pipefail && \
 																			      $$(COLLECT_DUP_METRICS) \
 																			      INPUT=$$(<) \
 																			      METRICS_FILE=$$(@)")
@@ -164,43 +164,43 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call picard-metrics,$(sample))))
 	
 summary/idx_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/idx,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/idx,"set -o pipefail && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 1 --sample_names '$(SAMPLES)'")
                       
 summary/aln_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/aln,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/aln,"set -o pipefail && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 2 --sample_names '$(SAMPLES)'")
 
 summary/insert_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/insert,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/insert,"set -o pipefail && \
 																			      $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 3 --sample_names '$(SAMPLES)'")
                       
 summary/oxog_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/oxog,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/oxog,"set -o pipefail && \
 																			    $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 4 --sample_names '$(SAMPLES)'")
                       
 summary/gc_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/gc,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/gc,"set -o pipefail && \
 																			  $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 5 --sample_names '$(SAMPLES)'")
                       
 summary/wgs_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/wgs,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/wgs,"set -o pipefail && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 6 --sample_names '$(SAMPLES)'")
                       
 summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt)
-	$(call RUN,-c -n 1 -s 16G -m 24G -p $(PROJECT_DIR)/summary -N summary/dup,"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/dup,"set -o pipefail && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 7 --sample_names '$(SAMPLES)'")
 
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
-	     head -3 version/tmp.txt | tail -2 > version/cnv_dlp.txt; \
+	     head -3 version/tmp.txt | tail -2 > version/DLP.txt; \
 	     rm version/tmp.txt; \
-	     $(SAMTOOLS) --version >> version/cnv_dlp.txt; \
-	     echo "gatk3" >> version/cnv_dlp.txt; \
-	     $(GATK) --version >> version/cnv_dlp.txt; \
-	     echo "picard" >> version/cnv_dlp.txt; \
-	     $(PICARD) MarkIlluminaAdapters --version &>> version/cnv_dlp.txt)
+	     $(SAMTOOLS) --version >> version/DLP.txt; \
+	     echo "gatk3" >> version/DLP.txt; \
+	     $(GATK) --version >> version/DLP.txt; \
+	     echo "picard" >> version/DLP.txt; \
+	     $(PICARD) MarkIlluminaAdapters --version &>> version/DLP.txt)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: bwamem clean
