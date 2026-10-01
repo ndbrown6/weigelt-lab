@@ -119,6 +119,11 @@ TARGETS += cnv_kit
 cnv_kit :
 	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_kit.mk) && \
 	$(MAKE) -f weigelt-lab/copy_number/cnv_kit.mk clean
+	
+TARGETS += cnv_dlp
+cnv_dlp :
+	$(call RUN_MAKE,weigelt-lab/copy_number/cnv_dlp.mk) && \
+	$(MAKE) -f weigelt-lab/copy_number/cnv_dlp.mk clean
 
 #==================================================
 # RNA expression
