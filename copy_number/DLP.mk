@@ -4,7 +4,7 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-		 $(foreach sample,$(SAMPLES),qdnaseq/bin/100kb/$(sample).txt) \
+		 $(foreach sample,$(SAMPLES),qdnaseq/log2/100kb/$(sample).txt) \
 		 summary/idx_metrics.txt \
 		 summary/aln_metrics.txt \
 		 summary/insert_metrics.txt \
@@ -102,12 +102,20 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call fastq-2-bam,$(sample))))
 	
 define qdnaseq-extract
-qdnaseq/bin/100kb/$1.txt : bam/$1.bam
+qdnaseq/log2/100kb/$1.txt : bam/$1.bam
 	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/qdnaseq -N $1 -v $(QDNASEQ_ENV),"set -o pipefail && \
 																						$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
 																						--option 1 \
 																						--sample_name $1 \
 																						--bin_size 100 \
+																						--output_file $$(@)")
+
+qdnaseq/log2/500kb/$1.txt : bam/$1.bam
+	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/qdnaseq -N $1 -v $(QDNASEQ_ENV),"set -o pipefail && \
+																						$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																						--option 1 \
+																						--sample_name $1 \
+																						--bin_size 500 \
 																						--output_file $$(@)")
 	
 endef
