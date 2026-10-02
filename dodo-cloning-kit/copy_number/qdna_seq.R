@@ -37,15 +37,15 @@ if (as.numeric(opt$option) == 1) {
 										   chromosomes = c("Y", "MT"),
 										   verbose = FALSE)
 	read_counts_ft = QDNAseq::estimateCorrection(read_counts_ft,
-												family = "symmetric",
-												maxIter = 2,
-												cutoff = 3)
+												 family = "symmetric",
+												 maxIter = 2,
+												 cutoff = 3)
 	copy_number = QDNAseq::correctBins(read_counts_ft)
 	copy_number_nm = QDNAseq::normalizeBins(copy_number)
 	copy_number_sm = QDNAseq::smoothOutlierBins(copy_number_nm)
 	exportBins(copy_number_sm,
 			   file = paste0("qdnaseq/", as.character(opt$sample_name), ".txt"),
-			   fotmat = "tsv")
+			   format = "tsv")
 	
 } else if (as.numeric(opt$option) == 2) {
 	sample_names = unlist(strsplit(x = as.character(opt$sample_name), split = " ", fixed = TRUE))
