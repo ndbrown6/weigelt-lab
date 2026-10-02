@@ -4,14 +4,14 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+		 $(foreach sample,$(SAMPLES),qdnaseq/100KB/$(sample).txt) \
 		 summary/idx_metrics.txt \
 		 summary/aln_metrics.txt \
 		 summary/insert_metrics.txt \
 		 summary/oxog_metrics.txt \
 		 summary/gc_metrics.txt \
 		 summary/wgs_metrics.txt \
-		 summary/duplicate_metrics.txt \
-		 $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt)
+		 summary/duplicate_metrics.txt		 
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -102,7 +102,7 @@ $(foreach sample,$(SAMPLES),\
 	$(eval $(call fastq-2-bam,$(sample))))
 	
 define qdnaseq-extract
-qdnaseq/$1.txt : bam/$1.bam
+qdnaseq/100KB/$1.txt : bam/$1.bam
 	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/qdnaseq -N $1 -v $(QDNASEQ_ENV),"set -o pipefail && \
 																						$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
 																						--option 1 \
