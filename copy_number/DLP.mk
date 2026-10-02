@@ -226,6 +226,7 @@ clean :
 	rm -f metrics/*.idx_stats.txt && \
 	rm -f metrics/*.aln_metrics.txt && \
 	rm -f metrics/*.insert_metrics.txt && \
+	rm -f metrics/*.insert_metrics.pdf && \
 	rm -f metrics/*.oxog_metrics.txt && \
 	rm -f metrics/*.gc_metrics_summary.txt && \
 	rm -f metrics/*.gc_metrics.txt && \
