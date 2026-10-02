@@ -13,7 +13,8 @@ if (!interactive()) {
 
 args_list <- list(make_option("--option", default = NA, type = 'numeric', help = "option"),
 				  make_option("--sample_name", default = NA, type = 'character', help = "sample name"),
-				  make_option("--bin_size", default = 100, type = 'numeric', help = "bin size"))
+				  make_option("--bin_size", default = 100, type = 'numeric', help = "bin size"),
+				  make_option("--output_file", default = 100, type = 'character', help = "path of output file"))
 parser <- OptionParser(usage = "%prog", option_list = args_list)
 arguments <- parse_args(parser, positional_arguments = T)
 opt <- arguments$options
@@ -44,7 +45,7 @@ if (as.numeric(opt$option) == 1) {
 	copy_number_nm = QDNAseq::normalizeBins(copy_number)
 	copy_number_sm = QDNAseq::smoothOutlierBins(copy_number_nm)
 	exportBins(copy_number_sm,
-			   file = paste0("qdnaseq/", as.character(opt$sample_name), ".txt"),
+			   file = as.character(opt$output_file),
 			   format = "tsv")
 	
 } else if (as.numeric(opt$option) == 2) {
