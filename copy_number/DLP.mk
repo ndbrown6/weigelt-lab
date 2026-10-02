@@ -5,6 +5,7 @@ LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 $(foreach sample,$(SAMPLES),qdnaseq/log2/100kb/$(sample).txt) \
+		 $(foreach sample,$(SAMPLES),qdnaseq/log2/500kb/$(sample).txt) \
 		 summary/idx_metrics.txt \
 		 summary/aln_metrics.txt \
 		 summary/insert_metrics.txt \
