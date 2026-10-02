@@ -4,21 +4,14 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-		 $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).oxog_metrics.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).gc_metrics_summary.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).wgs_metrics.txt) \
-		 $(foreach sample,$(SAMPLES),metrics/$(sample).duplicate_metrics.txt) \
 		 summary/idx_metrics.txt \
 		 summary/aln_metrics.txt \
 		 summary/insert_metrics.txt \
 		 summary/oxog_metrics.txt \
 		 summary/gc_metrics.txt \
 		 summary/wgs_metrics.txt \
-		 summary/duplicate_metrics.txt
+		 summary/duplicate_metrics.txt \
+		 $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt)
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -229,4 +222,13 @@ clean :
 	rm -f bwamem/*/*_cl_aln_srt.bai* && \
 	rm -f bwamem/*/*_cl_aln_srt_FX.bam* && \
 	rm -f bwamem/*/*_cl_aln_srt_FX.bai && \
-	rm -f bwamem/*/*_cl_aln_srt_FX_MD.bam*
+	rm -f bwamem/*/*_cl_aln_srt_FX_MD.bam* && \
+	rm -f metrics/*.idx_stats.txt && \
+	rm -f metrics/*.aln_metrics.txt && \
+	rm -f metrics/*.insert_metrics.txt && \
+	rm -f metrics/*.oxog_metrics.txt && \
+	rm -f metrics/*.gc_metrics_summary.txt && \
+	rm -f metrics/*.gc_metrics.txt && \
+	rm -f metrics/*.gc_metrics.pdf && \
+	rm -f metrics/*.wgs_metrics.txt && \
+	rm -f metrics/*.duplicate_metrics.txt
