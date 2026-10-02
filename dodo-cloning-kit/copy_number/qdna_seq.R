@@ -36,7 +36,7 @@ if (as.numeric(opt$option) == 1) {
 										   blacklist = TRUE,
 										   chromosomes = c("Y", "MT"),
 										   verbose = FALSE)
-	read_counts_ft = QDNAseq:estimateCorrection(read_counts_ft,
+	read_counts_ft = QDNAseq::estimateCorrection(read_counts_ft,
 												family = "symmetric",
 												maxIter = 2,
 												cutoff = 3)
