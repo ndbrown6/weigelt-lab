@@ -4,6 +4,7 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
+		 $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt) \
 		 $(foreach sample,$(SAMPLES),metrics/$(sample).idx_stats.txt) \
 		 $(foreach sample,$(SAMPLES),metrics/$(sample).aln_metrics.txt) \
 		 $(foreach sample,$(SAMPLES),metrics/$(sample).insert_metrics.txt) \
@@ -106,6 +107,18 @@ bam/$1.bam : bwamem/$1/$1_cl_aln_srt_FX_MD.bam
 endef
 $(foreach sample,$(SAMPLES),\
 	$(eval $(call fastq-2-bam,$(sample))))
+	
+define qdnaseq-extract
+qdnaseq/$1.txt : bam/$1.bam
+	$$(call RUN,-c -n 1 -s 8G -m 16G -p $(PROJECT_DIR)/qdnaseq -N $1 -v $(QDNASEQ_ENV),"set -o pipefail && \
+																						$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																						--option 1 \
+																						--sample_name $1 \
+																						--bin_size 100")
+	
+endef
+$(foreach sample,$(SAMPLES),\
+		$(eval $(call qdnaseq-extract,$(sample))))
 		
 
 define picard-metrics
