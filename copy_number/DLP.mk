@@ -213,7 +213,7 @@ summary/aggregate_log2_100kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/100k
 																				   --option 2 \
 																				   --sample_name '$(SAMPLES)' \
 																				   --bin_size 100 \
-																				   --output_file $$(@)")
+																				   --output_file $(@)")
 																				   
 summary/aggregate_log2_500kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/500kb/$(sample).txt)
 	$(call RUN,-c -n 1 -s 48G -m 72G -p $(PROJECT_DIR)/summary -N aggregate/500kb,"set -o pipefail && \
@@ -221,7 +221,7 @@ summary/aggregate_log2_500kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/500k
 																				   --option 2 \
 																				   --sample_name '$(SAMPLES)' \
 																				   --bin_size 500 \
-																				   --output_file $$(@)")
+																				   --output_file $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
