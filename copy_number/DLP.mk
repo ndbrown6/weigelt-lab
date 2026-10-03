@@ -4,15 +4,15 @@ include weigelt-lab/config/gatk.inc
 LOGDIR ?= log/DLP.$(NOW)
 
 bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
-		 $(foreach sample,$(SAMPLES),qdnaseq/log2/100kb/$(sample).txt) \
-		 $(foreach sample,$(SAMPLES),qdnaseq/log2/500kb/$(sample).txt) \
 		 summary/idx_metrics.txt \
 		 summary/aln_metrics.txt \
 		 summary/insert_metrics.txt \
 		 summary/oxog_metrics.txt \
 		 summary/gc_metrics.txt \
 		 summary/wgs_metrics.txt \
-		 summary/duplicate_metrics.txt		 
+		 summary/duplicate_metrics.txt \
+		 summary/aggregate_log2_100kb.txt \
+		 summary/aggregate_log2_500kb.txt
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -118,7 +118,7 @@ qdnaseq/log2/500kb/$1.txt : bam/$1.bam
 																						--sample_name $1 \
 																						--bin_size 500 \
 																						--output_file $$(@)")
-	
+																						
 endef
 $(foreach sample,$(SAMPLES),\
 		$(eval $(call qdnaseq-extract,$(sample))))
@@ -207,6 +207,21 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N summary/dup,"set -o pipefail && \
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 7 --sample_names '$(SAMPLES)'")
 
+summary/aggregate_log2_100kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/100kb/$(sample).txt)
+	$(call RUN,-c -n 1 -s 48G -m 72G -p $(PROJECT_DIR)/summary -N aggregate/100kb,"set -o pipefail && \
+																				   $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																				   --option 2 \
+																				   --sample_name '$(SAMPLES)' \
+																				   --bin_size 100 \
+																				   --output_file $$(@)")
+																				   
+summary/aggregate_log2_500kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/500kb/$(sample).txt)
+	$(call RUN,-c -n 1 -s 48G -m 72G -p $(PROJECT_DIR)/summary -N aggregate/500kb,"set -o pipefail && \
+																				   $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																				   --option 2 \
+																				   --sample_name '$(SAMPLES)' \
+																				   --bin_size 500 \
+																				   --output_file $$(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
@@ -242,4 +257,6 @@ clean :
 	rm -f metrics/*.gc_metrics.txt && \
 	rm -f metrics/*.gc_metrics.pdf && \
 	rm -f metrics/*.wgs_metrics.txt && \
-	rm -f metrics/*.duplicate_metrics.txt
+	rm -f metrics/*.duplicate_metrics.txt && \
+	rm -f qdnaseq/log2/100kb/*.txt && \
+	rm -f qdnaseq/log2/500kb/*.txt

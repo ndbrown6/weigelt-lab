@@ -4,6 +4,8 @@ suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("magrittr"))
+suppressPackageStartupMessages(library("reshape2"))
+suppressPackageStartupMessages(library("purrr"))
 suppressPackageStartupMessages(library("QDNAseq"))
 suppressPackageStartupMessages(library("QDNAseq.hg19"))
 
@@ -42,9 +44,9 @@ if (as.numeric(opt$option) == 1) {
 												 maxIter = 2,
 												 cutoff = 3)
 	copy_number = QDNAseq::correctBins(read_counts_ft)
-	copy_number_nm = QDNAseq::normalizeBins(copy_number)
-	copy_number_sm = QDNAseq::smoothOutlierBins(copy_number_nm)
-	exportBins(copy_number_sm,
+	copy_number_norm = QDNAseq::normalizeBins(copy_number)
+	copy_number_smoothed = QDNAseq::smoothOutlierBins(copy_number_norm)
+	exportBins(copy_number_smoothed,
 			   file = as.character(opt$output_file),
 			   format = "tsv")
 	
@@ -52,13 +54,12 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(x = as.character(opt$sample_name), split = " ", fixed = TRUE))
 	df = list()
 	for (i in 1:length(sample_names)) {
-		df[[i]] = readr::read_tsv(file = paste0("qdnaseq/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
+		df[[i]] = readr::read_tsv(file = paste0("qdnaseq/log2/", opt$bin_size, "kb/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				  readr::type_convert() %>%
-				  dplyr::mutate(sample_name = sample_names[i])
-		colnames(df[[i]])[1] = "feature"
-		colnames(df[[i]])[5] = "log2"
+				  dplyr::select(-1)
+		
 	}
-	do.call(rbind, df) %>%
-	dplyr::select(-feature) %>%
-	readr::write_tsv(file = "summary/aggregated-log2.txt", append = FALSE, col_names = TRUE)
+	agg_df = df %>% 
+			 purrr::reduce(left_join, by = c("chromosome", "start", "end"))
+	readr::write_tsv(agg_df, file = as.character(opt$output_file), append = FALSE, col_names = TRUE)
 }
