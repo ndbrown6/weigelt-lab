@@ -208,20 +208,20 @@ summary/duplicate_metrics.txt : $(foreach sample,$(SAMPLES),metrics/$(sample).du
 																			   $(RSCRIPT) $(SCRIPTS_DIR)/summary/wgs_metrics.R --option 7 --sample_names '$(SAMPLES)'")
 
 summary/aggregate_log2_100kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/100kb/$(sample).txt)
-	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N aggregate/100kb,"set -o pipefail && \
-																				   $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
-																				   --option 2 \
-																				   --sample_name '$(SAMPLES)' \
-																				   --bin_size 100 \
-																				   --output_file $(@)")
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N aggregate/100kb -v $(QDNASEQ_ENV),"set -o pipefail && \
+																									 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																									 --option 2 \
+																									 --sample_name '$(SAMPLES)' \
+																									 --bin_size 100 \
+																									 --output_file $(@)")
 																				   
 summary/aggregate_log2_500kb.txt : $(foreach sample,$(SAMPLES),qdnaseq/log2/500kb/$(sample).txt)
-	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N aggregate/500kb,"set -o pipefail && \
-																				   $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
-																				   --option 2 \
-																				   --sample_name '$(SAMPLES)' \
-																				   --bin_size 500 \
-																				   --output_file $(@)")
+	$(call RUN,-c -n 1 -s 24G -m 48G -p $(PROJECT_DIR)/summary -N aggregate/500kb -v $(QDNASEQ_ENV),"set -o pipefail && \
+																									 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/qdna_seq.R \
+																									 --option 2 \
+																									 --sample_name '$(SAMPLES)' \
+																									 --bin_size 500 \
+																									 --output_file $(@)")
 
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
