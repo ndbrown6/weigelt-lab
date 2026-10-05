@@ -128,6 +128,5 @@ df = dplyr::tibble(`Is_FP?` = cl,
 #––––––––––––––––––––––––––––––––––––––––––––––––––
 mutation_smry %>%
 dplyr::bind_cols(df) %>%
-dplyr::filter(`Is_FP?` == "No") %>%
 readr::write_tsv(file = as.character(opt$output), append = FALSE, col_names = TRUE)
 
