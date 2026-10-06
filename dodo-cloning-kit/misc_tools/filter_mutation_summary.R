@@ -105,8 +105,7 @@ df_to_filter = mutation_smry %>%
 						     gnomAD_AF = ifelse(is.na(gnomAD_AF), 0, gnomAD_AF),
 						     ExAC_FILTER = case_when(
 						 		   is.na(ExAC_FILTER) ~ "UNKNOWN",
-						 		   grepl("VQSRTranche", ExAC_FILTER) ~ "FAIL",
-						 		   grepl("InbreedingCoeff", ExAC_FILTER) ~ "FAIL",
+						 		   grepl("VQSRTranche|InbreedingCoeff|AC_Adj0_Filter", ExAC_FILTER, fixed = FALSE, perl = TRUE) ~ "FAIL",
 						 		   TRUE ~ ExAC_FILTER)) %>%
 		      readr::type_convert()
 
