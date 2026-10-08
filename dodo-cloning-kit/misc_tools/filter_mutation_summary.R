@@ -51,19 +51,6 @@ mutation_smry = mutation_smry %>%
 				
 				dplyr::filter(!duplicated(paste0(Tumor_Sample_Barcode, Matched_Norm_Sample_Barcode, Chromosome, Start_Position, Reference_Allele, Tumor_Seq_Allele2))) %>%
 						   
-				# filter out unwanted variant caller combination
-				
-				dplyr::mutate(`Is_filtered?` = case_when(
-									`Is_mutect?` == "yes" ~ TRUE,
-									(nchar(Reference_Allele)==1 & nchar(Tumor_Seq_Allele2)==1) & `Is_varscan?` == "yes" ~ TRUE,
-									(nchar(Reference_Allele)>1 | nchar(Tumor_Seq_Allele2)>1) & `Is_varscan?` == "yes" & (`Is_scalpel?` == "yes" | `Is_strelka?` == "yes") ~ TRUE,
-									(nchar(Reference_Allele)>1 | nchar(Tumor_Seq_Allele2)>1) & `Is_scalpel?` == "yes" & `Is_strelka?` == "yes" ~ TRUE,
-									TRUE ~ FALSE
-				)) %>%
-				dplyr::filter(`Is_filtered?`) %>%
-				dplyr::select(-`Is_filtered?`) %>%
-				
-				
 				# ADD MORE FILTERS HERE IF NECESSARY
 				dplyr::filter(Chromosome != "MT") %>%
 				dplyr::filter(Chromosome != "Y") %>%
@@ -79,19 +66,9 @@ mutation_smry = mutation_smry %>%
 # 2. Get a table of all positives
 #––––––––––––––––––––––––––––––––––––––––––––––––––
 df_to_filter = mutation_smry %>%
-			   dplyr::mutate(Reference_Allele_L = nchar(Reference_Allele)) %>%
-			   dplyr::mutate(Tumor_Seq_Allele2_L = nchar(Tumor_Seq_Allele2)) %>%
-			   dplyr::mutate(Variant_Length = case_when(
-		   			Reference_Allele_L > Tumor_Seq_Allele2_L ~ Reference_Allele_L,
-		   			TRUE ~ Tumor_Seq_Allele2_L
-			   )) %>%
-			   dplyr::mutate(n_maf = n_alt_count/n_depth,
-		   				     t_maf = t_alt_count/t_depth,
-		   				     `t/n maf` = t_maf/(n_maf+1e-9)) %>%
-			   dplyr::select(Variant_Type, Variant_Length,
+			   dplyr::select(Variant_Type,
 			   				 n_alt_count,
 			   				 ExAC_AF,
-			   				 ExAC_AF_Adj,
 			   				 gnomAD_AF,
 			   				 FILTER,
 			   				 ExAC_FILTER,
@@ -101,7 +78,6 @@ df_to_filter = mutation_smry %>%
 		   						   Variant_Type == "INS" | Variant_Type == "DEL" ~ "INDEL",
 		   						   TRUE ~ "SNP"),
 		   				     ExAC_AF = ifelse(is.na(ExAC_AF), 0, ExAC_AF),
-						     ExAC_AF_Adj = ifelse(is.na(ExAC_AF_Adj), 0, ExAC_AF_Adj),
 						     gnomAD_AF = ifelse(is.na(gnomAD_AF), 0, gnomAD_AF),
 						     ExAC_FILTER = case_when(
 						 		   is.na(ExAC_FILTER) ~ "UNKNOWN",
