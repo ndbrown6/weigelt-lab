@@ -54,7 +54,7 @@ if (as.numeric(opt$option) == 1) {
 	sample_names = unlist(strsplit(x = as.character(opt$sample_name), split = " ", fixed = TRUE))
 	df = list()
 	for (i in 1:length(sample_names)) {
-		df[[i]] = readr::read_tsv(file = paste0("qdnaseq/log2/", opt$bin_size, "kb/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
+		df[[i]] = readr::read_tsv(file = paste0("qdnaseq/", sample_names[i], ".txt"), col_names = TRUE, col_types = cols(.default = col_character())) %>%
 				  readr::type_convert() %>%
 				  dplyr::select(-1)
 		
