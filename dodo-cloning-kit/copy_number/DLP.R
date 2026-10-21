@@ -664,11 +664,11 @@ cn_colors = c("0" = "#a6cee3",
 	manifest = load_manifest(ploidy = FALSE)
 	log2_ratio = read_log2()
 	make_dir("Log2")
+	
+	readr::write_tsv(log2_ratio , file = url_output("Log2", "Hello.txt"))
 
 	res = foreach (i=1:nrow(manifest)) %dopar% {
 	
-		cat(i , file = url_output("Log2", paste0(manifest$barcode_id[i], ".txt")))
-
 		cell = segment_cell(log2_ratio, manifest$barcode_id[i])
 		
 		plot_ = cell$smoothed %>%
