@@ -552,7 +552,7 @@ cn_colors = c("0" = "#a6cee3",
 			xlab("\nAligned Read Pairs") +
 			ylab("Frequency\n") +
 			qc_theme(x_text = TRUE)
-	save_pdf(plot_, url_output("DLP/QC", "aligned_read_pairs.pdf"), width = 5, height = 5)
+	save_pdf(plot_, url_output("QC", "aligned_read_pairs.pdf"), width = 5, height = 5)
 
 	# 2. Histogram of MAPD ———————————————————————————————————————————————————————————————
 	plot_ = manifest %>%
@@ -567,7 +567,7 @@ cn_colors = c("0" = "#a6cee3",
 			xlab("\nMAPD") +
 			ylab("Frequency\n") +
 			qc_theme(x_text = TRUE)
-	save_pdf(plot_, url_output("DLP/QC", "mapd.pdf"), width = 5, height = 5)
+	save_pdf(plot_, url_output("QC", "mapd.pdf"), width = 5, height = 5)
 
 	# 3. Scatter plot of MAPD by total aligned read pairs ————————————————————————————————
 	plot_ = manifest %>%
@@ -584,7 +584,7 @@ cn_colors = c("0" = "#a6cee3",
 			xlab("\nMAPD") +
 			ylab("Number of Aligned Read Pairs\n") +
 			qc_theme(x_text = TRUE)
-	save_pdf(plot_, url_output("DLP/QC", "mapd_by_aligned_read_pairs.pdf"), width = 6, height = 5)
+	save_pdf(plot_, url_output("QC", "mapd_by_aligned_read_pairs.pdf"), width = 6, height = 5)
 
 	# 4. Histogram of fraction of empty bins by chromosome ———————————————————————————————
 	plot_ = manifest %>%
@@ -600,7 +600,7 @@ cn_colors = c("0" = "#a6cee3",
 			ylab("\nFrequency\n\n") +
 			qc_theme(x_text = FALSE) +
 			facet_wrap(~chromosome)
-	save_pdf(plot_, url_output("DLP/QC", "empty_bins_by_chromosome.pdf"), width = 17, height = 14)
+	save_pdf(plot_, url_output("QC", "empty_bins_by_chromosome.pdf"), width = 17, height = 14)
 
 	# 5. Histogram of aligned read pairs by chromosome ———————————————————————————————————
 	plot_ = manifest %>%
@@ -617,7 +617,7 @@ cn_colors = c("0" = "#a6cee3",
 			ylab("\nFrequency\n\n") +
 			qc_theme(x_text = FALSE) +
 			facet_wrap(~CHROMOSOME, scales = "free_x")
-	save_pdf(plot_, url_output("DLP/QC", "aligned_read_pairs_by_chromosome.pdf"), width = 17, height = 14)
+	save_pdf(plot_, url_output("QC", "aligned_read_pairs_by_chromosome.pdf"), width = 17, height = 14)
 
 	# 6. Scatter plot of fraction of empty bins by aligned read pairs, per chromosome ————
 	plot_ = manifest %>%
@@ -637,7 +637,7 @@ cn_colors = c("0" = "#a6cee3",
 			ylab("\nFraction of Empty Bins\n\n") +
 			qc_theme(x_text = FALSE) +
 			facet_wrap(~CHROMOSOME, scales = "free_x")
-	save_pdf(plot_, url_output("DLP/QC", "aligned_read_pairs_empty_bins_by_chromosome.pdf"), width = 17, height = 14)
+	save_pdf(plot_, url_output("QC", "aligned_read_pairs_empty_bins_by_chromosome.pdf"), width = 17, height = 14)
 
 	# 7. Summarize all QC metrics ————————————————————————————————————————————————————————
 	manifest %>%
@@ -655,7 +655,7 @@ cn_colors = c("0" = "#a6cee3",
 				  total_aligned_read_pairs = TOTAL_READS,
 				  median_absolute_pairwise_deviation = MAPD,
 				  `any_missing_chromosome_yes_no?` = ANY_MISSING) %>%
-	readr::write_tsv(file = url_output("DLP/QC", "manifest.txt"), append = FALSE, col_names = TRUE)
+	readr::write_tsv(file = url_output("QC", "manifest.txt"), append = FALSE, col_names = TRUE)
 }
 
 #==================================================
