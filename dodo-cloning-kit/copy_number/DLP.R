@@ -57,7 +57,7 @@ args_list <- list(
 	make_option("--ncores", type = "integer", default = 12,
 				help = "Number of cores for per-cell loops [default: %default]"),
 
-	make_option("--min_total_reads", type = "double", default = 2.5e5,
+	make_option("--min_total_reads", type = "double", default = 250000,
 				help = "Minimum number of aligned read pairs [default: %default]"),
 	make_option("--max_mapd", type = "double", default = 0.5,
 				help = "Maximum MAPD [default: %default]"),
