@@ -41,6 +41,7 @@ SIGNATURE_TOOLS_ENV ?= $(HOME)/share/env/r-signature.tools.lib-2.2.0
 VARIANT_ANNOTATION_ENV = $(HOME)/share/env/r-variantannotation-1.44.0
 FPFILTER_ENV = $(HOME)/share/env/fpfilter-0.0.1
 QDNASEQ_ENV = $(HOME)/share/env/r-qdnaseq-1.42.0
+DLP_ENV = $(HOME)/share/env/r-dlp-0.0.1
 
 # aliases
 PYTHON ?= python
