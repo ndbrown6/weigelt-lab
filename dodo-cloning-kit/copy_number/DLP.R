@@ -666,7 +666,6 @@ cn_colors = c("0" = "#a6cee3",
 	log2_ratio = read_log2()
 	make_dir("Log2")
 	
-
 	res = foreach (i=1:nrow(manifest)) %dopar% {
 	
 		cell = segment_cell(log2_ratio, manifest$barcode_id[i])

@@ -218,17 +218,18 @@ DLP/QC/manifest.txt : summary/aggregated_log2.txt
 																				--sample_names '$(SAMPLES)'")
 																				
 DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
-	$(call RUN,-n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N DLP/Log2 -v $(DLP_ENV),"set -o pipefail && \
+	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N DLP/Log2 -v $(DLP_ENV),"set -o pipefail && \
 																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
 																						 --option 2 \
-																						 --ncores 1 \
+																						 --ncores $(NCORES) \
 																						 --summary_dir $(SUMMARY_DIR) \
 																						 --output_dir $(OUTPUT_DIR) \
 																						 --min_total_reads $(MIN_TOTAL_READS) \
 																						 --max_mapd $(MAX_MAPD) \
 																						 --winsorize_tau $(WINSORIZE_TAU) \
 																						 --winsorize_k $(WINSORIZE_K) \
-																						 --pcf_gamma $(PCF_GAMMA) & \
+																						 --pcf_gamma $(PCF_GAMMA) \
+																						 --sample_names '$(SAMPLES)' & \
 																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
