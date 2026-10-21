@@ -668,6 +668,8 @@ cn_colors = c("0" = "#a6cee3",
 	res = foreach (i=1:nrow(manifest)) %dopar% {
 
 		cell = segment_cell(log2_ratio, manifest$barcode_id[i])
+		
+		readr::write_tsv(x = cell$segments, file = url_output("Log2", paste0(manifest$barcode_id[i], ".txt")))
 
 		plot_ = cell$smoothed %>%
 				dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE)) %>%
