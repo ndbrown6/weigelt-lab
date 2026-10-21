@@ -223,7 +223,12 @@ DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
 																						 --option 2 \
 																						 --ncores $(NCORES) \
 																						 --summary_dir $(SUMMARY_DIR) \
-																						 --output_dir $(OUTPUT_DIR) & \
+																						 --output_dir $(OUTPUT_DIR) \
+																						 --min_total_reads $(MIN_TOTAL_READS) \
+																						 --max_mapd $(MAX_MAPD) \
+																						 --winsorize_tau $(WINSORIZE_TAU) \
+																						 --winsorize_k $(WINSORIZE_K) \
+																						 --pcf_gamma $(PCF_GAMMA) & \
 																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
