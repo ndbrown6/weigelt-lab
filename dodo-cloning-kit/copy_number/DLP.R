@@ -666,11 +666,11 @@ cn_colors = c("0" = "#a6cee3",
 	make_dir("Log2")
 
 	res = foreach (i=1:nrow(manifest)) %dopar% {
+	
+		cat(i , file = url_output("Log2", paste0(manifest$barcode_id[i], ".txt")))
 
 		cell = segment_cell(log2_ratio, manifest$barcode_id[i])
 		
-		cat(i , file = url_output("Log2", paste0(manifest$barcode_id[i], ".txt")))
-
 		plot_ = cell$smoothed %>%
 				dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE)) %>%
 				ggplot(aes(x = Position, y = Log2)) +
