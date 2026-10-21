@@ -14,7 +14,8 @@ bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 summary/duplicate_metrics.txt \
 		 summary/aggregated_log2.txt \
 		 DLP/QC/manifest.txt \
-		 DLP/Log2/taskcomplete.txt
+		 DLP/Log2/taskcomplete.txt \
+		 DLP/RMSE/taskcomplete.txt
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -229,6 +230,23 @@ DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
 																						 --winsorize_tau $(WINSORIZE_TAU) \
 																						 --winsorize_k $(WINSORIZE_K) \
 																						 --pcf_gamma $(PCF_GAMMA) && \
+																						 touch $(@)")
+																						 
+DLP/RMSE/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/Log2/taskcomplete.txt
+	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N Log2 -v $(DLP_ENV),"set -o pipefail && \
+																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
+																						 --option 3 \
+																						 --ncores $(NCORES) \
+																						 --summary_dir $(SUMMARY_DIR) \
+																						 --output_dir $(OUTPUT_DIR) \
+																						 --min_total_reads $(MIN_TOTAL_READS) \
+																						 --max_mapd $(MAX_MAPD) \
+																						 --winsorize_tau $(WINSORIZE_TAU) \
+																						 --winsorize_k $(WINSORIZE_K) \
+																						 --pcf_gamma $(PCF_GAMMA) \
+																						 --rmse_ploidy $(RMSE_PLOIDY) \
+																						 --rmse_penalty $(RMSE_PENALTY) \
+																						 --rmse_step $(RMSE_STEP) && \
 																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \

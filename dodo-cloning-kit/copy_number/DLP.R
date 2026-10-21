@@ -686,14 +686,12 @@ cn_colors = c("0" = "#a6cee3",
 	
 }
 
-#==================================================
-# Option 3: Ploidy estimation per cell (was 03a_rmse_fit.R)
-#==================================================
+# Option 3: Ploidy estimation per cell ———————————————————————————————————————————————————
 'run_ploidy' <- function() {
 
 	manifest = load_manifest(ploidy = FALSE)
 	log2_ratio = read_log2()
-	make_dir("bycell", "rmse")
+	make_dir("RMSE")
 
 	rmse = foreach (i=1:nrow(manifest)) %dopar% {
 
@@ -724,16 +722,16 @@ cn_colors = c("0" = "#a6cee3",
 					  axis.text.y = element_text(size = 8),
 					  panel.spacing = unit(2, "lines"))
 
-		save_pdf(plot_, url_output("bycell", "rmse", paste0(manifest$barcode_id[i], ".pdf")),
+		save_pdf(plot_, url_output("RMSE", paste0(manifest$barcode_id[i], ".pdf")),
 				 width = 3, height = 3)
 
 		fit$best = fit$best %>%
 				   dplyr::mutate("N" = nrow(fit$segments_cn))
+				   
 		return(invisible(fit$best))
 	}
 
-	# Extend the (unfiltered) QC manifest with the ploidy fit of the cells that passed QC
-	read_tsv_typed(url_output("qc", "manifest_w_qc.txt")) %>%
+	read_tsv_typed(url_output("QC", "manifest.txt")) %>%
 	dplyr::left_join(do.call(rbind, rmse) %>%
 					 dplyr::mutate(barcode_id = manifest$barcode_id) %>%
 					 dplyr::rename(best_ploidy_estimate = ploidy,
@@ -741,7 +739,7 @@ cn_colors = c("0" = "#a6cee3",
 								   penalized_rmse = score,
 								   number_of_segments = N),
 					 by = "barcode_id") %>%
-	readr::write_tsv(file = url_output("qc", "manifest_w_qc_ext.txt"), append = FALSE, col_names = TRUE)
+	readr::write_tsv(file = url_output("QC", "manifest.txt"), append = FALSE, col_names = TRUE)
 }
 
 #==================================================
