@@ -316,8 +316,7 @@ cn_colors = c("0" = "#a6cee3",
 }
 
 'load_manifest' <- function(ploidy = FALSE) {
-	file = ifelse(ploidy, "manifest_w_qc_ext.txt", "manifest_w_qc.txt")
-	res = read_tsv_typed(url_output("qc", file)) %>%
+	res = read_tsv_typed(url_output("QC", "manifest.txt")) %>%
 		  qc_filter(ploidy = ploidy)
 
 	return(invisible(res))
@@ -658,9 +657,7 @@ cn_colors = c("0" = "#a6cee3",
 	readr::write_tsv(file = url_output("QC", "manifest.txt"), append = FALSE, col_names = TRUE)
 }
 
-#==================================================
-# Option 2: Log2 ratio plot per cell (was 02_plot_log2_ratio.R)
-#==================================================
+# Option 2: Log2 ratio plot per cell —————————————————————————————————————————————————————
 'run_log2_plots' <- function() {
 
 	manifest = load_manifest(ploidy = FALSE)
