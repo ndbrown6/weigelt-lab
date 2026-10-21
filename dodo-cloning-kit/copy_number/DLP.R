@@ -662,9 +662,6 @@ cn_colors = c("0" = "#a6cee3",
 'run_log2_plots' <- function() {
 
 	manifest = load_manifest(ploidy = FALSE)
-
-	readr::write_tsv(manifest , file = url_output("Log2", "Hello.txt"))
-	
 	log2_ratio = read_log2()
 	make_dir("Log2")
 	
