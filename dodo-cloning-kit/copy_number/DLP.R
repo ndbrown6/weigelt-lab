@@ -537,7 +537,7 @@ cn_colors = c("0" = "#a6cee3",
 		   dplyr::rename(SAMPLE_NAME = barcode_id)
 	ebf = empty_bin_fraction(log2_ratio)
 
-	make_dir("DLP/QC")
+	make_dir("QC")
 
 	# 1. Histogram of total read pairs aligned ———————————————————————————————————————————
 	plot_ = manifest %>%
