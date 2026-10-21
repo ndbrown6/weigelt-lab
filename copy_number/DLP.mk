@@ -209,7 +209,7 @@ summary/aggregated_log2.txt : $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt)
 																									 --output_file $(@)")
 																									 
 DLP/QC/manifest.txt : summary/aggregated_log2.txt
-	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N DLP/QC -v $(DLP_ENV),"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N QC -v $(DLP_ENV),"set -o pipefail && \
 																				$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
 																				--option 1 \
 																				--ncores 1 \
@@ -218,7 +218,7 @@ DLP/QC/manifest.txt : summary/aggregated_log2.txt
 																				--sample_names '$(SAMPLES)'")
 																				
 DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
-	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N DLP/Log2 -v $(DLP_ENV),"set -o pipefail && \
+	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N Log2 -v $(DLP_ENV),"set -o pipefail && \
 																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
 																						 --option 2 \
 																						 --ncores $(NCORES) \
@@ -228,8 +228,7 @@ DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
 																						 --max_mapd $(MAX_MAPD) \
 																						 --winsorize_tau $(WINSORIZE_TAU) \
 																						 --winsorize_k $(WINSORIZE_K) \
-																						 --pcf_gamma $(PCF_GAMMA) \
-																						 --sample_names '$(SAMPLES)' & \
+																						 --pcf_gamma $(PCF_GAMMA) & \
 																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
