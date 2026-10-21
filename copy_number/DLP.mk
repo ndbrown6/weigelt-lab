@@ -211,9 +211,9 @@ DLP/QC/manifest.txt : summary/aggregated_log2.txt
 	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N QC -v $(DLP_ENV),"set -o pipefail && \
 																				$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
 																				--option 1 \
+																				--ncores 1 \
 																				--summary_dir $(SUMMARY_DIR) \
 																				--output_dir $(OUTPUT_DIR) \
-																				--ncores 1 \
 																				--sample_names '$(SAMPLES)'")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
