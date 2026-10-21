@@ -36,9 +36,9 @@ suppressPackageStartupMessages({
 	library("foreach")
 	library("doMC")
 	library("fuzzyjoin")
-	library("GenomicRanges")
-	library("copynumber")
-	library("ComplexHeatmap")
+#	library("GenomicRanges")
+#	library("copynumber")
+#	library("ComplexHeatmap")
 })
 
 args_list <- list(
