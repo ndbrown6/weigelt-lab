@@ -123,7 +123,8 @@ numeric_args = c(
   "clone_height"
 )
 for (arg in numeric_args) {
-	if (!is.numeric(opt[[arg]]) || length(opt[[arg]]) != 1 || is.na(opt[[arg]])) {
+	opt[[arg]] = as.numeric(opt[[arg]])
+	if (length(opt[[arg]]) != 1 || is.na(opt[[arg]])) {
 		stop("--", arg, " must be a single number", call. = FALSE)
 	}
 }
