@@ -13,7 +13,8 @@ bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 summary/wgs_metrics.txt \
 		 summary/duplicate_metrics.txt \
 		 summary/aggregated_log2.txt \
-		 DLP/QC/manifest.txt
+		 DLP/QC/manifest.txt \
+		 DLP/Log2/taskcomplete.txt
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -208,13 +209,22 @@ summary/aggregated_log2.txt : $(foreach sample,$(SAMPLES),qdnaseq/$(sample).txt)
 																									 --output_file $(@)")
 																									 
 DLP/QC/manifest.txt : summary/aggregated_log2.txt
-	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N QC -v $(DLP_ENV),"set -o pipefail && \
+	$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N DLP/QC -v $(DLP_ENV),"set -o pipefail && \
 																				$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
 																				--option 1 \
 																				--ncores 1 \
 																				--summary_dir $(SUMMARY_DIR) \
 																				--output_dir $(OUTPUT_DIR) \
 																				--sample_names '$(SAMPLES)'")
+																				
+DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
+	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N DLP/Log2 -v $(DLP_ENV),"set -o pipefail && \
+																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
+																						 --option 2 \
+																						 --ncores $(NCORES) \
+																						 --summary_dir $(SUMMARY_DIR) \
+																						 --output_dir $(OUTPUT_DIR) & \
+																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
