@@ -228,7 +228,7 @@ DLP/Log2/taskcomplete.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt
 																						 --max_mapd $(MAX_MAPD) \
 																						 --winsorize_tau $(WINSORIZE_TAU) \
 																						 --winsorize_k $(WINSORIZE_K) \
-																						 --pcf_gamma $(PCF_GAMMA) & \
+																						 --pcf_gamma $(PCF_GAMMA) && \
 																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
