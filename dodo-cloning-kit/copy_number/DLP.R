@@ -742,14 +742,11 @@ cn_colors = c("0" = "#a6cee3",
 	readr::write_tsv(file = url_output("QC", "manifest.txt"), append = FALSE, col_names = TRUE)
 }
 
-#==================================================
-# Option 4: Absolute copy number plot per cell (was 03b_plot_absolute_copies.R)
-#==================================================
+# Option 4: Absolute copy number plot per cell ———————————————————————————————————————————
 'run_absolute_plots' <- function() {
 
 	manifest = load_manifest(ploidy = TRUE)
 	log2_ratio = read_log2()
-	make_dir("bycell", "absolute")
 
 	res = foreach (i=1:nrow(manifest)) %dopar% {
 
@@ -769,8 +766,9 @@ cn_colors = c("0" = "#a6cee3",
 				log2_axes(legend_bottom = TRUE) +
 				guides(color = guide_legend(title = "Copies", nrow = 1, override.aes = list(size = 2)))
 
-		save_pdf(plot_, url_output("bycell", "absolute", paste0(manifest$barcode_id[i], ".pdf")),
+		save_pdf(plot_, url_output("Log2", paste0(manifest$barcode_id[i], ".pdf")),
 				 width = 24/2.25, height = 3.25)
+				 
 		return(invisible(0))
 	}
 }
