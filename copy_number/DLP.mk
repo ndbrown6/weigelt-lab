@@ -279,7 +279,9 @@ DLP/timestamp5.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timesta
 																				--winsorize_tau $(WINSORIZE_TAU) \
 																				--winsorize_k $(WINSORIZE_K) \
 																				--mpcf_gamma $(MPCF_GAMMA) \
-																				--max_copies $(MAX_COPIES) && \
+																				--max_copies $(MAX_COPIES) \
+																				--clone_height $(CLONE_HEIGHT) \
+																				--clone_linkage $(CLONE_LINKAGE) && \
 																				touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
