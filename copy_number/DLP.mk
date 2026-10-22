@@ -267,20 +267,20 @@ DLP/timestamp4.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timesta
 																						 touch $(@)")
 																						 
 DLP/timestamp5.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timestamp3.txt
-	$(call RUN,-n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N absolute -v $(DLP_ENV),"set -o pipefail && \
-																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
-																						 --option 5 \
-																						 --ncores $(NCORES) \
-																						 --summary_dir $(SUMMARY_DIR) \
-																						 --output_dir $(OUTPUT_DIR) \
-																						 --min_total_reads $(MIN_TOTAL_READS) \
-																						 --max_mapd $(MAX_MAPD) \
-																						 --min_ploidy $(MIN_PLOIDY) \
-																						 --winsorize_tau $(WINSORIZE_TAU) \
-																						 --winsorize_k $(WINSORIZE_K) \
-																						 --mpcf_gamma $(MPCF_GAMMA) \
-																						 --max_copies $(MAX_COPIES) && \
-																						 touch $(@)")
+	$(call RUN,-n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N clone -v $(DLP_ENV),"set -o pipefail && \
+																				$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
+																				--option 5 \
+																				--ncores 1 \
+																				--summary_dir $(SUMMARY_DIR) \
+																				--output_dir $(OUTPUT_DIR) \
+																				--min_total_reads $(MIN_TOTAL_READS) \
+																				--max_mapd $(MAX_MAPD) \
+																				--min_ploidy $(MIN_PLOIDY) \
+																				--winsorize_tau $(WINSORIZE_TAU) \
+																				--winsorize_k $(WINSORIZE_K) \
+																				--mpcf_gamma $(MPCF_GAMMA) \
+																				--max_copies $(MAX_COPIES) && \
+																				touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
