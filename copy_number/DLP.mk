@@ -16,7 +16,8 @@ bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 DLP/QC/manifest.txt \
 		 DLP/timestamp2.txt \
 		 DLP/timestamp3.txt \
-		 DLP/timestamp4.txt
+		 DLP/timestamp4.txt \
+		 DLP/timestamp5.txt
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -264,6 +265,22 @@ DLP/timestamp4.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timesta
 																						 --winsorize_k $(WINSORIZE_K) \
 																						 --pcf_gamma $(PCF_GAMMA) && \
 																						 touch $(@)")
+																						 
+DLP/timestamp5.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timestamp3.txt
+	$(call RUN,-n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N absolute -v $(DLP_ENV),"set -o pipefail && \
+																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
+																						 --option 4 \
+																						 --ncores $(NCORES) \
+																						 --summary_dir $(SUMMARY_DIR) \
+																						 --output_dir $(OUTPUT_DIR) \
+																						 --min_total_reads $(MIN_TOTAL_READS) \
+																						 --max_mapd $(MAX_MAPD) \
+																						 --min_ploidy $(MIN_PLOIDY) \
+																						 --winsorize_tau $(WINSORIZE_TAU) \
+																						 --winsorize_k $(WINSORIZE_K) \
+																						 --mpcf_gamma $(MPCF_GAMMA) \
+																						 --max_copies $(MAX_COPIES) && \
+																						 touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
@@ -300,4 +317,5 @@ clean :
 	rm -f metrics/*.gc_metrics.pdf && \
 	rm -f metrics/*.wgs_metrics.txt && \
 	rm -f metrics/*.duplicate_metrics.txt && \
-	rm -f qdnaseq/*.txt
+	rm -f qdnaseq/*.txt && \
+	rm -f DLP/timestamp*.txt

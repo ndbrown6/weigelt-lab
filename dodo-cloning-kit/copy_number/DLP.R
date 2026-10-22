@@ -5,10 +5,9 @@
 #   --option 2   Log2 Ratio plot per cell
 #   --option 3   Ploidy (RMSE) fit per cell
 #   --option 4   Absolute copy number per cell
-#   --option 5   Heatmap of absolute copies
+#   --option 5   Clonal decomposition
 #   --option 6   Absolute copies, all bins
 #   --option 7   Marginal CN distribution/gene
-#   --option 8   Clonal decomposition
 #
 # Tunable parameters
 #   QC gates          --min_total_reads --max_mapd --min_log2_ratio --fraction_empty_bins --min_ploidy
@@ -20,7 +19,7 @@
 #
 # Dependencies
 #   1 -> 2
-#   1 -> 3 -> 4, 5, 6 -> 7, 8
+#   1 -> 3 -> 4, 5, 6 -> 7
 
 suppressPackageStartupMessages({
 	library("optparse")
@@ -539,7 +538,7 @@ cn_colors = c("0" = "#a6cee3",
 
 	make_dir("QC")
 
-	# 1. Histogram of total read pairs aligned ———————————————————————————————————————————
+	# 1. Histogram of total read pairs aligned
 	plot_ = manifest %>%
 			dplyr::full_join(aln_metrics, by = "SAMPLE_NAME") %>%
 			control_key() %>%
@@ -554,7 +553,7 @@ cn_colors = c("0" = "#a6cee3",
 			qc_theme(x_text = TRUE)
 	save_pdf(plot_, url_output("QC", "aligned_read_pairs.pdf"), width = 5, height = 5)
 
-	# 2. Histogram of MAPD ———————————————————————————————————————————————————————————————
+	# 2. Histogram of MAPD
 	plot_ = manifest %>%
 			dplyr::full_join(mapd, by = "SAMPLE_NAME") %>%
 			control_key() %>%
@@ -569,7 +568,7 @@ cn_colors = c("0" = "#a6cee3",
 			qc_theme(x_text = TRUE)
 	save_pdf(plot_, url_output("QC", "mapd.pdf"), width = 5, height = 5)
 
-	# 3. Scatter plot of MAPD by total aligned read pairs ————————————————————————————————
+	# 3. Scatter plot of MAPD by total aligned read pairs
 	plot_ = manifest %>%
 			dplyr::full_join(aln_metrics, by = "SAMPLE_NAME") %>%
 			dplyr::full_join(mapd, by = "SAMPLE_NAME") %>%
@@ -586,7 +585,7 @@ cn_colors = c("0" = "#a6cee3",
 			qc_theme(x_text = TRUE)
 	save_pdf(plot_, url_output("QC", "mapd_by_aligned_read_pairs.pdf"), width = 6, height = 5)
 
-	# 4. Histogram of fraction of empty bins by chromosome ———————————————————————————————
+	# 4. Histogram of fraction of empty bins by chromosome
 	plot_ = manifest %>%
 			dplyr::full_join(ebf, by = "SAMPLE_NAME") %>%
 			control_key() %>%
@@ -602,7 +601,7 @@ cn_colors = c("0" = "#a6cee3",
 			facet_wrap(~chromosome)
 	save_pdf(plot_, url_output("QC", "empty_bins_by_chromosome.pdf"), width = 17, height = 14)
 
-	# 5. Histogram of aligned read pairs by chromosome ———————————————————————————————————
+	# 5. Histogram of aligned read pairs by chromosome
 	plot_ = manifest %>%
 			dplyr::full_join(idx_metrics, by = "SAMPLE_NAME") %>%
 			dplyr::filter(CHROMOSOME %in% chromosomes) %>%
@@ -619,7 +618,7 @@ cn_colors = c("0" = "#a6cee3",
 			facet_wrap(~CHROMOSOME, scales = "free_x")
 	save_pdf(plot_, url_output("QC", "aligned_read_pairs_by_chromosome.pdf"), width = 17, height = 14)
 
-	# 6. Scatter plot of fraction of empty bins by aligned read pairs, per chromosome ————
+	# 6. Scatter plot of fraction of empty bins by aligned read pairs, per chromosome
 	plot_ = manifest %>%
 			dplyr::full_join(ebf %>%
 							 dplyr::rename(CHROMOSOME = chromosome),
@@ -639,7 +638,7 @@ cn_colors = c("0" = "#a6cee3",
 			facet_wrap(~CHROMOSOME, scales = "free_x")
 	save_pdf(plot_, url_output("QC", "aligned_read_pairs_empty_bins_by_chromosome.pdf"), width = 17, height = 14)
 
-	# 7. Summarize all QC metrics ————————————————————————————————————————————————————————
+	# 7. Summarize all QC metrics
 	manifest %>%
 	dplyr::full_join(aln_metrics, by = "SAMPLE_NAME") %>%
 	dplyr::full_join(mapd, by = "SAMPLE_NAME") %>%
@@ -773,34 +772,126 @@ cn_colors = c("0" = "#a6cee3",
 	}
 }
 
-#==================================================
-# Option 5: Heatmap of absolute copy number (was 04_heatmap_absolute_copies.R)
-#==================================================
-'run_heatmap' <- function() {
+# Option 5: Clonal decomposition —————————————————————————————————————————————————————————
+'run_clones' <- function() {
 
 	manifest = load_manifest(ploidy = TRUE)
 	log2_ratio = read_log2()
-	make_dir("smry")
+	make_dir("clones")
 
-	res = foreach (i=1:nrow(manifest)) %dopar% {
+	# 1. Joint segmentation and absolute copy number
+	log2_smoothed = log2_ratio %>%
+					dplyr::select(all_of(c("chromosome", "position", manifest$barcode_id))) %>%
+					as.data.frame() %>%
+					copynumber::winsorize(method = "mad", tau = opt$winsorize_tau, k = opt$winsorize_k, verbose = FALSE) %>%
+					dplyr::rename(Chromosome = chrom, Position = pos)
 
-		cell = segment_cell(log2_ratio, manifest$barcode_id[i])
-		fit = call_copy_number(cell$segments, ploidy = manifest$best_ploidy_estimate[i])
+	segmented_log2 = log2_smoothed %>%
+					 copynumber::multipcf(gamma = opt$mpcf_gamma, normalize = FALSE, fast = FALSE, verbose = FALSE) %>%
+					 dplyr::select(-arm, -n.probes) %>%
+					 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
+					 dplyr::mutate(Chromosome = case_when(
+					 					Chromosome == 23 ~ "X",
+					 					TRUE ~ as.character(Chromosome)
+					 )) %>%
+					 dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE))
 
-		bin_copy_number(cell$smoothed, fit) %>%
-		dplyr::select(-Log2) %>%
-		dplyr::as_tibble() %>%
-		dplyr::mutate(CN = pmin(CN, opt$max_copies))
-	}
+	fit = segmented_log2 %>%
+		  reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"),
+		  				 variable.name = "barcode_id",
+		  				 value.name = "Log2_Ratio") %>%
+		  dplyr::left_join(manifest, by = "barcode_id") %>%
+		  dplyr::mutate(CN_raw = best_ploidy_estimate * 2^Log2_Ratio,
+						CN = pmax(round(CN_raw), 0)) %>%
+		  reshape2::dcast(Chromosome + Start_Position + End_Position ~ barcode_id, value.var = "CN")
 
-	copy_number = bind_cells(res, manifest$barcode_id, by = c("Chromosome", "Position")) %>%
+	# 2. Estimate number of clones
+	sample_cols = setdiff(names(fit), c("Chromosome", "Start_Position", "End_Position"))
+	cn = as.data.frame(fit)[, sample_cols]
+	w = (fit$End_Position - fit$Start_Position)/sum(fit$End_Position - fit$Start_Position)
+	d = as.matrix(dist(t(cn*w), method = "manhattan"))
+	hc = hclust(as.dist(d), method = opt$clone_linkage)
+	h = seq(from = 0, to = 1, by = .05)
+	nc = vapply(h, function(x) { length(unique(cutree(hc, h = x))) }, numeric(1))
+
+	plot_ = dplyr::tibble(d = h,
+						  nc = nc) %>%
+			ggplot(aes(x = d, y = nc)) +
+			geom_line(stat = "identity", color = "steelblue", linewidth = .5) +
+			geom_point(stat = "identity", shape = 21, fill = NA, color = "steelblue", size = 2) +
+			geom_vline(data = ~ dplyr::filter(.x, nc == 2) %>% dplyr::filter(d == min(d)),
+					   aes(xintercept = d), linetype = 2, colour = "red") +
+			geom_vline(xintercept = opt$clone_height, linetype = 3, color = "goldenrod3") +
+			scale_x_continuous() +
+			scale_y_continuous() +
+			xlab("Weighted manhattan distance") +
+			ylab("Number of clones") +
+			theme_minimal() +
+			theme(axis.title.x = element_text(margin = margin(t = 20), size = 14),
+				  axis.title.y = element_text(margin = margin(r = 20), size = 14),
+				  axis.text.x = element_text(size = 12),
+				  axis.text.y = element_text(size = 12))
+	save_pdf(plot_, url_output("clones", "number_clones_weighted_distance.pdf"), width = 4, height = 4)
+
+	grp = cutree(hc, h = opt$clone_height)
+	grp = dplyr::tibble(barcode_id = names(grp),
+						clone_id = grp) %>%
+		  dplyr::left_join(manifest %>%
+						   dplyr::select(barcode_id, best_ploidy_estimate, number_of_segments),
+						   by = "barcode_id")
+
+	clone_ord = grp %>%
+				dplyr::group_by(clone_id) %>%
+				dplyr::summarize(mean_ploidy = round(mean(best_ploidy_estimate)),
+								 number_cells = n()) %>%
+				dplyr::arrange(mean_ploidy, desc(number_cells))
+
+	grp = grp %>%
+		  dplyr::mutate(clone_id = factor(clone_id, levels = rev(clone_ord$clone_id), ordered = TRUE)) %>%
+		  dplyr::arrange(clone_id)
+
+	# 3. Keep the cell-to-clone assignments
+	readr::write_tsv(x = grp, file = url_output("clones", "clone_assignments.txt"), append = FALSE, col_names = TRUE)
+
+	# 4. Plot clone CN heatmap
+	copy_number = fit %>%
+				  fuzzyjoin::genome_left_join(log2_ratio %>%
+											  dplyr::select(Chromosome = chromosome,
+															Start_Position = position,
+															End_Position = position),
+											  by = c("Chromosome", "Start_Position", "End_Position")) %>%
+				  dplyr::mutate(Start_Position.x = Start_Position.y) %>%
+				  dplyr::select(-`Chromosome.y`,
+								-`Start_Position.y`,
+								-`End_Position.y`,
+								-`End_Position.x`) %>%
+				  dplyr::rename(Chromosome = Chromosome.x, Position = Start_Position.x) %>%
+				  reshape2::melt(id.vars = c("Chromosome", "Position"), variable.name = "barcode_id", value.name = "CN") %>%
+				  dplyr::mutate(CN = pmin(CN, opt$max_copies)) %>%
+				  reshape2::dcast(Chromosome + Position ~ barcode_id, value.var = "CN") %>%
 				  dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE),
 								Position = as.numeric(Position)) %>%
 				  dplyr::arrange(Chromosome, Position)
 
-	pdf(url_output("smry", "aggregated_cells_absolute_copies.pdf"), width = 7*2.5, height = 7*1.25)
+	cluster_palette = colorRampPalette(brewer.pal(9, "Set1"))(nrow(clone_ord))
+	names(cluster_palette) = sort(clone_ord$clone_id)
+
+	ploidy_palette = colorRampPalette(brewer.pal(12, "Set3"))(length(unique(clone_ord$mean_ploidy)))
+	names(ploidy_palette) = sort(unique(clone_ord$mean_ploidy))
+
+	ha = rowAnnotation(
+		`Clone ID` = as.character(grp %>% .[["clone_id"]]),
+		`Ploidy`   = as.character(round(grp %>% .[["best_ploidy_estimate"]])),
+		col = list(`Clone ID` = cluster_palette,
+				   `Ploidy` = ploidy_palette),
+		show_annotation_name = FALSE,
+		simple_anno_size = unit(3, "mm"),
+		annotation_legend_param = list(grid_height = unit(4, "mm"), grid_width = unit(4, "mm"))
+	)
+
+	pdf(url_output("clones", "aggregated_cells_absolute_copies.pdf"), width = 7*2.5, height = 7*1.25)
 	draw(Heatmap(matrix = copy_number %>%
-						  dplyr::select(-Chromosome, -Position) %>%
+						  dplyr::select(grp$barcode_id) %>%
 						  t(),
 				 col = cn_colors[as.character(0:opt$max_copies)],
 				 name = "CN",
@@ -808,11 +899,15 @@ cn_colors = c("0" = "#a6cee3",
 				 rect_gp = gpar(col = NA, lwd = 0),
 				 border = NA,
 
-				 cluster_rows = TRUE,
-				 clustering_distance_rows = "manhattan",
-				 clustering_method_rows = "complete",
-				 row_dend_width = unit(30, "mm"),
+				 cluster_rows = FALSE,
+				 row_split = grp$clone_id,
 				 show_row_names = FALSE,
+				 row_title_gp = gpar(fontsize = 10),
+				 row_title_rot = 0,
+				 cluster_row_slices = TRUE,
+				 clustering_distance_rows = "manhattan",
+				 clustering_method_rows = "ward.D",
+				 show_row_dend = FALSE,
 
 				 cluster_columns = FALSE,
 				 column_split = copy_number %>% .[["Chromosome"]],
@@ -820,15 +915,15 @@ cn_colors = c("0" = "#a6cee3",
 				 column_title_side = "bottom",
 				 column_title_gp = gpar(fontsize = 12),
 
+				 left_annotation = ha,
+
 				 use_raster = FALSE,
 				 show_heatmap_legend = TRUE,
 				 heatmap_legend_param = list(legend_height = unit(1, "cm"), legend_width = unit(1, "cm"))))
 	dev.off()
 }
 
-#==================================================
-# Option 6: Absolute copy number tables (was 05a_summary_bygene_absolute_copies.R)
-#==================================================
+# Option 6: Absolute copy number tables ——————————————————————————————————————————————————
 'run_bygene_tables' <- function() {
 
 	if (is.null(opt$gene_coords)) {
@@ -898,9 +993,7 @@ cn_colors = c("0" = "#a6cee3",
 					 append = FALSE, col_names = TRUE)
 }
 
-#==================================================
-# Option 7: Marginal CN distribution by gene (was 05b_plot_marginal_copies_bygene.R)
-#==================================================
+# Option 7: Marginal CN distribution by gene —————————————————————————————————————————————
 'run_bygene_plots' <- function() {
 
 	genes_of_interest = trimws(strsplit(opt$genes, ",")[[1]])
@@ -939,159 +1032,6 @@ cn_colors = c("0" = "#a6cee3",
 }
 
 #==================================================
-# Option 8: Clonal decomposition (was 06_clonal_decomposition.R)
-#==================================================
-'run_clones' <- function() {
-
-	manifest = load_manifest(ploidy = TRUE)
-	log2_ratio = read_log2()
-	make_dir("byclone")
-
-	# 1. Joint segmentation and absolute copy number ——————————————————————————————————————
-	log2_smoothed = log2_ratio %>%
-					dplyr::select(all_of(c("chromosome", "position", manifest$barcode_id))) %>%
-					as.data.frame() %>%
-					copynumber::winsorize(method = "mad", tau = opt$winsorize_tau, k = opt$winsorize_k, verbose = FALSE) %>%
-					dplyr::rename(Chromosome = chrom, Position = pos)
-
-	segmented_log2 = log2_smoothed %>%
-					 copynumber::multipcf(gamma = opt$mpcf_gamma, normalize = FALSE, fast = FALSE, verbose = FALSE) %>%
-					 dplyr::select(-arm, -n.probes) %>%
-					 dplyr::rename(Chromosome = chrom, Start_Position = start.pos, End_Position = end.pos) %>%
-					 dplyr::mutate(Chromosome = case_when(
-					 					Chromosome == 23 ~ "X",
-					 					TRUE ~ as.character(Chromosome)
-					 )) %>%
-					 dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE))
-
-	fit = segmented_log2 %>%
-		  reshape2::melt(id.vars = c("Chromosome", "Start_Position", "End_Position"), variable.name = "barcode_id", value.name = "Log2_Ratio") %>%
-		  dplyr::left_join(manifest, by = "barcode_id") %>%
-		  dplyr::mutate(CN_raw = best_ploidy_estimate * 2^Log2_Ratio,
-						CN = pmax(round(CN_raw), 0)) %>%
-		  reshape2::dcast(Chromosome + Start_Position + End_Position ~ barcode_id, value.var = "CN")
-
-	# 2. Estimate number of clones ————————————————————————————————————————————————————————
-	sample_cols = setdiff(names(fit), c("Chromosome", "Start_Position", "End_Position"))
-	cn = as.data.frame(fit)[, sample_cols]
-	w = (fit$End_Position - fit$Start_Position)/sum(fit$End_Position - fit$Start_Position)
-	d = as.matrix(dist(t(cn*w), method = "manhattan"))
-	hc = hclust(as.dist(d), method = opt$clone_linkage)
-	h = seq(from = 0, to = 1, by = .05)
-	nc = vapply(h, function(x) { length(unique(cutree(hc, h = x))) }, numeric(1))
-
-	plot_ = dplyr::tibble(d = h,
-						  nc = nc) %>%
-			ggplot(aes(x = d, y = nc)) +
-			geom_line(stat = "identity", color = "steelblue", linewidth = .5) +
-			geom_point(stat = "identity", shape = 21, fill = NA, color = "steelblue", size = 2) +
-			geom_vline(data = ~ dplyr::filter(.x, nc == 2) %>% dplyr::filter(d == min(d)),
-					   aes(xintercept = d), linetype = 2, colour = "red") +
-			geom_vline(xintercept = opt$clone_height, linetype = 3, color = "goldenrod3") +
-			scale_x_continuous() +
-			scale_y_continuous() +
-			xlab("Weighted manhattan distance") +
-			ylab("Number of clones") +
-			theme_minimal() +
-			theme(axis.title.x = element_text(margin = margin(t = 20), size = 14),
-				  axis.title.y = element_text(margin = margin(r = 20), size = 14),
-				  axis.text.x = element_text(size = 12),
-				  axis.text.y = element_text(size = 12))
-	save_pdf(plot_, url_output("byclone", "number_clones_weighted_distance.pdf"), width = 4, height = 4)
-
-	grp = cutree(hc, h = opt$clone_height)
-	grp = dplyr::tibble(barcode_id = names(grp),
-						clone_id = grp) %>%
-		  dplyr::left_join(manifest %>%
-						   dplyr::select(barcode_id, best_ploidy_estimate, number_of_segments),
-						   by = "barcode_id")
-
-	clone_ord = grp %>%
-				dplyr::group_by(clone_id) %>%
-				dplyr::summarize(mean_ploidy = round(mean(best_ploidy_estimate)),
-								 number_cells = n()) %>%
-				dplyr::arrange(mean_ploidy, desc(number_cells))
-
-	grp = grp %>%
-		  dplyr::mutate(clone_id = factor(clone_id, levels = rev(clone_ord$clone_id), ordered = TRUE)) %>%
-		  dplyr::arrange(clone_id)
-
-	# NEW: keep the cell-to-clone assignments
-	readr::write_tsv(x = grp, file = url_output("byclone", "clone_assignments.txt"), append = FALSE, col_names = TRUE)
-
-	# 3. Plot clone CN heatmap ————————————————————————————————————————————————————————————
-	copy_number = fit %>%
-				  fuzzyjoin::genome_left_join(log2_ratio %>%
-											  dplyr::select(Chromosome = chromosome,
-															Start_Position = position,
-															End_Position = position),
-											  by = c("Chromosome", "Start_Position", "End_Position")) %>%
-				  dplyr::mutate(Start_Position.x = Start_Position.y) %>%
-				  dplyr::select(-`Chromosome.y`,
-								-`Start_Position.y`,
-								-`End_Position.y`,
-								-`End_Position.x`) %>%
-				  dplyr::rename(Chromosome = Chromosome.x, Position = Start_Position.x) %>%
-				  reshape2::melt(id.vars = c("Chromosome", "Position"), variable.name = "barcode_id", value.name = "CN") %>%
-				  dplyr::mutate(CN = pmin(CN, opt$max_copies)) %>%
-				  reshape2::dcast(Chromosome + Position ~ barcode_id, value.var = "CN") %>%
-				  dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE),
-								Position = as.numeric(Position)) %>%
-				  dplyr::arrange(Chromosome, Position)
-
-	cluster_palette = colorRampPalette(brewer.pal(9, "Set1"))(nrow(clone_ord))
-	names(cluster_palette) = sort(clone_ord$clone_id)
-
-	ploidy_palette = colorRampPalette(brewer.pal(12, "Set3"))(length(unique(clone_ord$mean_ploidy)))
-	names(ploidy_palette) = sort(unique(clone_ord$mean_ploidy))
-
-	# FIXME (kept as in 06_clonal_decomposition.R): the list name `Plopidy` below does not match
-	# the annotation name `Ploidy`, so ploidy_palette is never applied to the Ploidy annotation.
-	ha = rowAnnotation(
-		`Clone ID` = as.character(grp %>% .[["clone_id"]]),
-		`Ploidy`   = as.character(round(grp %>% .[["best_ploidy_estimate"]])),
-		col = list(`Clone ID` = cluster_palette,
-				   `Plopidy` = ploidy_palette),
-		show_annotation_name = FALSE,
-		simple_anno_size = unit(3, "mm"),
-		annotation_legend_param = list(grid_height = unit(4, "mm"), grid_width = unit(4, "mm"))
-	)
-
-	pdf(url_output("byclone", "aggregated_cells_absolute_copies.pdf"), width = 7*2.5, height = 7*1.25)
-	draw(Heatmap(matrix = copy_number %>%
-						  dplyr::select(grp$barcode_id) %>%
-						  t(),
-				 col = cn_colors[as.character(0:opt$max_copies)],
-				 name = "CN",
-				 na_col = "#f0f0f0",
-				 rect_gp = gpar(col = NA, lwd = 0),
-				 border = NA,
-
-				 cluster_rows = FALSE,
-				 row_split = grp$clone_id,
-				 show_row_names = FALSE,
-				 row_title_gp = gpar(fontsize = 10),
-				 row_title_rot = 0,
-				 cluster_row_slices = TRUE,
-				 clustering_distance_rows = "manhattan",
-				 clustering_method_rows = "ward.D",
-				 show_row_dend = FALSE,
-
-				 cluster_columns = FALSE,
-				 column_split = copy_number %>% .[["Chromosome"]],
-				 show_column_names = FALSE,
-				 column_title_side = "bottom",
-				 column_title_gp = gpar(fontsize = 12),
-
-				 left_annotation = ha,
-
-				 use_raster = FALSE,
-				 show_heatmap_legend = TRUE,
-				 heatmap_legend_param = list(legend_height = unit(1, "cm"), legend_width = unit(1, "cm"))))
-	dev.off()
-}
-
-#==================================================
 # Dispatch
 #==================================================
 switch(as.character(opt$option),
@@ -1099,8 +1039,7 @@ switch(as.character(opt$option),
 	"2" = run_log2_plots(),
 	"3" = run_ploidy(),
 	"4" = run_absolute_plots(),
-	"5" = run_heatmap(),
+	"5" = run_clones(),
 	"6" = run_bygene_tables(),
-	"7" = run_bygene_plots(),
-	"8" = run_clones()
+	"7" = run_bygene_plots()
 )
