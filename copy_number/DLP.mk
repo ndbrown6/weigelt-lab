@@ -269,7 +269,7 @@ DLP/timestamp4.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timesta
 DLP/timestamp5.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timestamp3.txt
 	$(call RUN,-n 1 -s 12G -m 24G -p $(PROJECT_DIR)/DLP -N absolute -v $(DLP_ENV),"set -o pipefail && \
 																						 $(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
-																						 --option 4 \
+																						 --option 5 \
 																						 --ncores $(NCORES) \
 																						 --summary_dir $(SUMMARY_DIR) \
 																						 --output_dir $(OUTPUT_DIR) \
