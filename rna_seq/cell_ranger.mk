@@ -14,6 +14,8 @@ PROJECT_DIR := $(notdir $(CURDIR))
 
 comma := ,
 space := $(empty) $(empty)
+fq_prefix = $(shell for f in $(foreach s,$(split.$(1)),$(fq.$(s))); do basename $$f; done \
+            | sed -E 's/_S[0-9]+_L[0-9]+_[RI][12]_001\.fastq\.gz$$//' | sort -u | paste -sd, -)
 
 define cellranger-count
 cellranger/$1/outs/web_summary.html : $$(foreach split,$2,$$(fq.$$(split)))
@@ -24,7 +26,7 @@ cellranger/$1/outs/web_summary.html : $$(foreach split,$2,$$(fq.$$(split)))
 																																								  --id=$1 \
 																																								  --transcriptome=$(CELLRANGER_REF) \
 																																								  --fastqs=$$(subst $$(space),$$(comma),$$(abspath $$(sort $$(dir $$(foreach split,$2,$$(fq.$$(split))))))) \
-																																								  --sample=$1 \
+																																								  --sample=$$(call fq_prefix,$1) \
 																																								  --create-bam=true \
 																																								  --localcores=$(CELLRANGER_THREADS) \
 																																								  --localmem=64")
