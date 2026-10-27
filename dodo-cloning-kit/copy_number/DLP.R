@@ -7,7 +7,6 @@
 #   --option 4   Absolute copy number per cell
 #   --option 5   Clonal decomposition
 #   --option 6   Absolute copies, all bins
-#   --option 7   Marginal CN distribution/gene
 #
 # Tunable parameters
 #   QC gates          --min_total_reads --max_mapd --min_log2_ratio --fraction_empty_bins --min_ploidy
@@ -19,7 +18,7 @@
 #
 # Dependencies
 #   1 -> 2
-#   1 -> 3 -> 4, 5, 6 -> 7
+#   1 -> 3 -> 4, 5, 6
 
 suppressPackageStartupMessages({
 	library("optparse")
@@ -49,10 +48,8 @@ args_list <- list(
 				help = "Directory for output files [default: %default]"),
 	make_option("--sample_names", type = "character", default = NULL,
 				help = "Space-separated cell names e.g. '$(SAMPLES)'"),
-	make_option("--gene_coords", type = "character", default = "~/share/lib/bed_files/targets/IMPACT505/b37/gene_coords.txt",
+	make_option("--gene_coords", type = "character", default = "~/share/lib/bed_files/targets/IMPACT468/b37/gene_coords.txt",
 				help = "Path to gene coordinates table"),
-	make_option("--genes", type = "character", default = "MYC,CCNE1,MAPK3,CEBPA,KMT2B",
-				help = "Comma-separated genes to plot [default: %default]"),
 	make_option("--ncores", type = "integer", default = 12,
 				help = "Number of cores for per-cell loops [default: %default]"),
 
@@ -932,6 +929,7 @@ cn_colors = c("0" = "#a6cee3",
 
 	manifest = load_manifest(ploidy = TRUE)
 	log2_ratio = read_log2()
+	make_dir("summary")
 
 	gene_coords = read_tsv_typed(opt$gene_coords, col_names = FALSE) %>%
 				  dplyr::group_by(X2) %>%
@@ -940,10 +938,6 @@ cn_colors = c("0" = "#a6cee3",
 								   End_Position = max(X5)) %>%
 				  dplyr::rename(Hugo_Symbol = X2)
 
-	make_dir("smry")
-	make_dir("bygene")
-
-	# Segmentation is done once per cell and used for both the all-bins and the by-gene table
 	res = foreach (i=1:nrow(manifest)) %dopar% {
 
 		cell = segment_cell(log2_ratio, manifest$barcode_id[i])
@@ -979,7 +973,7 @@ cn_colors = c("0" = "#a6cee3",
 				  dplyr::mutate(Chromosome = factor(Chromosome, levels = chromosomes, ordered = TRUE),
 								Position = as.numeric(Position)) %>%
 				  dplyr::arrange(Chromosome, Position)
-	readr::write_tsv(x = copy_number, file = url_output("smry", "aggregated_cells_absolute_copies_all_bins.txt"),
+	readr::write_tsv(x = copy_number, file = url_output("summary", "aggregated_cells_absolute_copies_all_bins.txt"),
 					 append = FALSE, col_names = TRUE)
 
 	# 2. All genes
@@ -989,47 +983,10 @@ cn_colors = c("0" = "#a6cee3",
 								Start_Position = as.numeric(Start_Position),
 								End_Position = as.numeric(End_Position)) %>%
 				  dplyr::arrange(Chromosome, Start_Position, End_Position)
-	readr::write_tsv(x = copy_number, file = url_output("bygene", "aggregated_cells_absolute_copies_by_gene.txt"),
+	readr::write_tsv(x = copy_number, file = url_output("summary", "aggregated_cells_absolute_copies_by_gene.txt"),
 					 append = FALSE, col_names = TRUE)
 }
 
-# Option 7: Marginal CN distribution by gene —————————————————————————————————————————————
-'run_bygene_plots' <- function() {
-
-	genes_of_interest = trimws(strsplit(opt$genes, ",")[[1]])
-
-	copy_number = read_tsv_typed(url_output("bygene", "aggregated_cells_absolute_copies_by_gene.txt")) %>%
-				  reshape2::melt(id.vars = c("Hugo_Symbol", "Chromosome", "Start_Position", "End_Position"),
-								 variable.name = "barcode_id", value.name = "CN")
-
-	for (gene in genes_of_interest) {
-
-		data = copy_number %>%
-			   dplyr::filter(Hugo_Symbol == gene)
-		if (nrow(data) == 0) {
-			warning("Gene not found in by-gene table, skipping: ", gene)
-			next
-		}
-
-		plot_ = data %>%
-				ggplot(aes(x = CN)) +
-				geom_histogram(stat = "bin", position = "identity", fill = "steelblue", color = "steelblue", alpha = .25) +
-				scale_x_continuous(breaks = function(x) { unique(round(pretty(x, n = 5))) }) +
-				scale_y_continuous() +
-				xlab("Copy number") +
-				ylab("Number of cells") +
-				labs(title = paste0(gene, "\n")) +
-				theme_minimal() +
-				theme(axis.title.x = element_text(margin = margin(t = 20), size = 14),
-					  axis.title.y = element_text(margin = margin(r = 20), size = 14),
-					  axis.text.x = element_text(size = 12),
-					  axis.text.y = element_text(size = 12),
-					  plot.title = element_text(hjust = .5, face = "italic"))
-
-		save_pdf(plot_, url_output("bygene", paste0("marginal_distribution_cells_", gene, ".pdf")),
-				 width = 3, height = 4)
-	}
-}
 
 #==================================================
 # Dispatch
@@ -1040,6 +997,5 @@ switch(as.character(opt$option),
 	"3" = run_ploidy(),
 	"4" = run_absolute_plots(),
 	"5" = run_clones(),
-	"6" = run_bygene_tables(),
-	"7" = run_bygene_plots()
+	"6" = run_bygene_tables()
 )

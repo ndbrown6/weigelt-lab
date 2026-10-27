@@ -17,7 +17,8 @@ bwamem : $(foreach sample,$(SAMPLES),bam/$(sample).bam) \
 		 DLP/timestamp2.txt \
 		 DLP/timestamp3.txt \
 		 DLP/timestamp4.txt \
-		 DLP/timestamp5.txt
+		 DLP/timestamp5.txt \
+		 DLP/timestamp6.txt
 
 BWAMEM_THREADS = 8
 BWAMEM_MEM_PER_THREAD = 2G
@@ -283,6 +284,20 @@ DLP/timestamp5.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timesta
 																				--clone_height $(CLONE_HEIGHT) \
 																				--clone_linkage $(CLONE_LINKAGE) && \
 																				touch $(@)")
+																				
+DLP/timestamp6.txt : summary/aggregated_log2.txt DLP/QC/manifest.txt DLP/timestamp3.txt
+	$(call RUN,-n $(NCORES) -s 4G -m 6G -p $(PROJECT_DIR)/DLP -N summary -v $(DLP_ENV),"set -o pipefail && \
+																						$(RSCRIPT) $(SCRIPTS_DIR)/copy_number/DLP.R \
+																						--option 6 \
+																						--ncores $(NCORES) \
+																						--summary_dir $(SUMMARY_DIR) \
+																						--output_dir $(OUTPUT_DIR) \
+																						--min_total_reads $(MIN_TOTAL_READS) \
+																						--max_mapd $(MAX_MAPD) \
+																						--min_ploidy $(MIN_PLOIDY) \
+																						--winsorize_tau $(WINSORIZE_TAU) \
+																						--winsorize_k $(WINSORIZE_K) && \
+																						touch $(@)")
 																				   
 ..DUMMY := $(shell mkdir -p version; \
 	     $(BWA) &> version/tmp.txt; \
