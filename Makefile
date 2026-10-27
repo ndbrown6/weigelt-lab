@@ -135,7 +135,7 @@ kallisto_quant :
 	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
 
 TARGETS += cell_ranger
-cell_range :
+cell_ranger :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/cell_ranger.mk clean
 	
