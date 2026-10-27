@@ -42,6 +42,7 @@ VARIANT_ANNOTATION_ENV = $(HOME)/share/env/r-variantannotation-1.44.0
 FPFILTER_ENV = $(HOME)/share/env/fpfilter-0.0.1
 QDNASEQ_ENV = $(HOME)/share/env/r-qdnaseq-1.42.0
 DLP_ENV = $(HOME)/share/env/r-dlp-0.0.1
+CELLRANGE_ENV = $(HOME)/share/env/cellranger-10.1.0
 
 # aliases
 PYTHON ?= python

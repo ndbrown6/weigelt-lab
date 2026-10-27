@@ -4,6 +4,10 @@ LOGDIR = log/cell_ranger.$(NOW)
 
 cellranger : $(foreach sample,$(SAMPLES),cellranger/$(sample)/outs/web_summary.html)
 
+CELLRANGER_THREADS ?= 16
+CELLRANGER_MEM_THREAD ?= 5G
+CELLRANGER_WALL_TIME ?= 48:00:00
+
 PROJECT_DIR := $(notdir $(CURDIR))
 
 comma := ,
@@ -11,17 +15,18 @@ space := $(empty) $(empty)
 
 define cellranger-count
 cellranger/$1/outs/web_summary.html : $$(foreach split,$2,$$(fq.$$(split)))
-	$$(call RUN,-c -n 16 -s 4G -m 5G -p $(PROJECT_DIR)/star -N $1/cellranger -v $(CELLRANGER_ENV) -w 48:00:00,"set -o pipefail && \
-																											   mkdir -p cellranger && \
-																											   cd cellranger && \
-																											   cellranger count \
-																											   --id=$1 \
-																											   --transcriptome=$(CELLRANGER_REF) \
-																											   --fastqs=$$(subst $$(space),$$(comma),$$(abspath $$(sort $$(dir $$(foreach split,$2,$$(fq.$$(split))))))) \
-																											   --sample=$1 \
-																											   --create-bam=true \
-																											   --localcores=16 \
-																											   --localmem=64")
+	$$(call RUN,-c -n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N $1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
+																																								  mkdir -p cellranger/$1 && \
+																																								  cd cellranger && \
+																																								  cellranger count \
+																																								  --id=$1 \
+																																								  --transcriptome=$(CELLRANGER_REF) \
+																																								  --fastqs=$$(subst $$(space),$$(comma),$$(abspath $$(sort $$(dir $$(foreach split,$2,$$(fq.$$(split))))))) \
+																																								  --sample=$1 \
+																																								  --create-bam=true \
+																																								  --localcores=$(CELLRANGER_THREADS) \
+																																								  --localmem=64")
+
 endef
 $(foreach sample,$(SAMPLES),\
         $(eval $(call cellranger-count,$(sample),$(split.$(sample)))))
