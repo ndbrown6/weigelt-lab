@@ -134,11 +134,16 @@ kallisto_quant :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/kallisto_quant.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
 
+TARGETS += cell_ranger
+cell_range :
+	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk) && \
+	$(MAKE) -f weigelt-lab/rna_seq/cell_ranger.mk clean
+	
 TARGETS += immune_deconvolution
 immune_deconvolution :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/immune_deconvolution.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/immune_deconvolution.mk clean
-
+	
 #==================================================
 # DNA structural variant callers
 #==================================================
