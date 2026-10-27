@@ -27,7 +27,7 @@ $(foreach sample,$(SAMPLES),\
         $(eval $(call cellranger-count,$(sample),$(split.$(sample)))))
         
 ..DUMMY := $(shell mkdir -p version; \
-	~/share/env/cellranger-10.1.0/bin/cellranger --version >> version/cell_ranger.txt;)
+	~/share/env/cellranger-10.1.0/opt/cellranger-10.1.0/cellranger --version >> version/cell_ranger.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
 .PHONY: cellranger clean
