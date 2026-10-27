@@ -20,7 +20,7 @@ fq_prefix = $(shell for f in $(foreach s,$(split.$(1)),$(fq.$(s))); do basename 
 define cellranger-count
 cellranger/$1/outs/web_summary.html : $$(foreach split,$2,$$(fq.$$(split)))
 	$$(call RUN,-c -n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N $1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
-																																								  mkdir -p cellranger/$1 && \
+																																								  mkdir -p cellranger && \
 																																								  cd cellranger && \
 																																								  cellranger count \
 																																								  --id=$1 \
