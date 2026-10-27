@@ -8,7 +8,7 @@ CELLRANGER_THREADS ?= 16
 CELLRANGER_MEM_THREAD ?= 5G
 CELLRANGER_WALL_TIME ?= 48:00:00
 
-CELLRANGER_REF ?= $(HOME)/share/lib/ref_files/10X/refdata-gex-GRCm39-2024-A
+CELLRANGER_REF ?= $(HOME)/share/lib/ref_files/10X/refdata-gex-GRCh38-2024-A
 
 PROJECT_DIR := $(notdir $(CURDIR))
 
