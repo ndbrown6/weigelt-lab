@@ -17,7 +17,7 @@ ENSEMBL = $(HOME)/share/lib/resource_files/Ensemble_b37.RData
 STAR_REF = $(REF_DIR)/STAR_b37
 KALLISTO_INDEX = $(REF_DIR)/b37/ensembl_v75-0.43.0_kallisto_index
 REF_MSI = $(REF_DIR)/b37/human_g1k_v37.msi
-CELLRANGER_REF ?= $(HOME)/share/lib/ref_files/10X/
+CELLRANGER_REF ?= $(HOME)/share/lib/ref_files/10X/refdata-gex-GRCh38-2024-A
 
 endif
 B37_INC = true
