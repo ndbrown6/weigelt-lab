@@ -20,22 +20,37 @@ fq_prefix = $(shell for f in $(foreach s,$(split.$(1)),$(fq.$(s))); do basename 
 
 define cellranger-count
 cellranger/$1/outs/web_summary.html : $$(foreach split,$2,$$(fq.$$(split)))
-	$$(call RUN,-c -n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N $1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
-																																								  mkdir -p cellranger && \
-																																								  cd cellranger && \
-																																								  rm -rf $1 2>/dev/null || true && \
-																																								  cellranger count \
-																																								  --id=$1 \
-																																								  --transcriptome=$(CELLRANGER_REF) \
-																																								  --fastqs=$$(subst $$(space),$$(comma),$$(abspath $$(sort $$(dir $$(foreach split,$2,$$(fq.$$(split))))))) \
-																																								  --sample=$$(call fq_prefix,$1) \
-																																								  --create-bam=true \
-																																								  --localcores=$(CELLRANGER_THREADS) \
-																																								  --localmem=64")
+	$$(call RUN,-c -n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N count/$1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
+																																										mkdir -p cellranger && \
+																																										cd cellranger && \
+																																										rm -rf $1 2>/dev/null || true && \
+																																										cellranger count \
+																																										--id=$1 \
+																																										--transcriptome=$(CELLRANGER_REF) \
+																																										--fastqs=$$(subst $$(space),$$(comma),$$(abspath $$(sort $$(dir $$(foreach split,$2,$$(fq.$$(split))))))) \
+																																										--sample=$$(call fq_prefix,$1) \
+																																										--create-bam=true \
+																																										--localcores=$(CELLRANGER_THREADS) \
+																																										--localmem=64")
 
 endef
 $(foreach sample,$(SAMPLES),\
         $(eval $(call cellranger-count,$(sample),$(split.$(sample)))))
+        
+define cellranger-multi
+cellranger/$1/timestamp.txt : $$(foreach split,$2,$$(fq.$$(split)))
+	$$(call RUN,-c -n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N multi/$1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
+																																										mkdir -p cellranger && \
+																																										cd cellranger && \
+																																										rm -rf $1 2>/dev/null || true && \
+																																										cellranger multi \
+																																										--id=$1 \
+																																										--localcores=$(CELLRANGER_THREADS) \
+																																										--localmem=64")
+
+endef
+$(foreach sample,$(SAMPLES),\
+        $(eval $(call cellranger-multi,$(sample),$(split.$(sample)))))
         
 ..DUMMY := $(shell mkdir -p version; \
 	~/share/env/cellranger-10.1.0/opt/cellranger-10.1.0/cellranger --version >> version/cell_ranger.txt;)
