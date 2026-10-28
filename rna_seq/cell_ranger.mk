@@ -2,7 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/cell_ranger.$(NOW)
 
-cellranger : $(foreach sample,$(SAMPLES),cellranger/$(sample)/outs/web_summary.html)
+count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/outs/web_summary.html)
+multi: $(foreach sample,$(SAMPLES),cellranger/$(sample)/timestamp.txt)
 
 CELLRANGER_THREADS ?= 16
 CELLRANGER_MEM_THREAD ?= 5G
@@ -40,6 +41,6 @@ $(foreach sample,$(SAMPLES),\
 	~/share/env/cellranger-10.1.0/opt/cellranger-10.1.0/cellranger --version >> version/cell_ranger.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: cellranger clean
+.PHONY: count clean
 
 clean:

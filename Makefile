@@ -134,9 +134,9 @@ kallisto_quant :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/kallisto_quant.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/kallisto_quant.mk clean
 
-TARGETS += cell_ranger
-cell_ranger :
-	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk) && \
+TARGETS += cell_ranger_count
+cell_ranger_count :
+	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk count) && \
 	$(MAKE) -f weigelt-lab/rna_seq/cell_ranger.mk clean
 	
 TARGETS += immune_deconvolution
