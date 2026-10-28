@@ -41,6 +41,6 @@ $(foreach sample,$(SAMPLES),\
 	~/share/env/cellranger-10.1.0/opt/cellranger-10.1.0/cellranger --version >> version/cell_ranger.txt;)
 .SECONDARY:
 .DELETE_ON_ERROR:
-.PHONY: count clean
+.PHONY: count multi clean
 
 clean:
