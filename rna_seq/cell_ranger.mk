@@ -44,7 +44,7 @@ cellranger/$1/timestamp.txt : $$(foreach split,$2,$$(fq.$$(split)))
 																																										rm -rf $1 2>/dev/null || true && \
 																																										cellranger multi \
 																																										--id=$1 \
-																																										--csv=$(CURDIR)/config/config.csv \
+																																										--csv=../config/config.csv \
 																																										--localcores=$(CELLRANGER_THREADS) \
 																																										--localmem=64"")
 
