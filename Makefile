@@ -139,13 +139,13 @@ immune_deconvolution :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/immune_deconvolution.mk) && \
 	$(MAKE) -f weigelt-lab/rna_seq/immune_deconvolution.mk clean
 	
-TARGETS += cell_ranger_count
-cell_ranger_count :
+TARGETS += cellranger_count
+cellranger_count :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk count) && \
 	$(MAKE) -f weigelt-lab/rna_seq/cell_ranger.mk clean
 
-TARGETS += cell_ranger_multi
-cell_ranger_multi :
+TARGETS += cellranger_multi
+cellranger_multi :
 	$(call RUN_MAKE,weigelt-lab/rna_seq/cell_ranger.mk multi) && \
 	$(MAKE) -f weigelt-lab/rna_seq/cell_ranger.mk clean
 	
