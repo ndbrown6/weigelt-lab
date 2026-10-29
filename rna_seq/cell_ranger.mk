@@ -61,3 +61,4 @@ $(foreach sample,$(SAMPLES),\
 .PHONY: count multi clean
 
 clean:
+	rm -f cellranger/*/timestamp.*.txt
