@@ -49,6 +49,6 @@ if (as.numeric(opt$option)==2) {
 
 	tx[["percent.mt"]] = PercentageFeatureSet(tx, pattern = "^mt-")
 	tx$group = NA_character_
-	write.table(x = data.frame(cell = colnames(tx), tx@meta.data), file = sub("\\.rds$", ".txt", out_file), sep = "\t", row.names = FALSE)
+	write.table(x = data.frame(cell = colnames(tx), tx@meta.data), file = sub("\\.RData$", ".txt", out_file), sep = "\t", row.names = FALSE)
 	save(tx, file = out_file)
 }
