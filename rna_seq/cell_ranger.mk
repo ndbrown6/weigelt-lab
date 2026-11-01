@@ -3,7 +3,7 @@ include weigelt-lab/Makefile.inc
 LOGDIR = log/cell_ranger.$(NOW)
 
 count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
-multi: $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
+multi : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
 
 CELLRANGER_THREADS ?= 16
 CELLRANGER_MEM_THREAD ?= 5G
