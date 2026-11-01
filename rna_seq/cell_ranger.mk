@@ -2,7 +2,7 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/cell_ranger.$(NOW)
 
-count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/timestamp.count.txt)
+count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
 multi: $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
 
 CELLRANGER_THREADS ?= 16
@@ -18,7 +18,7 @@ fq_prefix = $(shell for f in $(foreach s,$(split.$(1)),$(fq.$(s))); do basename 
             | sed -E 's/_S[0-9]+_L[0-9]+_[RI][12]_001\.fastq\.gz$$//' | sort -u | paste -sd, -)
 
 define cellranger-count
-cellranger/$1/timestamp.count.txt : $$(foreach split,$2,$$(fq.$$(split)))
+cellranger/$1/timestamp.txt : $$(foreach split,$2,$$(fq.$$(split)))
 	$$(call RUN,-n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N count/$1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
 																																									 mkdir -p cellranger && \
 																																									 cd cellranger && \
@@ -31,14 +31,21 @@ cellranger/$1/timestamp.count.txt : $$(foreach split,$2,$$(fq.$$(split)))
 																																									 --create-bam=true \
 																																									 --localcores=$(CELLRANGER_THREADS) \
 																																									 --localmem=64 && \
-																																									 touch timestamp.count.txt")
+																																									 touch $1/timestamp.txt")
 
+cellranger/$1/$1.RData : cellranger/$1/timestamp.txt
+	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/cellranger -N summarize/$1 -v $(SEURAT_ENV),"set -o pipefail && \
+																									 $(RSCRIPT) $(SCRIPTS_DIR)/rna_seq/summarize_cellranger.R \
+																									 --option 1 \
+																									 --sample_name $1 \
+																									 --out_file $$(@)")
+																									 
 endef
 $(foreach sample,$(SAMPLES),\
         $(eval $(call cellranger-count,$(sample),$(split.$(sample)))))
         
 define cellranger-multi
-cellranger/$1/timestamp.multi.txt : $$(foreach split,$2,$$(fq.$$(split)))
+cellranger/$1/timestamp.txt : $$(foreach split,$2,$$(fq.$$(split)))
 	$$(call RUN,-n $(CELLRANGER_THREADS) -s 3G -m $(CELLRANGER_MEM_THREAD) -p $(PROJECT_DIR)/cellranger -N multi/$1 -v $(CELLRANGER_ENV) -w $(CELLRANGER_WALL_TIME),"set -o pipefail && \
 																																									 mkdir -p cellranger && \
 																																									 cd cellranger && \
@@ -48,9 +55,9 @@ cellranger/$1/timestamp.multi.txt : $$(foreach split,$2,$$(fq.$$(split)))
 																																									 --csv=../config/config.csv \
 																																									 --localcores=$(CELLRANGER_THREADS) \
 																																									 --localmem=64 && \
-																																									 touch timestamp.multi.txt")
+																																									 touch $1/timestamp.txt")
 																																									 
-cellranger/$1/$1.RData : cellranger/$1/timestamp.multi.txt
+cellranger/$1/$1.RData : cellranger/$1/timestamp.txt
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/cellranger -N summarize/$1 -v $(SEURAT_ENV),"set -o pipefail && \
 																									 $(RSCRIPT) $(SCRIPTS_DIR)/rna_seq/summarize_cellranger.R \
 																									 --option 2 \
@@ -68,4 +75,4 @@ $(foreach sample,$(SAMPLES),\
 .PHONY: count multi clean
 
 clean:
-	rm -f cellranger/*/timestamp.*.txt
+	rm -f cellranger/*/timestamp.txt
