@@ -2,10 +2,8 @@ include weigelt-lab/Makefile.inc
 
 LOGDIR = log/cell_ranger.$(NOW)
 
-count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/timestamp.count.txt) \
-		$(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
-
-multi : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).RData)
+count : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).count.RData)
+multi : $(foreach sample,$(SAMPLES),cellranger/$(sample)/$(sample).multi.RData)
 
 CELLRANGER_THREADS ?= 16
 CELLRANGER_MEM_THREAD ?= 5G
@@ -35,7 +33,7 @@ cellranger/$1/timestamp.count.txt : $$(foreach split,$2,$$(fq.$$(split)))
 																																									 --localmem=64 && \
 																																									 touch $1/timestamp.txt")
 
-cellranger/$1/$1.RData : cellranger/$1/timestamp.count.txt
+cellranger/$1/$1.count.RData : cellranger/$1/timestamp.count.txt
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/cellranger -N summarize/$1 -v $(SEURAT_ENV),"set -o pipefail && \
 																									 $(RSCRIPT) $(SCRIPTS_DIR)/rna_seq/summarize_cellranger.R \
 																									 --option 1 \
@@ -59,7 +57,7 @@ cellranger/$1/timestamp.multi.txt : $$(foreach split,$2,$$(fq.$$(split)))
 																																									 --localmem=64 && \
 																																									 touch $1/timestamp.txt")
 																																									 
-cellranger/$1/$1.RData : cellranger/$1/timestamp.multi.txt
+cellranger/$1/$1.multi.RData : cellranger/$1/timestamp.multi.txt
 	$$(call RUN,-c -n 1 -s 12G -m 24G -p $(PROJECT_DIR)/cellranger -N summarize/$1 -v $(SEURAT_ENV),"set -o pipefail && \
 																									 $(RSCRIPT) $(SCRIPTS_DIR)/rna_seq/summarize_cellranger.R \
 																									 --option 2 \
