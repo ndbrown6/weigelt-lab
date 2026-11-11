@@ -38,13 +38,14 @@ MSISENSOR_ENV ?= $(HOME)/share/env/msisensor-0.5/
 MSISENSOR_PRO_ENV ?= $(HOME)/share/env/msisensor-pro-1.3.0/
 POLYSOLVER_ENV ?= $(HOME)/share/env/hla-polysolver-0.0.1
 SIGNATURE_TOOLS_ENV ?= $(HOME)/share/env/r-signature.tools.lib-2.2.0
-VARIANT_ANNOTATION_ENV = $(HOME)/share/env/r-variantannotation-1.44.0
-FPFILTER_ENV = $(HOME)/share/env/fpfilter-0.0.1
-QDNASEQ_ENV = $(HOME)/share/env/r-qdnaseq-1.42.0
-DLP_ENV = $(HOME)/share/env/r-dlp-0.0.1
-CELLRANGER_ENV = $(HOME)/share/env/cellranger-10.1.0
-SEURAT_ENV = $(HOME)/share/env/r-seurat-5.5.1
-MIXCR_ENV = $(HOME)/share/env/mixcr-4.7.0
+VARIANT_ANNOTATION_ENV ?= $(HOME)/share/env/r-variantannotation-1.44.0
+FPFILTER_ENV ?= $(HOME)/share/env/fpfilter-0.0.1
+QDNASEQ_ENV ?= $(HOME)/share/env/r-qdnaseq-1.42.0
+DLP_ENV ?= $(HOME)/share/env/r-dlp-0.0.1
+CELLRANGER_ENV ?= $(HOME)/share/env/cellranger-10.1.0
+SEURAT_ENV ?= $(HOME)/share/env/r-seurat-5.5.1
+MIXCR_ENV ?= $(HOME)/share/env/mixcr-4.7.0
+SAMTOOLS_119_ENV = $(HOME)/share/env/samtools-1.19.2
 
 # aliases
 PYTHON ?= python
