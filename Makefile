@@ -172,6 +172,11 @@ TARGETS += delly_tumor_normal
 delly_tumor_normal :
 	$(call RUN_MAKE,weigelt-lab/sv_callers/delly_tumor_normal.mk) && \
 	$(MAKE) -f weigelt-lab/sv_callers/delly_tumor_normal.mk clean
+	
+TARGETS += mixcr_tumor_normal
+mixcr_tumor_normal :
+	$(call RUN_MAKE,weigelt-lab/sv_callers/mixcr_tumor_normal.mk) && \
+	$(MAKE) -f weigelt-lab/sv_callers/mixcr_tumor_normal.mk clean
 
 #==================================================
 # RNA fusion callers

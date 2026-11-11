@@ -44,6 +44,7 @@ QDNASEQ_ENV = $(HOME)/share/env/r-qdnaseq-1.42.0
 DLP_ENV = $(HOME)/share/env/r-dlp-0.0.1
 CELLRANGER_ENV = $(HOME)/share/env/cellranger-10.1.0
 SEURAT_ENV = $(HOME)/share/env/r-seurat-5.5.1
+MIXCR_ENV = $(HOME)/share/env/mixcr-4.7.0
 
 # aliases
 PYTHON ?= python
