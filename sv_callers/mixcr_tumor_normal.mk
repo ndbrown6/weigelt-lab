@@ -103,6 +103,7 @@ mixcr/$1/clones.clns : mixcr/$1/alignments_rescued_3_extended.vdjca
 mixcr/$1/taskcomplete.txt : mixcr/$1/clones.clns
 	$$(call RUN,-n 8 -s 2G -m 4G -p $(PROJECT_DIR)/mixcr -N $1/exportClones -v $(MIXCR_ENV),"set -o pipefail && \
 																							 mixcr exportClones \
+																							 --split-files-by chain \
 																							 $$(<) \
 																							 $$(@D)/clones.tsv & \
 																							 touch $$(@)")
